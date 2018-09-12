@@ -2,6 +2,8 @@
 
 The Public Invention Math-a-thon is dedicated to a harassment-free virtual-conference experience for everyone. Our anti-harassment policy can be found at:
 
+https://github.com/PubInv/Simplex-a-thon/blob/master/anti-harrassment-policy.txt
+
 Long public version
 
 The Public Invention Math-a-thon is dedicated to providing a harassment-free virtual conference experience for everyone regardless of math skill, native language, gender, gender identity and expression, sexual orientation, disability, physical appearance, body size, race, age or religion. We do not tolerate harassment of virtual conference participants in any form. Sexual language and imagery is not appropriate for any virtual conference venue, including talks. Virtual Conference participants violating these rules may be sanctioned or expelled from the virtual conference at the discretion of the virtual conference organizers.
@@ -31,5 +33,8 @@ Report
 You can make a personal report by emailing Robert L. Read at <read.robert@gmail.com>, direct messaging Rob in the Slack channel,
 or calling Rob's phone number which will be made prominently available in the electronic forums at the time of the hackathon.
 
+Acknowledgement
+
+This anti-harassment policy is based on the example policy from the Geek Feminism wiki, created by the Ada Initiative and other volunteers.
 
 
