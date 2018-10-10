@@ -3,4 +3,4 @@ Organizing for a math research cooperative hackathon around "open" problems with
 
 ## The Platform
 
-We have written a [platform](~/platforms/index.html) for testing 2D simplex generators.
+We have written a [platform](platforms/index.html) for testing 2D simplex generators.
