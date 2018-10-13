@@ -277,5 +277,20 @@ function markNextTriangle() {
     x_t += 1;
     y_t += 1;
 }
+function plot_polar(r,theta) {
+    var y = r*Math.sin(theta);
+    var x = r*Math.cos(theta);
+    render_spot(x,y,"black");
+}
 
-// renderTriangle();
+function drawGoldenSpiral() {
+    const phi = (1 + Math.sqrt(5))/2.0;
+    const contraction = 2;
+    for(var theta = 0; theta < 20; theta += 0.05) {
+	r = Math.pow(phi,theta*2/Math.PI)/contraction;
+	console.log(theta);
+	plot_polar(r,theta);
+    }
+    
+}
+
