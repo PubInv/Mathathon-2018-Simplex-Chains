@@ -54,7 +54,7 @@ initial_generators["hex"] = '(n) => { return ((n < 6) ?  "L" : "S"); }';
 // The rand generator is not guaranteed not to self-collide!
 initial_generators["rand"] = '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }';
 
-initial_generators["bighex"] = '(n) => {  return ((n % 10) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
+initial_generators["triangle"] = '(n) => {  return ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
 
 
 function step(tx,ty,f,n) {    
@@ -64,7 +64,7 @@ function step(tx,ty,f,n) {
     dir = (dir + 60)%360;
     break;
   case 'R':
-    dir = (dir - 60)%360;
+    dir = (dir + 300 )%360;
   break;
   case 'S':
     executeButton.disabled = false;
