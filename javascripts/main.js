@@ -31,10 +31,6 @@ var EXAMPLE_GENERATORS = {
 var params = { width: 1000, height: 1000 };
 var two = new Two(params).appendTo(elem);
 
-// var tx = 0;
-// var ty = 0;
-var dir = 90;
-
 // Page Elements
 
 var executeButton = document.getElementById("execute-button");
@@ -54,7 +50,7 @@ function generator(n) {
     return ((n < 6) ? "L" : "S");
 }
 
-function step(tx,ty,f,n) {    
+function step(tx, ty, dir, f, n) {    
   var action = n < MAX_STEPS ? f(n) : 'S';
   switch(action) {
   case 'L':
@@ -85,7 +81,7 @@ function step(tx,ty,f,n) {
   console.log("Turning " + action + ". New direction " + dir + ". New location (" + tx + ", " + ty + ").");
     //  mark_triangle(tx, ty, n);
     renderTriangle(tx,ty,n);
-    setTimeout(step, INTERVAL,tx,ty,f,n+1);
+    setTimeout(step, INTERVAL, tx, ty, dir, f, n+1);
 }
 
 function createGrid(s) {
@@ -325,7 +321,7 @@ function executeGenerator() {
         try {
             two.clear();
             draw_empty_grid();
-            setTimeout(step, INTERVAL,0,0,new_func,0);	    
+            setTimeout(step, INTERVAL, 0, 0, 90, new_func, 0);	    
         } catch(err) {
             funcstatus.innerHTML = "On Evaluation:" + err.message;
         }
