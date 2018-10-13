@@ -20,6 +20,8 @@
 var INTERVAL = 100; // Milliseconds between steps
 var MAX_STEPS = 100;
 var TWO_PARAMS = { width: 1000, height: 1000 };
+var WIDTH = 10.0;
+var HEIGHT = 10.0;
 
 // The rand generator is not guaranteed not to self-collide!
 var EXAMPLE_GENERATORS = {
@@ -94,112 +96,69 @@ function step(tx, ty, dir, f, n) {
 }
 
 function createGrid(s) {
-
     var size = s || 30;
-
     for(var j = -s; j < s; j++) {
         var x0 = -s;
         var y0 = j;
         var x1 = s;
         var y1 = j;
-
         var p0 = transform_to_viewport(new THREE.Vector2(x0,y0));
         var p1 = transform_to_viewport(new THREE.Vector2(x1,y1));
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
     }
-
     for(var j = -s; j < s; j++) {
         var x0 = j;
         var y0 = s;
-        
         var x1 = j+s;
         var y1 = -s;
-
         var p0 = transform_to_viewport(new THREE.Vector2(x0,y0));
         var p1 = transform_to_viewport(new THREE.Vector2(x1,y1));
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
-
         var x1 = j+-s;
-        
         var p1 = transform_to_viewport(new THREE.Vector2(x1,y1));
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
     }
-
-    two.update();
 }
 
-var w = 10.0;
-var h = 10.0;
-
 function createTriangleGrid(s) {
-
     var size = s || 30;
     for(var i = -s; i < s; i++) {
         for(var j = -s; j < s; j++) {
             render_spot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue');
         }
     }
-    two.update();
 }
 
-// Input is a THREE.Vector2, out put an [x,y] array...
+// Input is a THREE.Vector2, output an [x,y] array...
 function transform_to_viewport(pnt) {
-
     // Let's assume our play space is from -10 to + 10, centered on the origin...
-
     var x = pnt.x;
     var y = pnt.y;
     // first scale appropriately
-    x = x * (TWO_PARAMS.width / (2 * w));
-    y = y * (TWO_PARAMS.height / (2 * h));    
+    x = x * (TWO_PARAMS.width / (2 * WIDTH));
+    y = y * (TWO_PARAMS.height / (2 * HEIGHT));    
     // now move to origin....
     x += TWO_PARAMS.width/2;
     y = (-y) + TWO_PARAMS.height/2;
-
     // These adjust our weird grid background to the origin...
     //    y = y + params.height / (2 *(2 * h));
     //    x = x + params.width / (2 * (2 * w)) ;
     return [x,y];
 }
 
-function transform_from_viewport(x,y) {
-
-    // now move to origin...
-    x = x - (TWO_PARAMS.width)/2;
-    y = y - (TWO_PARAMS.height)/2;
-
-    // then unscale..
-    x = x / (TWO_PARAMS.width / (2*w));
-    y = - y / (TWO_PARAMS.height / (2*h));    
-    
-    return [x,y];
-}
-
-function test_transforms() {
-    for(var x = -10; x < 10; x++) {
-        for(var y = -10; y < 10; y++) {
-            var p = transform_from_viewport(x,y);
-            var v = new THREE.Vector2(p[0],p[1]);
-            var r = transform_to_viewport(v);
-            console.log(x,y);
-            console.log(r);
-            
-    //	    assert(r.x == x);
-    //	    assert(r.y == y);
-        }
-    }
-}
-
-function render_origin() {
-    var origin = transform_to_viewport(new THREE.Vector2(o0,0));
-    var circle = two.makeCircle(origin[0], origin[1], 2);
-    circle.fill = '#000000';
-    circle.stroke = 'black'; // Accepts all valid css color
-    circle.linewidth = 2;
-}
+// Not currently used:
+// function transform_from_viewport(x,y) {
+//     // now move to origin...
+//     x = x - (TWO_PARAMS.width)/2;
+//     y = y - (TWO_PARAMS.height)/2;
+//     // then unscale..
+//     x = x / (TWO_PARAMS.width / (2*WIDTH));
+//     y = - y / (TWO_PARAMS.height / (2*HEIGHT));    
+//     return [x,y];
+// }
 
 function render_spot(x,y,color) {
     var pnt = transform_to_viewport(new THREE.Vector2(x,y));
@@ -216,15 +175,6 @@ function draw_empty_grid() {
     two.update();
 }
 
-// This function converts "Triangle coordinates" into a point close to the center 
-// of the "Cartesian coordinate" triangle
-function cartesian_spot_triangle(x,y) {
-    var ctx,cty;
-    ctx = x/2.0;
-    cty = y - 0.5;
-    return {x: ctx, y: cty};
-}
-
 // compute the 3 vertices (in cartesian cooreds) of Triangle x,y
 function vertices_of_triangle(x,y) {
     // first let us decide if the triangle is upwardpointing..
@@ -234,21 +184,21 @@ function vertices_of_triangle(x,y) {
     var bx,by;
     var cx,cy;
     if (((x+y) % 2) == 0) {
-	// this is up
-	ax = x/2.0;
-	ay = y;
-	bx = ax - 0.5;
-	by = y - 1.0;
-	cx = ax + 0.5;
-	cy = y - 1.0;
+        // this is up
+        ax = x/2.0;
+        ay = y;
+        bx = ax - 0.5;
+        by = y - 1.0;
+        cx = ax + 0.5;
+        cy = y - 1.0;
     } else {
-	// this is down
-	ax = (x/2.0);	
-	ay = y - 1.0;
-	bx = ax + 0.5;
-	by = y;
-	cx = ax - 0.5;
-	cy = y;
+        // this is down
+        ax = (x/2.0);	
+        ay = y - 1.0;
+        bx = ax + 0.5;
+        by = y;
+        cx = ax - 0.5;
+        cy = y;
     }
     return [ax,ay,bx,by,cx,cy];
 }
@@ -265,14 +215,10 @@ function color(c) {
 
 function renderTriangle(x,y,c) {
     var v = vertices_of_triangle(x,y);
-
     var vpa = transform_to_viewport(new THREE.Vector2(v[0],v[1]));
     var vpb = transform_to_viewport(new THREE.Vector2(v[2],v[3]));
     var vpc = transform_to_viewport(new THREE.Vector2(v[4],v[5]));    
-    var path = two.makePath(vpa[0],vpa[1],
-			    vpb[0],vpb[1],
-			    vpc[0],vpc[1],
- 		       false);
+    var path = two.makePath(vpa[0], vpa[1], vpb[0], vpb[1], vpc[0], vpc[1], false);
     path.linewidth = 2;
     path.stroke = "#000000";
     path.fill = color(c);
@@ -291,7 +237,6 @@ function drawGoldenSpiral() {
     const contraction = 2;
     for(var theta = 0; theta < 20; theta += 0.05) {
         r = Math.pow(phi,theta*2/Math.PI)/contraction;
-        console.log(theta);
         plot_polar(r,theta);
     }
     two.update();
