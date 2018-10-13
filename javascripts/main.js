@@ -52,6 +52,8 @@ initial_generators["hex"] = '(n) => { return ((n < 6) ?  "L" : "S"); }';
 // The rand generator is not guaranteed not to self-collide!
 initial_generators["rand"] = '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }';
 
+initial_generators["bighex"] = '(n) => {  return ((n % 10) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
+
 
 function step(tx,ty,f,n) {    
   var action = n < MAX_STEPS ? f(n) : 'S';
