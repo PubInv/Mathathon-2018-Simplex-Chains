@@ -3,11 +3,63 @@
 // Make an instance of two and place it on the page.
 var elem = document.getElementById('visualsection');
 
+var INTERVAL = 1000; // Milliseconds between steps≥
+
 var TARGET_X = 0;
 var TARGET_Y = 0;
 
 var params = { width: 1000, height: 1000 };
 var two = new Two(params).appendTo(elem);
+
+var n = 0;
+var tx = 0;
+var ty = 0;
+var dir = 90;
+
+function start() {
+  // TODO: clear triangles?
+  n = 0;
+  setTimeout(step, INTERVAL);
+}
+
+function generator(n) {
+    return ((n < 6) ? "L" : "S");
+}
+
+function step() {
+
+  var action = generator(n++);
+
+  switch(action) {
+  case 'L':
+    dir = (dir + 60)%360;
+    break;
+  case 'R':
+    dir = (dir - 60)%360;
+  break;
+  case 'S':
+    console.log("Stopping.");
+    return;
+  }
+
+  switch(dir) {
+  case 30:
+  case 330:
+    tx++; break;
+  case 90:
+    ty++;
+    break;
+  case 150:
+  case 210:
+    tx--; break;
+  case 270:
+    ty--;
+    break;
+  }
+  console.log("Turning " + action + ". New direction " + dir + ". New location (" + tx + ", " + ty + ").");
+  mark_triangle(tx, ty, n);
+  setTimeout(step, INTERVAL);
+}
 
 function createGrid(s) {
 
@@ -140,6 +192,7 @@ createTrinagleGrid(30);
 render_spot(0.0,0.0,'red');
 two.update();
 
+setTimeout(start, 1000);
 
 // This function converts "Triangle coordinates" into a point close to the center 
 // of the "Cartesian coordinate" triangle
