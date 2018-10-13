@@ -14,12 +14,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Make an instance of two and place it on the page.
-var elem = document.getElementById('visualsection');
 
 // Constants
 
 var INTERVAL = 100; // Milliseconds between steps
 var MAX_STEPS = 100;
+var TWO_PARAMS = { width: 1000, height: 1000 };
+var WIDTH = 10.0;
+var HEIGHT = 10.0;
 
 // The rand generator is not guaranteed not to self-collide!
 var EXAMPLE_GENERATORS = {
@@ -27,19 +29,22 @@ var EXAMPLE_GENERATORS = {
     hex: '(n) => { return ((n < 6) ?  "L" : "S"); }',
     rand: '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }',
     triangle: '(n) => {  return ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }',
-    hexagon: '(n) => {  return (n > 41) ? "S" :  ((n % 7) == 0) ? "L" : ((((n + Math.round(n / 7) )% 2) == 0 ) ? "L" : "R"); }'
+    hexagon: '(n) => {  return (n > 41) ? "S" :  ((n % 7) == 0) ? "L" : ((((n + Math.round(n / 7) )% 2) == 0 ) ? "L" : "R"); }',
     trefoil: '(n) => {  return (n > 270) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
 };
-
-var params = { width: 1000, height: 1000 };
-var two = new Two(params).appendTo(elem);
 
 // Page Elements
 
 var executeButton = document.getElementById("execute-button");
+var funcstatus = document.getElementById("function-status");
 var generatorText = document.getElementById("user-defined-generator");
 var generatorsSelector = document.getElementById("generators-selector");
 var spiralButton = document.getElementById("spiral-button");
+var visualSection = document.getElementById('visualsection');
+
+// Global Variables
+
+var two; // The Two canvas for our 2D drawing.
 
 // Event Handlers
 
@@ -49,226 +54,7 @@ generatorsSelector.addEventListener("change", function() {
 });
 spiralButton.addEventListener("click", drawGoldenSpiral);
 
-function generator(n) {
-    return ((n < 6) ? "L" : "S");
-}
-
-var initial_generators = {};
-initial_generators["beam"] = '(n) => { return ((n < 10) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }';
-initial_generators["hex"] = '(n) => { return ((n < 6) ?  "L" : "S"); }';
-
-// The rand generator is not guaranteed not to self-collide!
-initial_generators["rand"] = '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }';
-
-initial_generators["triangle"] = '(n) => {  return ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
-
-
-function step(tx, ty, dir, f, n) {    
-  var action = n < MAX_STEPS ? f(n) : 'S';
-  switch(action) {
-  case 'L':
-    dir = (dir + 60)%360;
-    break;
-  case 'R':
-    dir = (dir + 300 )%360;
-  break;
-  case 'S':
-    executeButton.disabled = false;
-    return;
-  }
-
-  switch(dir) {
-  case 30:
-  case 330:
-    tx++; break;
-  case 90:
-    ty++;
-    break;
-  case 150:
-  case 210:
-    tx--; break;
-  case 270:
-    ty--;
-    break;
-  }
-  console.log("Turning " + action + ". New direction " + dir + ". New location (" + tx + ", " + ty + ").");
-    //  mark_triangle(tx, ty, n);
-    renderTriangle(tx,ty,n);
-    setTimeout(step, INTERVAL, tx, ty, dir, f, n+1);
-}
-
-function createGrid(s) {
-
-    var size = s || 30;
-
-    for(var j = -s; j < s; j++) {
-    var x0 = -s;
-    var y0 = j;
-    var x1 = s;
-    var y1 = j;
-
-    var p0 = transform_to_viewport(new THREE.Vector2(x0,y0));
-    var p1 = transform_to_viewport(new THREE.Vector2(x1,y1));
-    var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
-    a.stroke = '#6dcff6';
-    }
-
-    for(var j = -s; j < s; j++) {
-    var x0 = j;
-    var y0 = s;
-    
-    var x1 = j+s;
-    var y1 = -s;
-
-    var p0 = transform_to_viewport(new THREE.Vector2(x0,y0));
-    var p1 = transform_to_viewport(new THREE.Vector2(x1,y1));
-    var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
-    a.stroke = '#6dcff6';
-
-    var x1 = j+-s;
-    
-    var p1 = transform_to_viewport(new THREE.Vector2(x1,y1));
-    var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
-    a.stroke = '#6dcff6';
-    }
-
-    two.update();
-}
-
-var w = 10.0;
-var h = 10.0;
-
-function createTriangleGrid(s) {
-
-    var size = s || 30;
-    for(var i = -s; i < s; i++) {
-        for(var j = -s; j < s; j++) {
-            render_spot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue');
-        }
-    }
-    two.update();
-}
-
-// Input is a THREE.Vector2, out put an [x,y] array...
-function transform_to_viewport(pnt) {
-
-    // Let's assume our play space is from -10 to + 10, centered on the origin...
-
-    var x = pnt.x;
-    var y = pnt.y;
-    // first scale appropriately
-    x = x * (params.width / (2 * w));
-    y = y * (params.height / (2 * h));    
-    // now move to origin....
-    x += params.width/2;
-    y = (-y) + params.height/2;
-
-    // These adjust our weird grid background to the origin...
-    //    y = y + params.height / (2 *(2 * h));
-    //    x = x + params.width / (2 * (2 * w)) ;
-    return [x,y];
-}
-
-function transform_from_viewport(x,y) {
-
-    // now move to origin...
-    x = x - (params.width)/2;
-    y = y - (params.height)/2;
-
-    // then unscale..
-    x = x / (params.width / (2*w));
-    y = - y / (params.height / (2*h));    
-    
-    return [x,y];
-}
-
-function test_transforms() {
-    for(var x = -10; x < 10; x++) {
-    for(var y = -10; y < 10; y++) {
-        var p = transform_from_viewport(x,y);
-        var v = new THREE.Vector2(p[0],p[1]);
-        var r = transform_to_viewport(v);
-        console.log(x,y);
-        console.log(r);
-        
-//	    assert(r.x == x);
-//	    assert(r.y == y);
-    }
-    }
-}
-
-function render_origin() {
-    var origin = transform_to_viewport(new THREE.Vector2(o0,0));
-    var circle = two.makeCircle(origin[0], origin[1], 2);
-    circle.fill = '#000000';
-    circle.stroke = 'black'; // Accepts all valid css color
-    circle.linewidth = 2;
-}
-
-function render_spot(x,y,color) {
-    var pnt = transform_to_viewport(new THREE.Vector2(x,y));
-    var circle = two.makeCircle(pnt[0], pnt[1], 3);
-    circle.fill = color;
-    circle.stroke = color; // Accepts all valid css color
-    circle.linewidth = 2;
-}
-
-function draw_empty_grid() {
-    createGrid(params.width / (2 * 10.0));
-    createTriangleGrid(30);
-    render_spot(0.0,0.0,'red');
-    two.update();
-}
-
-draw_empty_grid();
-
-// This function converts "Triangle coordinates" into a point close to the center 
-// of the "Cartesian coordinate" triangle
-function cartesian_spot_triangle(x,y) {
-    var ctx,cty;
-    ctx = x/2.0;
-    cty = y - 0.5;
-    return {x: ctx, y: cty};
-}
-
-// compute the 3 vertices (in cartesian cooreds) of Triangle x,y
-function vertices_of_triangle(x,y) {
-    // first let us decide if the triangle is upwardpointing..
-    // a is the apex, b is East, c is West.
-    var ax;
-    var ay;
-    var bx,by;
-    var cx,cy;
-    if (((x+y) % 2) == 0) {
-	// this is up
-	ax = x/2.0;
-	ay = y;
-	bx = ax - 0.5;
-	by = y - 1.0;
-	cx = ax + 0.5;
-	cy = y - 1.0;
-    } else {
-	// this is down
-	ax = (x/2.0);	
-	ay = y - 1.0;
-	bx = ax + 0.5;
-	by = y;
-	cx = ax - 0.5;
-	cy = y;
-    }
-    return [ax,ay,bx,by,cx,cy];
-}
-
-function mark_triangle(x,y,c) {
-
-    var cc = cartesian_spot_triangle(x,y);
-    render_spot(cc.x,cc.y,c);
-    two.update() ;   
-}
-
-var x_t = 0;
-var y_t = 0;
-var c = 0;
+// Helper Functions
 
 function color(c) {
     switch(c % 3) {
@@ -280,46 +66,56 @@ function color(c) {
     }
 }
 
-function renderTriangle(x,y,c) {
-    var v = vertices_of_triangle(x,y);
+function createGrid(s) {
+    var size = s || 30;
+    for(var j = -s; j < s; j++) {
+        var x0 = -s;
+        var y0 = j;
+        var x1 = s;
+        var y1 = j;
+        var p0 = transformToViewport(new THREE.Vector2(x0, y0));
+        var p1 = transformToViewport(new THREE.Vector2(x1, y1));
+        var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
+        a.stroke = '#6dcff6';
+    }
+    for(var j = -s; j < s; j++) {
+        var x0 = j;
+        var y0 = s;
+        var x1 = j+s;
+        var y1 = -s;
+        var p0 = transformToViewport(new THREE.Vector2(x0, y0));
+        var p1 = transformToViewport(new THREE.Vector2(x1, y1));
+        var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
+        a.stroke = '#6dcff6';
+        var x1 = j+-s;
+        var p1 = transformToViewport(new THREE.Vector2(x1, y1));
+        var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
+        a.stroke = '#6dcff6';
+    }
+}
 
-    var vpa = transform_to_viewport(new THREE.Vector2(v[0],v[1]));
-    var vpb = transform_to_viewport(new THREE.Vector2(v[2],v[3]));
-    var vpc = transform_to_viewport(new THREE.Vector2(v[4],v[5]));    
-    var path = two.makePath(vpa[0],vpa[1],
-			    vpb[0],vpb[1],
-			    vpc[0],vpc[1],
- 		       false);
-    path.linewidth = 2;
-    path.stroke = "#000000";
-    path.fill = color(c);
-    two.add(path);
+function createTriangleGrid(s) {
+    var size = s || 30;
+    for(var i = -s; i < s; i++) {
+        for(var j = -s; j < s; j++) {
+            renderSpot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue');
+        }
+    }
+}
+
+function drawEmptyGrid() {
+    createGrid(TWO_PARAMS.width / (2 * 10.0));
+    createTriangleGrid(30);
+    renderSpot(0.0, 0.0, 'red');
     two.update();
-}
-
-function markNextTriangle() {
-    mark_triangle(x_t,y_t,color(c));
-    
-    renderTriangle(x_t,y_t,c);
-    
-    c++;
-    x_t += 1;
-    y_t += 1;
-}
-
-function plot_polar(r,theta) {
-    var y = r*Math.sin(theta);
-    var x = r*Math.cos(theta);
-    render_spot(x,y,"black");
 }
 
 function drawGoldenSpiral() {
     const phi = (1 + Math.sqrt(5))/2.0;
     const contraction = 2;
     for(var theta = 0; theta < 20; theta += 0.05) {
-        r = Math.pow(phi,theta*2/Math.PI)/contraction;
-        console.log(theta);
-        plot_polar(r,theta);
+        r = Math.pow(phi, theta*2/Math.PI)/contraction;
+        plotPolar(r, theta);
     }
     two.update();
 }
@@ -328,12 +124,11 @@ function executeGenerator() {
     executeButton.disabled = true;
     var fsrc = generatorText.value;
     console.log(fsrc);
-    var funcstatus = 	document.getElementById("function-status");
     try {
         var new_func = eval(fsrc);
         try {
             two.clear();
-            draw_empty_grid();
+            drawEmptyGrid();
             setTimeout(step, INTERVAL, 0, 0, 90, new_func, 0);	    
         } catch(err) {
             funcstatus.innerHTML = "On Evaluation:" + err.message;
@@ -345,3 +140,138 @@ function executeGenerator() {
     }
     funcstatus.innerHTML = "Function Compiled."
 }
+
+function plotPolar(r, theta) {
+    var y = r*Math.sin(theta);
+    var x = r*Math.cos(theta);
+    renderSpot(x, y, "black");
+}
+
+function renderSpot(x, y, color) {
+    var pnt = transformToViewport(new THREE.Vector2(x, y));
+    var circle = two.makeCircle(pnt[0], pnt[1], 3);
+    circle.fill = color;
+    circle.stroke = color; // Accepts all valid css color
+    circle.linewidth = 2;
+}
+
+function renderTriangle(x, y, c) {
+    var v = verticesOfTriangle(x, y);
+    var vpa = transformToViewport(new THREE.Vector2(v[0], v[1]));
+    var vpb = transformToViewport(new THREE.Vector2(v[2], v[3]));
+    var vpc = transformToViewport(new THREE.Vector2(v[4], v[5]));    
+    var path = two.makePath(vpa[0], vpa[1], vpb[0], vpb[1], vpc[0], vpc[1], false);
+    path.linewidth = 2;
+    path.stroke = "#000000";
+    path.fill = color(c);
+    two.add(path);
+    two.update();
+}
+
+function step(tx, ty, dir, f, n) {
+    
+    // Call the generator function, which returns a direction, 'L' for left or 'R' for right, 
+    // or ''S' for stop.
+    // If we have reached the maximum number of steps, then assume 'S'.
+    var action = n < MAX_STEPS ? f(n) : 'S';
+
+    // Update our direction of travel.
+    // Left is a counter-clockwise turn of 60 degrees.
+    // Right is a clockwise turn of 60 degrees.
+    switch(action) {
+    case 'L':
+        dir = (dir + 60)%360;
+        break;
+    case 'R':
+        dir = (dir + 300)%360;
+    break;
+    case 'S':
+        executeButton.disabled = false;
+        return;
+    }
+
+    // Update the triangle (tx, ty) coordinates based on our new direction
+    switch(dir) {
+    case 30:
+    case 330:
+        tx++; break;
+    case 90:
+        ty++; break;
+    case 150:
+    case 210:
+        tx--; break;
+    case 270:
+        ty--; break;
+    }
+
+    // Draw the triangle at the new (tx, ty) coordinates.
+    renderTriangle(tx, ty, n);
+
+    // Do the next step after a short interval.
+    setTimeout(step, INTERVAL, tx, ty, dir, f, n+1);
+}
+
+// Not currently used:
+// function transformFromViewport(x, y) {
+//     // now move to origin...
+//     x = x - (TWO_PARAMS.width)/2;
+//     y = y - (TWO_PARAMS.height)/2;
+//     // then unscale..
+//     x = x / (TWO_PARAMS.width / (2*WIDTH));
+//     y = - y / (TWO_PARAMS.height / (2*HEIGHT));    
+//     return [x, y];
+// }
+
+// Input is a THREE.Vector2, output an [x, y] array...
+function transformToViewport(pnt) {
+    // Let's assume our play space is from -10 to + 10, centered on the origin...
+    var x = pnt.x;
+    var y = pnt.y;
+    // first scale appropriately
+    x = x * (TWO_PARAMS.width / (2 * WIDTH));
+    y = y * (TWO_PARAMS.height / (2 * HEIGHT));    
+    // now move to origin....
+    x += TWO_PARAMS.width/2;
+    y = (-y) + TWO_PARAMS.height/2;
+    // These adjust our weird grid background to the origin...
+    //    y = y + params.height / (2 *(2 * h));
+    //    x = x + params.width / (2 * (2 * w)) ;
+    return [x, y];
+}
+
+// compute the 3 vertices (in cartesian cooreds) of Triangle x, y
+function verticesOfTriangle(x, y) {
+    // first let us decide if the triangle is upwardpointing..
+    // a is the apex, b is East, c is West.
+    var ax;
+    var ay;
+    var bx, by;
+    var cx, cy;
+    if (((x+y) % 2) == 0) {
+        // this is up
+        ax = x/2.0;
+        ay = y;
+        bx = ax - 0.5;
+        by = y - 1.0;
+        cx = ax + 0.5;
+        cy = y - 1.0;
+    } else {
+        // this is down
+        ax = (x/2.0);	
+        ay = y - 1.0;
+        bx = ax + 0.5;
+        by = y;
+        cx = ax - 0.5;
+        cy = y;
+    }
+    return [ax, ay, bx, by, cx, cy];
+}
+
+// Main
+
+function main() {
+    two = new Two(TWO_PARAMS).appendTo(visualSection);
+    drawEmptyGrid();
+}
+
+main();

@@ -17,42 +17,32 @@
 
 <!DOCTYPE html>
 <html>
-<body>
 
-<h1>My First Heading</h1>
-
-<select id="generators-selector" style="display: block">
-    <option value="default" selected="selected">Select...</option>
-    <option value="beam">Beam</option>
-    <option value="hex">Little Hex</option>
-    <option value="rand">Random</option>
-    <option value="triangle">Triangle</option>
-    <option value="hexagon">Hexagon</option>
-    <option vlaue="trifoil">Trefoil</option>
-</select>
-
-<div style="display: flex; flex-direction: row" >
-    <button type="button" id="execute-button">Execute Generator</button>
-    <button type="button" id="spiral-button">Show Golden Spiral</button>  
-</div>
-
-<div style="display: flex; flex-direction: row" >
-<textarea id="user-defined-generator" rows="5" cols="60" placeholder="Select a generator, above, or create your own.">
-</textarea>
-Function Status: <span id="function-status"> </span>
-</div>
-
-<section id="visualsection" style="border: red;" class="xscrollable">    
-
-</body>
+    <body>
+        <h1>Simplex Generator</h1>
+        <select id="generators-selector" style="display: block">
+            <option value="default" selected="selected">Select...</option>
+            <option value="beam">Beam</option>
+            <option value="hex">Hexagon</option>
+	    <option value="triangle">Triangle</option>
+	    <option value="hexagon">Hexagon</option>
+	    <option value="trefoil">Trefoil</option>
+            <option value="rand">Random</option>
+        </select>
+        <div style="display: flex; flex-direction: row" >
+            <button type="button" id="execute-button">Execute Generator</button>
+            <button type="button" id="spiral-button">Show Golden Spiral</button>  
+        </div>
+        <div style="display: flex; flex-direction: row" >
+        <textarea id="user-defined-generator" rows="5" cols="60" placeholder="Select a generator, above, or create your own.">
+        </textarea>
+        Function Status: <span id="function-status"> </span>
+        </div>
+        <section id="visualsection" style="border: red;" class="xscrollable">    
+    </body>
     <script src="../javascripts/two.min.js"></script>
     <script src="../javascripts/underscore-min.js"></script>
     <script src="../javascripts/three.js"></script>
-   <script src="../javascripts/jquery-3.3.1.min.js"></script>    
-
-
-<!--     <script src="./bundle.js"></script> -->
-
+    <script src="../javascripts/jquery-3.3.1.min.js"></script>    
     <script src="../javascripts/main.js"></script>
-    
 </html>
