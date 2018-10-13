@@ -30,11 +30,13 @@ var dir = 90;
 
 // Page Elements
 
+var executeButton = document.getElementById("execute-button");
 var generatorText = document.getElementById("user-defined-generator");
 var generatorsSelector = document.getElementById("generators-selector");
 
 // Event Handlers
 
+executeButton.addEventListener("click", executeGenerator);
 generatorsSelector.addEventListener("change", function() {
   generatorText.value = initial_generators[generatorsSelector.value] || '';
 });
@@ -61,6 +63,7 @@ function step(tx,ty,f,n) {
     dir = (dir - 60)%360;
   break;
   case 'S':
+    executeButton.disabled = false;
     return;
   }
 
@@ -318,6 +321,7 @@ function drawGoldenSpiral() {
 }
 
 function executeGenerator() {
+    executeButton.disabled = true;
     var fsrc = generatorText.value;
     console.log(fsrc);
     var funcstatus = 	document.getElementById("function-status");
