@@ -21,16 +21,18 @@
 
 <h1>My First Heading</h1>
 
-<div style="{display: flex; flex-direction: row }" >
+<div style="display: flex; flex-direction: row" >
   <button type="button" onclick="executeGenerator()">Execute Generator</button>
 <button type="button" onclick="drawGoldenSpiral()">Show Golden Spiral</button>  
 </div>
 
+<div style="display: flex; flex-direction: row" >
 <textarea id="user-defined-generator" rows="5" cols="60">
   Put an anonymous function here that takes a natural number and returns "L","R", or "S"
   for Left, Right, or Stop".
 </textarea>
-
+Function Status: <span id="function-status"> </span>
+</div>
 
     <section id="visualsection" style="{border: red;}" class="xscrollable">    
 
