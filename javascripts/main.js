@@ -27,8 +27,10 @@ function generator(n) {
 }
 
 function step() {
-
-  var action = generator(n++);
+    stepAux(generator);
+}
+function stepAux(f) {
+  var action = f(n++);
 
   switch(action) {
   case 'L':
@@ -294,3 +296,9 @@ function drawGoldenSpiral() {
     
 }
 
+function executeGenerator() {
+    var f = document.getElementById("user-defined-generator").value;
+    console.log(f);
+    var new_func = eval(f);
+    new_func.call();
+}
