@@ -1,12 +1,25 @@
+// Copyright (C) 2018  Robert L. Read <read.robert@gmail.com
 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Make an instance of two and place it on the page.
 var elem = document.getElementById('visualsection');
 
-var INTERVAL = 100; // Milliseconds between steps≥
+// Constants
 
-var TARGET_X = 0;
-var TARGET_Y = 0;
+var INTERVAL = 100; // Milliseconds between steps
+var MAX_STEPS = 100;
 
 var params = { width: 1000, height: 1000 };
 var two = new Two(params).appendTo(elem);
@@ -38,7 +51,7 @@ initial_generators["hex"] = '(n) => { return ((n < 6) ?  "L" : "S"); }';
 initial_generators["rand"] = '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }';
 
 function step(f,n) {
-    var action = f(n);
+    var action = n < MAX_STEPS ? f(n) : 'S';
 
   switch(action) {
   case 'L':
@@ -48,7 +61,6 @@ function step(f,n) {
     dir = (dir - 60)%360;
   break;
   case 'S':
-    console.log("Stopping.");
     return;
   }
 
