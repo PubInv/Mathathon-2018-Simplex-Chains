@@ -3,7 +3,7 @@
 // Make an instance of two and place it on the page.
 var elem = document.getElementById('visualsection');
 
-var INTERVAL = 1000; // Milliseconds between steps≥
+var INTERVAL = 100; // Milliseconds between steps≥
 
 var TARGET_X = 0;
 var TARGET_Y = 0;
@@ -11,7 +11,6 @@ var TARGET_Y = 0;
 var params = { width: 1000, height: 1000 };
 var two = new Two(params).appendTo(elem);
 
-var n = 0;
 var tx = 0;
 var ty = 0;
 var dir = 90;
@@ -27,12 +26,6 @@ generatorsSelector.addEventListener("change", function() {
   generatorText.value = initial_generators[generatorsSelector.value] || '';
 });
 
-function start() {
-  // TODO: clear triangles?
-  n = 0;
-  setTimeout(step, INTERVAL);
-}
-
 function generator(n) {
     return ((n < 6) ? "L" : "S");
 }
@@ -44,14 +37,8 @@ initial_generators["hex"] = '(n) => { return ((n < 6) ?  "L" : "S"); }';
 // The rand generator is not guaranteed not to self-collide!
 initial_generators["rand"] = '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }';
 
-
-
-function step() {
-    stepAux(eval(initial_generators["beam"]));
-}
-function stepAux(f) {
-    var action = f(n++);
-    
+function step(f,n) {
+    var action = f(n);
 
   switch(action) {
   case 'L':
@@ -82,7 +69,7 @@ function stepAux(f) {
   console.log("Turning " + action + ". New direction " + dir + ". New location (" + tx + ", " + ty + ").");
     //  mark_triangle(tx, ty, n);
     renderTriangle(tx,ty,n);
-  setTimeout(step, INTERVAL);
+    setTimeout(step, INTERVAL,f,n+1);
 }
 
 function createGrid(s) {
@@ -216,8 +203,6 @@ createTrinagleGrid(30);
 render_spot(0.0,0.0,'red');
 two.update();
 
-// setTimeout(start, 1000);
-
 // This function converts "Triangle coordinates" into a point close to the center 
 // of the "Cartesian coordinate" triangle
 function cartesian_spot_triangle(x,y) {
@@ -322,21 +307,19 @@ function executeGenerator() {
     console.log(fsrc);
     var funcstatus = 	document.getElementById("function-status");
     try {
-	var new_func = new Function('n', fsrc);	
+	var new_func = eval(fsrc);
+	try {
+	    setTimeout(step, INTERVAL,new_func,0);	    
+	} catch(err) {
+	    funcstatus.innerHTML = "On Evaluation:" + err.message;
+	}
     }
     catch(err) {
 	funcstatus.innerHTML = "On Compilation:" + err.message;
 	return ;
     }
-
+    
     funcstatus.innerHTML = "Function Compiled."
-    try {
-    new_func.call();
-    for(var i = 0; i < 10; i++) {
-	stepAux(new_func);
-    }
-    } catch(err) {
-	funcstatus.innerHTML = "On Evaluation:" + err.message;
-    }
+
     
 }

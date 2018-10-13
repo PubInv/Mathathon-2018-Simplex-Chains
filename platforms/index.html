@@ -22,10 +22,6 @@
 <h1>My First Heading</h1>
 
 
-<div style="display: flex; flex-direction: row" >
-  <button type="button" onclick="executeGenerator()">Execute Generator</button>
-<button type="button" onclick="drawGoldenSpiral()">Show Golden Spiral</button>  
-</div>
 
 <select id="generators-selector" style="display: block">
     <option value="default" selected="selected">Select...</option>
@@ -33,6 +29,11 @@
     <option value="hex">Hexagon</option>
     <option value="rand">Random</option>
 </select>
+
+<div style="display: flex; flex-direction: row" >
+  <button type="button" onclick="executeGenerator()">Execute Generator</button>
+<button type="button" onclick="drawGoldenSpiral()">Show Golden Spiral</button>  
+</div>
 
 <div style="display: flex; flex-direction: row" >
 <textarea id="user-defined-generator" rows="5" cols="60" placeholder="Select a generator, above, or create your own.">
