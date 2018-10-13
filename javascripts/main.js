@@ -195,7 +195,7 @@ createTrinagleGrid(30);
 render_spot(0.0,0.0,'red');
 two.update();
 
-setTimeout(start, 1000);
+// setTimeout(start, 1000);
 
 // This function converts "Triangle coordinates" into a point close to the center 
 // of the "Cartesian coordinate" triangle
@@ -297,8 +297,11 @@ function drawGoldenSpiral() {
 }
 
 function executeGenerator() {
-    var f = document.getElementById("user-defined-generator").value;
-    console.log(f);
-    var new_func = eval(f);
+    var fsrc = document.getElementById("user-defined-generator").value;
+    console.log(fsrc);
+    var new_func = new Function('n', fsrc);
     new_func.call();
+    for(var i = 0; i < 10; i++) {
+	stepAux(new_func);
+    }
 }
