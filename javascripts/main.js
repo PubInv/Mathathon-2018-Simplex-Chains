@@ -119,7 +119,7 @@ function test_transforms() {
 
 
 function render_origin() {
-    var origin = transform_to_viewport(new THREE.Vector2(0,0));
+    var origin = transform_to_viewport(new THREE.Vector2(o0,0));
     var circle = two.makeCircle(origin[0], origin[1], 2);
     circle.fill = '#000000';
     circle.stroke = 'black'; // Accepts all valid css color
@@ -149,8 +149,36 @@ function cartesian_spot_triangle(x,y) {
     cty = y - 0.5;
     return {x: ctx, y: cty};
 }
+// compute the 3 vertices (in cartesian cooreds) of trinagle x,y
+function vertices_of_triangle(x,y) {
+    // first let us decide if the triangle is upwardpointing..
+    // a is the apex, b is East, c is West.
+    var ax;
+    var ay;
+    var bx,by;
+    var cx,cy;
+    if (((x+y) % 2) == 0) {
+	// this is up
+	ax = x/2.0;
+	ay = y;
+	bx = ax - 0.5;
+	by = y - 1.0;
+	cx = ax + 0.5;
+	cy = y - 1.0;
+    } else {
+	// this is down
+	ax = (x/2.0)+ 0.5;	
+	ay = y - 1.0;
+	bx = ax + 0.5;
+	by = y;
+	cx = ax - 0.5;
+	cy = y;
+    }
+    return [ax,ay,bx,by,cx,cy];
+}
 // 
 function mark_triangle(x,y,c) {
+
     var cc = cartesian_spot_triangle(x,y);
     render_spot(cc.x,cc.y,c);
     two.update() ;   
@@ -161,17 +189,39 @@ var y_t = 0;
 var c = 0;
 function color(c) {
     switch(c % 3) {
-	case 0: return "red";
-	case 1: return "green";
-	case 2: return "blue";
+	case 0: return "#ff0000";
+	case 1: return "#00ff00";
+	case 2: return "#0000ff";
     default:
 	alert("failure");
     }
 }
+function renderTriangle(x,y) {
+    var v = vertices_of_triangle(x,y);
+
+    var vpa = transform_to_viewport(new THREE.Vector2(v[0],v[1]));
+    var vpb = transform_to_viewport(new THREE.Vector2(v[2],v[3]));
+    var vpc = transform_to_viewport(new THREE.Vector2(v[4],v[5]));    
+    var path = two.makePath(vpa[0],vpa[1],
+			    vpb[0],vpb[1],
+			    vpc[0],vpc[1],
+ 		       false);
+    path.linewidth = 2;
+    path.stroke = "#000000";
+    path.fill = color(c);
+    two.add(path);
+    two.update();
+}
+
+
 function markNextTriangle() {
     mark_triangle(x_t,y_t,color(c));
+    
+    renderTriangle(x_t,y_t,color(c));
+    
     c++;
     x_t += 1;
     y_t += 1;
 }
 
+// renderTriangle();
