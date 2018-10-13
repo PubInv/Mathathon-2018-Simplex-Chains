@@ -16,6 +16,17 @@ var tx = 0;
 var ty = 0;
 var dir = 90;
 
+// Page Elements
+
+var generatorText = document.getElementById("user-defined-generator");
+var generatorsSelector = document.getElementById("generators-selector");
+
+// Event Handlers
+
+generatorsSelector.addEventListener("change", function() {
+  generatorText.value = initial_generators[generatorsSelector.value] || '';
+});
+
 function start() {
   // TODO: clear triangles?
   n = 0;
@@ -36,10 +47,10 @@ initial_generators["rand"] = '(n) => { return ((n < 10) ? ((Math.random() < 0.5)
 
 
 function step() {
-    stepAux(eval(initial_generators["beam"]),n++);
+    stepAux(eval(initial_generators["beam"]));
 }
-function stepAux(f,n) {
-    var action = f(n);
+function stepAux(f) {
+    var action = f(n++);
     
 
   switch(action) {
@@ -205,7 +216,7 @@ createTrinagleGrid(30);
 render_spot(0.0,0.0,'red');
 two.update();
 
-setTimeout(start, 1000);
+// setTimeout(start, 1000);
 
 // This function converts "Triangle coordinates" into a point close to the center 
 // of the "Cartesian coordinate" triangle
@@ -307,7 +318,7 @@ function drawGoldenSpiral() {
 }
 
 function executeGenerator() {
-    var fsrc = document.getElementById("user-defined-generator").value;
+    var fsrc = generatorText.value;
     console.log(fsrc);
     var funcstatus = 	document.getElementById("function-status");
     try {
@@ -322,9 +333,10 @@ function executeGenerator() {
     try {
     new_func.call();
     for(var i = 0; i < 10; i++) {
-	stepAux(new_func,i);
+	stepAux(new_func);
     }
     } catch(err) {
 	funcstatus.innerHTML = "On Evaluation:" + err.message;
     }
+    
 }
