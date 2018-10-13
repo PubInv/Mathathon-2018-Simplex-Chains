@@ -21,6 +21,13 @@ var elem = document.getElementById('visualsection');
 var INTERVAL = 100; // Milliseconds between steps
 var MAX_STEPS = 100;
 
+// The rand generator is not guaranteed not to self-collide!
+var EXAMPLE_GENERATORS = {
+    beam: '(n) => { return ((n < 10) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }',
+    hex: '(n) => { return ((n < 6) ?  "L" : "S"); }',
+    rand: '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }'
+};
+
 var params = { width: 1000, height: 1000 };
 var two = new Two(params).appendTo(elem);
 
@@ -39,20 +46,13 @@ var spiralButton = document.getElementById("spiral-button");
 
 executeButton.addEventListener("click", executeGenerator);
 generatorsSelector.addEventListener("change", function() {
-    generatorText.value = initial_generators[generatorsSelector.value] || '';
+    generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value] || '';
 });
 spiralButton.addEventListener("click", drawGoldenSpiral);
 
 function generator(n) {
     return ((n < 6) ? "L" : "S");
 }
-
-var initial_generators = {};
-initial_generators["beam"] = '(n) => { return ((n < 10) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }';
-initial_generators["hex"] = '(n) => { return ((n < 6) ?  "L" : "S"); }';
-
-// The rand generator is not guaranteed not to self-collide!
-initial_generators["rand"] = '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }';
 
 function step(tx,ty,f,n) {    
   var action = n < MAX_STEPS ? f(n) : 'S';
@@ -270,6 +270,7 @@ function color(c) {
 	alert("failure");
     }
 }
+
 function renderTriangle(x,y,c) {
     var v = vertices_of_triangle(x,y);
 
