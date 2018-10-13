@@ -157,7 +157,62 @@ However, in this research-a-thon, many of the open problems are probably easy---
 cared to look very closely at them.  However, they are still valuable. Hopefully the problems in this research-a-thon are ``real'', even if they
 not as ``hard'' as those professional researchers talk about.
 
-\section{Some problems of Regular Simplex Chains}
+We will give opinions about problems on a scale of $1-10$, with $1$ being quite easy and $10$ being very difficult. Problems of difficulty $1,2,3$
+are generally ``easy'', those of ``8,9,10'' hard.  A problem of difficulty $10$ is assumed to be publishable in a non-very-prestigous forum, though
+possibly easier problems will also be of interest..
+
+\section{Some problems of Regular 2D Simplex Chains}
+
+\subsection{Generators}
+
+Define a {\em regular simplex chaing generator} to be a function takes natural numvbers and returns a symbol from the set $\mathbb{N} \mapsto \{L,R,S\}$,
+  for {\em left}, {\em right}, and {\em stop}. The generator generates a simplex chain by defining to which edge a new triangle should
+  be attached. That is, measured from the direction of a previous edge, should $n$th addition of a triangle be made by adding it
+  to the left or right edge?
+
+  Here is an example of a generator in JavaScript:
+\begin{verbatim}
+function hex_generator(n) {
+    return ((n < 6) ? "L" : "S");
+}
+\end{verbatim}
+It produces a simple hexagon. We will assume that regular triangles of unit side length.
+
+Although a 2D simplex chain exists in $\mathbb{R}^2$, a generator is a much simpler object.  It is somewhat easier to ask questions about
+generators.
+
+\begin{itemize}
+\item (Easy 1) R2D-01: Can you create a generator which creates a beam?
+\item (Easy 2) R2D-02: Can you create a generator which fills the plane?
+\item (Easy 3) R2D-03: Can you create a generator which completely covers a circle or radious $r$ with no unnecessary triangles?
+\item (Medium 4) R2D-04: Can you create a generator which creates golden spiral?
+\item (Medium 4) R2D-05: Can you create a generator which completely and minimall covers a sinusoidal wave?
+  \item (Medium 5) R2D-06: Can you create a generator which defines a logarithmic spiral which does not rely on mapping first to the Cartesian plane?
+\end{itemize}
+
+Problem R2D-06 raises an interesing issue. It is of course possible to create an algorithm which solves a problem in Cartesian space, and then
+map this back to the turnings of the generator. However, it would be more elegant to create an algorithm which never in fact uses real numbers.
+
+\subsection{Trinagle Space Numbering}
+
+This is because any Regular 2D Simplex Chain, alhtough it may be thought of as points in $\mathbb{R}^2$, may also be thought of as simply
+selecting a set of triangles in an abstract space, which we call the {\em Triangle Space}, which is $\mathbb{Z}^2$. By convention,
+we begin numbering the Triangle Space at a equilateral triangle point upward, whose apex is at the origin.  Then any trinagle can be
+named by $(x,y)$, where $y=0$ on is the horizontal row of triangles below the $x$-axis. A triangle at position $x$ has an apex
+pointing either upward or downward at posigion $x/2$.
+
+\begin{figure}
+     \centering
+     \includegraphics[width=0.65\textwidth]{figures/Triangle_Plot_-_Major_grid_lines.png}
+     \caption{Triangle Space Numbering}
+  \label{fig:equitetrabeam}
+\end{figure}
+
+\begin{footnote} Amit proposes a different numbering scheme for regular triangles:
+  \url{http://www-cs-students.stanford.edu/~amitp/game-programming/grids/})
+  \end{footnote}
+
+
 
 \subsection{On the reachability of points}
 
