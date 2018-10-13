@@ -26,6 +26,11 @@ function generator(n) {
     return ((n < 6) ? "L" : "S");
 }
 
+var initial_generators = {};
+initial_generators["beam"] = '(n) => { return ((n < 10) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }';
+initial_generators["hex"] = '(n) => { return ((n < 6) ?  "L" : "S"); }';
+initial_generators["rand"] = '(n) => (n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }';
+
 function step() {
     stepAux(generator);
 }
