@@ -33,6 +33,7 @@ var dir = 90;
 var executeButton = document.getElementById("execute-button");
 var generatorText = document.getElementById("user-defined-generator");
 var generatorsSelector = document.getElementById("generators-selector");
+var spiralButton = document.getElementById("spiral-button");
 
 // Event Handlers
 
@@ -40,6 +41,7 @@ executeButton.addEventListener("click", executeGenerator);
 generatorsSelector.addEventListener("change", function() {
   generatorText.value = initial_generators[generatorsSelector.value] || '';
 });
+spiralButton.addEventListener("click", drawGoldenSpiral);
 
 function generator(n) {
     return ((n < 6) ? "L" : "S");
@@ -131,7 +133,7 @@ var w = 10.0;
 var h = 10.0;
 
 
-function createTrinagleGrid(s) {
+function createTriangleGrid(s) {
 
     var size = s || 30;
     for(var i = -s; i < s; i++) {
@@ -216,7 +218,7 @@ function render_spot(x,y,color) {
 
 function draw_empty_grid() {
     createGrid(params.width / (2 * 10.0));
-    createTrinagleGrid(30);
+    createTriangleGrid(30);
     render_spot(0.0,0.0,'red');
     two.update();
 }
@@ -231,7 +233,7 @@ function cartesian_spot_triangle(x,y) {
     cty = y - 0.5;
     return {x: ctx, y: cty};
 }
-// compute the 3 vertices (in cartesian cooreds) of trinagle x,y
+// compute the 3 vertices (in cartesian cooreds) of Triangle x,y
 function vertices_of_triangle(x,y) {
     // first let us decide if the triangle is upwardpointing..
     // a is the apex, b is East, c is West.
@@ -315,11 +317,11 @@ function drawGoldenSpiral() {
     const phi = (1 + Math.sqrt(5))/2.0;
     const contraction = 2;
     for(var theta = 0; theta < 20; theta += 0.05) {
-	r = Math.pow(phi,theta*2/Math.PI)/contraction;
-	console.log(theta);
-	plot_polar(r,theta);
+        r = Math.pow(phi,theta*2/Math.PI)/contraction;
+        console.log(theta);
+        plot_polar(r,theta);
     }
-    
+    two.update();
 }
 
 function executeGenerator() {
