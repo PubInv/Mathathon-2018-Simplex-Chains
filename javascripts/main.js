@@ -57,7 +57,8 @@ function step() {
     break;
   }
   console.log("Turning " + action + ". New direction " + dir + ". New location (" + tx + ", " + ty + ").");
-  mark_triangle(tx, ty, n);
+    //  mark_triangle(tx, ty, n);
+    renderTriangle(tx,ty,n);
   setTimeout(step, INTERVAL);
 }
 
@@ -220,7 +221,7 @@ function vertices_of_triangle(x,y) {
 	cy = y - 1.0;
     } else {
 	// this is down
-	ax = (x/2.0)+ 0.5;	
+	ax = (x/2.0);	
 	ay = y - 1.0;
 	bx = ax + 0.5;
 	by = y;
@@ -249,7 +250,7 @@ function color(c) {
 	alert("failure");
     }
 }
-function renderTriangle(x,y) {
+function renderTriangle(x,y,c) {
     var v = vertices_of_triangle(x,y);
 
     var vpa = transform_to_viewport(new THREE.Vector2(v[0],v[1]));
@@ -270,7 +271,7 @@ function renderTriangle(x,y) {
 function markNextTriangle() {
     mark_triangle(x_t,y_t,color(c));
     
-    renderTriangle(x_t,y_t,color(c));
+    renderTriangle(x_t,y_t,c);
     
     c++;
     x_t += 1;
