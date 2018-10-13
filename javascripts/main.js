@@ -11,8 +11,8 @@ var TARGET_Y = 0;
 var params = { width: 1000, height: 1000 };
 var two = new Two(params).appendTo(elem);
 
-var tx = 0;
-var ty = 0;
+// var tx = 0;
+// var ty = 0;
 var dir = 90;
 
 // Page Elements
@@ -37,7 +37,7 @@ initial_generators["hex"] = '(n) => { return ((n < 6) ?  "L" : "S"); }';
 // The rand generator is not guaranteed not to self-collide!
 initial_generators["rand"] = '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }';
 
-function step(f,n) {
+function step(tx,ty,f,n) {
     var action = f(n);
 
   switch(action) {
@@ -69,7 +69,7 @@ function step(f,n) {
   console.log("Turning " + action + ". New direction " + dir + ". New location (" + tx + ", " + ty + ").");
     //  mark_triangle(tx, ty, n);
     renderTriangle(tx,ty,n);
-    setTimeout(step, INTERVAL,f,n+1);
+    setTimeout(step, INTERVAL,tx,ty,f,n+1);
 }
 
 function createGrid(s) {
@@ -197,11 +197,14 @@ function render_spot(x,y,color) {
     circle.linewidth = 2;
 }
 
+function draw_empty_grid() {
+    createGrid(params.width / (2 * 10.0));
+    createTrinagleGrid(30);
+    render_spot(0.0,0.0,'red');
+    two.update();
+}
 
-createGrid(params.width / (2 * 10.0));
-createTrinagleGrid(30);
-render_spot(0.0,0.0,'red');
-two.update();
+draw_empty_grid();
 
 // This function converts "Triangle coordinates" into a point close to the center 
 // of the "Cartesian coordinate" triangle
@@ -309,7 +312,9 @@ function executeGenerator() {
     try {
 	var new_func = eval(fsrc);
 	try {
-	    setTimeout(step, INTERVAL,new_func,0);	    
+	    two.clear();
+	    draw_empty_grid();
+	    setTimeout(step, INTERVAL,0,0,new_func,0);	    
 	} catch(err) {
 	    funcstatus.innerHTML = "On Evaluation:" + err.message;
 	}
