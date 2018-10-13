@@ -45,13 +45,19 @@
 
 %% \tableofcontents
 
+\section{License}
+This work is Copyright 2018, Robert L. Read, but licensed under the Creative Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0).
+\url{https://creativecommons.org/licenses/by-sa/4.0/}. This means you are free to share and adapt this work work, giving appropriate credit
+and maintaining the same license.
+
+Contributions and suggestions from the reader are encouraged!
+
 \section{Introduction}
 
 {\em
-Note: This is a work in progress to develop a context for certain open problems that will be the subject of a ``virtual research-a-thon'' planned for the end of the summer 2018.
-Please read it as work designed to give a flavor of the problem area rather than a tehcnical paper.
+Note: This is a work in progress as a preparation for the Public Invention Mathathon planend for Nov. 30th-Dec. 2nd 2018.
+Please read it as work designed to give a flavor of the problem area rather than a tehcnical paper being prepared for publication.
 }
-
 
 The term {\em simplex} means the simplest regular polyhedron. In two dimensions, a simplex is an equilateral triangle.
 In three dimensions, a simplex is a regular tetrahedron. In four dimensions, it is just called a simplex.
@@ -82,6 +88,11 @@ in a straight line. That is, the whole figure is contained with in two parallel 
 
 Exercise: There is probably a simplex chain rule which tiles the entire plane with equilateral triangles. Can you define it?
 
+\subsection{The nature of this work}
+
+The problems posed here to make the Public Invention Mathathon interesting exist at the intersection of mathematics and
+computer science. The work is motivated by mechanical engineering and robotics.
+
 \subsection{A website to serve as a workbench}
 
 With the help of David Jeschke, we have written a website\url{https://pubinv.github.io/Mathathon-2018-Simplex-Chains/platforms/index.html}
@@ -89,7 +100,7 @@ designed to allow graphic and interactive play of these concepts.  This website 
 
 \subsection{The mechanically interesting shapes}
 
-Although simplex chains are interesting in their own right purely theoretic and for recreation,
+Although simplex chains are interesting in their own right purely theoretically and for recreation,
 they are of practical applied value as well.
 Mechanical and structural engineers are interested in simplex chains because when constructed out of real, physical
 members in the shape of the simplex chain, they may form rigid and structural strong shapes.
@@ -214,6 +225,10 @@ some interesting open problems.
   Or some notion based on completely covering the curve and not self-colliding?
 \item How do we best approximate an Archimedian spiral? A logarithmic spiral? A Fibonacci spiral?
 \item Given an arbitrary curve, how do we best approximate it with a simplex chain, either regular or not?
+\item Can we define a notional of ``translational periodicity'' of a regular simplex chain? That is, can we prove that
+  a given rule for producing a simplex chain produces of series of translations of a smaller simplex chain? For example,
+  if we have a simplex chain which approximates a sine wave or sawtooth wave, can prove that with a periodicity of $k$ it
+  is self-similar?
 \end{itemize}
 
 \section{Three dimensions}
@@ -345,6 +360,15 @@ attempt to find a simplex chain rule.
 On the other hand, it may be more elegant to create a simplex chain rule, see what shape is produced,
 and then attempt to modify the simplex chain rule to match a shape you are seeking.
 
+\section{G-Brain's relation to other mathematics}
+
+In comments in a Reddit post, \url{https://www.reddit.com/r/math/comments/9l4qmw/a_mathathon_a_cooperative_free_virtual_hackathon/},
+G-Brain point out this a simplex chain can be related to typical mathematical language:
+\begin{quote}
+  I would say a simplex chain is a (countable) pure simplicial $d$-complex in $R^d$ such that its facet graph (vertices are facets, edges are between facets which meet in a codimension 1 face) admits a Hamiltonian path (visits each vertex exactly once, without repetition of vertices or edges).
+\end{quote}
+We have not emphasized this language because it seems more user-friendly to approach some of the problems from the position of Computer Science than from pure mathematics.
+
 \section{Rules of the Mathathon}
 
 \subsection{Rules}
@@ -409,6 +433,11 @@ Robert L. Read, PhD
 \bibliographystyle{unsrt}
 \bibliography{vgt}
 
+\section{Acknowledgement}
+
+Many thanks to David Jeschke for assisting in writing the test software.
+
+Thanks to G-Brain of Reddit for relating this to typical mathematical language.
 
 \end{document}
 
