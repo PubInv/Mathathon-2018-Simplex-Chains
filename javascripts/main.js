@@ -21,12 +21,18 @@ var elem = document.getElementById('visualsection');
 var INTERVAL = 100; // Milliseconds between steps
 var MAX_STEPS = 100;
 
+// The rand generator is not guaranteed not to self-collide!
+var EXAMPLE_GENERATORS = {
+    beam: '(n) => { return ((n < 10) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }',
+    hex: '(n) => { return ((n < 6) ?  "L" : "S"); }',
+    rand: '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }',
+    triangle: '(n) => {  return ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }',
+    hexagon: '(n) => {  return (n > 41) ? "S" :  ((n % 7) == 0) ? "L" : ((((n + Math.round(n / 7) )% 2) == 0 ) ? "L" : "R"); }'
+    trefoil: '(n) => {  return (n > 270) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
+};
+
 var params = { width: 1000, height: 1000 };
 var two = new Two(params).appendTo(elem);
-
-// var tx = 0;
-// var ty = 0;
-var dir = 90;
 
 // Page Elements
 
@@ -39,7 +45,7 @@ var spiralButton = document.getElementById("spiral-button");
 
 executeButton.addEventListener("click", executeGenerator);
 generatorsSelector.addEventListener("change", function() {
-  generatorText.value = initial_generators[generatorsSelector.value] || '';
+    generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value] || '';
 });
 spiralButton.addEventListener("click", drawGoldenSpiral);
 
@@ -57,7 +63,7 @@ initial_generators["rand"] = '(n) => { return ((n < 10) ? ((Math.random() < 0.5)
 initial_generators["triangle"] = '(n) => {  return ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
 
 
-function step(tx,ty,f,n) {    
+function step(tx, ty, dir, f, n) {    
   var action = n < MAX_STEPS ? f(n) : 'S';
   switch(action) {
   case 'L':
@@ -88,7 +94,7 @@ function step(tx,ty,f,n) {
   console.log("Turning " + action + ". New direction " + dir + ". New location (" + tx + ", " + ty + ").");
     //  mark_triangle(tx, ty, n);
     renderTriangle(tx,ty,n);
-    setTimeout(step, INTERVAL,tx,ty,f,n+1);
+    setTimeout(step, INTERVAL, tx, ty, dir, f, n+1);
 }
 
 function createGrid(s) {
@@ -132,21 +138,16 @@ function createGrid(s) {
 var w = 10.0;
 var h = 10.0;
 
-
 function createTriangleGrid(s) {
 
     var size = s || 30;
     for(var i = -s; i < s; i++) {
-    for(var j = -s; j < s; j++) {
-        render_spot(i + (((j % 2) == 0) ? 0.0 : 0.5 ),
-            j,
-            'blue');
-    }
+        for(var j = -s; j < s; j++) {
+            render_spot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue');
+        }
     }
     two.update();
 }
-
-
 
 // Input is a THREE.Vector2, out put an [x,y] array...
 function transform_to_viewport(pnt) {
@@ -163,23 +164,20 @@ function transform_to_viewport(pnt) {
     y = (-y) + params.height/2;
 
     // These adjust our weird grid background to the origin...
-//    y = y + params.height / (2 *(2 * h));
-//    x = x + params.width / (2 * (2 * w)) ;
+    //    y = y + params.height / (2 *(2 * h));
+    //    x = x + params.width / (2 * (2 * w)) ;
     return [x,y];
 }
 
 function transform_from_viewport(x,y) {
 
-        // now move to origin...
+    // now move to origin...
     x = x - (params.width)/2;
     y = y - (params.height)/2;
 
-    
     // then unscale..
     x = x / (params.width / (2*w));
     y = - y / (params.height / (2*h));    
-
-
     
     return [x,y];
 }
@@ -198,7 +196,6 @@ function test_transforms() {
     }
     }
 }
-
 
 function render_origin() {
     var origin = transform_to_viewport(new THREE.Vector2(o0,0));
@@ -233,6 +230,7 @@ function cartesian_spot_triangle(x,y) {
     cty = y - 0.5;
     return {x: ctx, y: cty};
 }
+
 // compute the 3 vertices (in cartesian cooreds) of Triangle x,y
 function vertices_of_triangle(x,y) {
     // first let us decide if the triangle is upwardpointing..
@@ -260,7 +258,7 @@ function vertices_of_triangle(x,y) {
     }
     return [ax,ay,bx,by,cx,cy];
 }
-// 
+
 function mark_triangle(x,y,c) {
 
     var cc = cartesian_spot_triangle(x,y);
@@ -271,6 +269,7 @@ function mark_triangle(x,y,c) {
 var x_t = 0;
 var y_t = 0;
 var c = 0;
+
 function color(c) {
     switch(c % 3) {
 	case 0: return "#ff0000";
@@ -280,6 +279,7 @@ function color(c) {
 	alert("failure");
     }
 }
+
 function renderTriangle(x,y,c) {
     var v = vertices_of_triangle(x,y);
 
@@ -297,7 +297,6 @@ function renderTriangle(x,y,c) {
     two.update();
 }
 
-
 function markNextTriangle() {
     mark_triangle(x_t,y_t,color(c));
     
@@ -307,6 +306,7 @@ function markNextTriangle() {
     x_t += 1;
     y_t += 1;
 }
+
 function plot_polar(r,theta) {
     var y = r*Math.sin(theta);
     var x = r*Math.cos(theta);
@@ -330,21 +330,18 @@ function executeGenerator() {
     console.log(fsrc);
     var funcstatus = 	document.getElementById("function-status");
     try {
-	var new_func = eval(fsrc);
-	try {
-	    two.clear();
-	    draw_empty_grid();
-	    setTimeout(step, INTERVAL,0,0,new_func,0);	    
-	} catch(err) {
-	    funcstatus.innerHTML = "On Evaluation:" + err.message;
-	}
+        var new_func = eval(fsrc);
+        try {
+            two.clear();
+            draw_empty_grid();
+            setTimeout(step, INTERVAL, 0, 0, 90, new_func, 0);	    
+        } catch(err) {
+            funcstatus.innerHTML = "On Evaluation:" + err.message;
+        }
     }
     catch(err) {
-	funcstatus.innerHTML = "On Compilation:" + err.message;
-	return ;
+    	funcstatus.innerHTML = "On Compilation:" + err.message;
+	    return ;
     }
-    
     funcstatus.innerHTML = "Function Compiled."
-
-    
 }
