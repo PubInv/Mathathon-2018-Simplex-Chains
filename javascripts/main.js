@@ -70,8 +70,8 @@ function createGrid(s) {
         var y0 = j;
         var x1 = s;
         var y1 = j;
-        var p0 = transform_to_viewport(new THREE.Vector2(x0, y0));
-        var p1 = transform_to_viewport(new THREE.Vector2(x1, y1));
+        var p0 = transformToViewport(new THREE.Vector2(x0, y0));
+        var p1 = transformToViewport(new THREE.Vector2(x1, y1));
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
     }
@@ -80,12 +80,12 @@ function createGrid(s) {
         var y0 = s;
         var x1 = j+s;
         var y1 = -s;
-        var p0 = transform_to_viewport(new THREE.Vector2(x0, y0));
-        var p1 = transform_to_viewport(new THREE.Vector2(x1, y1));
+        var p0 = transformToViewport(new THREE.Vector2(x0, y0));
+        var p1 = transformToViewport(new THREE.Vector2(x1, y1));
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
         var x1 = j+-s;
-        var p1 = transform_to_viewport(new THREE.Vector2(x1, y1));
+        var p1 = transformToViewport(new THREE.Vector2(x1, y1));
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
     }
@@ -95,15 +95,15 @@ function createTriangleGrid(s) {
     var size = s || 30;
     for(var i = -s; i < s; i++) {
         for(var j = -s; j < s; j++) {
-            render_spot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue');
+            renderSpot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue');
         }
     }
 }
 
-function draw_empty_grid() {
+function drawEmptyGrid() {
     createGrid(TWO_PARAMS.width / (2 * 10.0));
     createTriangleGrid(30);
-    render_spot(0.0, 0.0, 'red');
+    renderSpot(0.0, 0.0, 'red');
     two.update();
 }
 
@@ -112,7 +112,7 @@ function drawGoldenSpiral() {
     const contraction = 2;
     for(var theta = 0; theta < 20; theta += 0.05) {
         r = Math.pow(phi, theta*2/Math.PI)/contraction;
-        plot_polar(r, theta);
+        plotPolar(r, theta);
     }
     two.update();
 }
@@ -125,7 +125,7 @@ function executeGenerator() {
         var new_func = eval(fsrc);
         try {
             two.clear();
-            draw_empty_grid();
+            drawEmptyGrid();
             setTimeout(step, INTERVAL, 0, 0, 90, new_func, 0);	    
         } catch(err) {
             funcstatus.innerHTML = "On Evaluation:" + err.message;
@@ -138,14 +138,14 @@ function executeGenerator() {
     funcstatus.innerHTML = "Function Compiled."
 }
 
-function plot_polar(r, theta) {
+function plotPolar(r, theta) {
     var y = r*Math.sin(theta);
     var x = r*Math.cos(theta);
-    render_spot(x, y, "black");
+    renderSpot(x, y, "black");
 }
 
-function render_spot(x, y, color) {
-    var pnt = transform_to_viewport(new THREE.Vector2(x, y));
+function renderSpot(x, y, color) {
+    var pnt = transformToViewport(new THREE.Vector2(x, y));
     var circle = two.makeCircle(pnt[0], pnt[1], 3);
     circle.fill = color;
     circle.stroke = color; // Accepts all valid css color
@@ -153,10 +153,10 @@ function render_spot(x, y, color) {
 }
 
 function renderTriangle(x, y, c) {
-    var v = vertices_of_triangle(x, y);
-    var vpa = transform_to_viewport(new THREE.Vector2(v[0], v[1]));
-    var vpb = transform_to_viewport(new THREE.Vector2(v[2], v[3]));
-    var vpc = transform_to_viewport(new THREE.Vector2(v[4], v[5]));    
+    var v = verticesOfTriangle(x, y);
+    var vpa = transformToViewport(new THREE.Vector2(v[0], v[1]));
+    var vpb = transformToViewport(new THREE.Vector2(v[2], v[3]));
+    var vpc = transformToViewport(new THREE.Vector2(v[4], v[5]));    
     var path = two.makePath(vpa[0], vpa[1], vpb[0], vpb[1], vpc[0], vpc[1], false);
     path.linewidth = 2;
     path.stroke = "#000000";
@@ -209,7 +209,7 @@ function step(tx, ty, dir, f, n) {
 }
 
 // Not currently used:
-// function transform_from_viewport(x, y) {
+// function transformFromViewport(x, y) {
 //     // now move to origin...
 //     x = x - (TWO_PARAMS.width)/2;
 //     y = y - (TWO_PARAMS.height)/2;
@@ -220,7 +220,7 @@ function step(tx, ty, dir, f, n) {
 // }
 
 // Input is a THREE.Vector2, output an [x, y] array...
-function transform_to_viewport(pnt) {
+function transformToViewport(pnt) {
     // Let's assume our play space is from -10 to + 10, centered on the origin...
     var x = pnt.x;
     var y = pnt.y;
@@ -237,7 +237,7 @@ function transform_to_viewport(pnt) {
 }
 
 // compute the 3 vertices (in cartesian cooreds) of Triangle x, y
-function vertices_of_triangle(x, y) {
+function verticesOfTriangle(x, y) {
     // first let us decide if the triangle is upwardpointing..
     // a is the apex, b is East, c is West.
     var ax;
@@ -268,7 +268,7 @@ function vertices_of_triangle(x, y) {
 
 function main() {
     two = new Two(TWO_PARAMS).appendTo(visualSection);
-    draw_empty_grid();
+    drawEmptyGrid();
 }
 
 main();
