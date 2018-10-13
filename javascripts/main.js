@@ -16,6 +16,17 @@ var tx = 0;
 var ty = 0;
 var dir = 90;
 
+// Page Elements
+
+var generatorText = document.getElementById("user-defined-generator");
+var generatorsSelector = document.getElementById("generators-selector");
+
+// Event Handlers
+
+generatorsSelector.addEventListener("change", function() {
+  generatorText.value = initial_generators[generatorsSelector.value] || '';
+});
+
 function start() {
   // TODO: clear triangles?
   n = 0;
@@ -302,7 +313,7 @@ function drawGoldenSpiral() {
 }
 
 function executeGenerator() {
-    var fsrc = document.getElementById("user-defined-generator").value;
+    var fsrc = generatorText.value;
     console.log(fsrc);
     var new_func = new Function('n', fsrc);
     new_func.call();
