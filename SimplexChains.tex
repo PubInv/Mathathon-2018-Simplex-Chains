@@ -82,6 +82,11 @@ in a straight line. That is, the whole figure is contained with in two parallel 
 
 Exercise: There is probably a simplex chain rule which tiles the entire plane with equilateral triangles. Can you define it?
 
+\subsection{A website to serve as a workbench}
+
+With the help of David Jeschke, we have written a website\url{https://pubinv.github.io/Mathathon-2018-Simplex-Chains/platforms/index.html}
+designed to allow graphic and interactive play of these concepts.  This website will likely evolve faster than this document!
+
 \subsection{The mechanically interesting shapes}
 
 Although simplex chains are interesting in their own right purely theoretic and for recreation,
@@ -139,7 +144,31 @@ and is not obvious.''
 Open problems you hear about are mostly ones that have been studied a lot and remain unsolved, and are therefore probably difficult problems.
 However, in this research-a-thon, many of the open problems are probably easy---they are open and unsolved because nobody has yet
 cared to look very closely at them.  However, they are still valuable. Hopefully the problems in this research-a-thon are ``real'', even if they
-not as ``hard'' as those professional researchers talk about. 
+not as ``hard'' as those professional researchers talk about.
+
+\section{Some problems of Regular Simplex Chains}
+
+\subsection{On the reachability of points}
+
+Although too simple for a professional mathematician in two dimensions, let us consider the problem of {\em reaching} certain regions
+or points with a simplex chain from a starting point.
+
+Let us for the time being consider {\em regular} simplex chains.  In the Cartesian plane, it is pretty clear tha any point can {\em reached},
+that is, intersected, by a simplex chain of finite length. Developing an algorithm to produce such a chain from the coordinates of a point
+is an easy problem. We could then pose questions about the shortest such chain, or the number of such chains.
+
+Now consider the problem of reaching a point in 3D with a simplex chain formed only of regular tetrahedra. This is a much harder problem.
+It seems likely that any point can be intersected, except perhaps points very close to the starting point. Producing an algorithm to do so
+is more of a challenge. This is a very interesting problem to mechanical engineers, robotocists, and possibly molecular scientists.
+
+Now if instead of merely {\em intersecting} a point with the body of simplex we instead seek to move the {\em apex} of a tetrahedra close
+to the point, we have a real challenge: What simplex chain of regular tetrahedra gets us closest to a point, and of what length? Can
+we come arbitrarily close to a point with arbitrary length chains?
+
+An interestig, if somewhat wild idea, is to build a coordinate system around points based on reaching them with simplex chains. In this model
+we do not start with the Cartesian plane; rather we ``name'' points by the simplex chain we reaches them. What is the nature of a space
+of such points? 
+
 
 
 \section{Relaxations of Regularity}
@@ -184,7 +213,7 @@ some interesting open problems.
 \item What is the best way to define ``approximating'' a curve with a simplex chain? Is it the sum of the distances of the centroid to the curve?
   Or some notion based on completely covering the curve and not self-colliding?
 \item How do we best approximate an Archimedian spiral? A logarithmic spiral? A Fibonacci spiral?
-  \item Given an arbitrary curve, how do we best approximate it with a simplex chain, either regular or not?
+\item Given an arbitrary curve, how do we best approximate it with a simplex chain, either regular or not?
 \end{itemize}
 
 \section{Three dimensions}
@@ -265,6 +294,16 @@ Note: We use the term ``equitetrabeam'' to refer to an irregular tetrahelix that
 \item Is it possible to make a perfectly regular structure that has a ``hole''?
 \item If it is not possible, what is most regular system that an make a ``hole''?
 \end{itemize}
+
+Define {\em point reachability} to mean place the apex of a simplex chain near a point.
+\begin{itemize}
+\item In 2D, give an algorithm that produces the shortest simplex chain coming as close as possible to a point.
+\item In 3D, are the spaces that cannot be reached with any number of simplices?
+\item Given a limit to the number of simplices, what is the reacheable space to with distance $x$?
+\item What is the shape of reachable points for $N$ simplices?
+  \item In 3D, given an algorithm that produces the shortest simplex chain that comes with $x$ of a target point.
+  \end{itemize}
+
 
 \section{Is there a rule that produces ``straight'' 4D simplex chains?}
 
