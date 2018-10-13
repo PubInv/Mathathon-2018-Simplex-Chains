@@ -21,7 +21,7 @@
 
 <h1>My First Heading</h1>
 
-    <p>My first paragraph.</p>
+    <button type="button" onclick="markNextTriangle()">Click Me!</button>
     <section id="visualsection" style="{border: red;}" class="xscrollable">    
 
 
@@ -177,6 +177,41 @@ createGrid(params.width / (2 * 10.0));
 createTrinagleGrid(30);
 render_spot(0.0,0.0,'red');
 two.update();
+
+// This function converts "Triangle coordinates" into a point close to the center 
+// of the "Cartesian coordinate" triangle
+function cartesian_spot_triangle(x,y) {
+    var ctx,cty;
+    ctx = x/2.0;
+    cty = y - 0.5;
+    return {x: ctx, y: cty};
+}
+// 
+function mark_triangle(x,y,c) {
+    var cc = cartesian_spot_triangle(x,y);
+    render_spot(cc.x,cc.y,c);
+    two.update() ;   
+}
+
+var x_t = 0;
+var y_t = 0;
+var c = 0;
+function color(c) {
+    switch(c % 3) {
+	case 0: return "red";
+	case 1: return "green";
+	case 2: return "blue";
+    default:
+	alert("failure");
+    }
+}
+function markNextTriangle() {
+    mark_triangle(x_t,y_t,color(c));
+    c++;
+    x_t += 1;
+    y_t += 1;
+}
+
 
   </script>
     
