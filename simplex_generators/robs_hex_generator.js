@@ -18,4 +18,12 @@
 
 
 
+// return "L" "R" "S" (Left, Right, Stop, from the direction of the shared edge.)
+// Starts at 0.
+function hexagon(n) {
+    return ((n < 6) ? "L" : "S");
+}
 
+function ladder(n) {
+    return ((n % 2) == 0) ? "L" : "R";
+}
