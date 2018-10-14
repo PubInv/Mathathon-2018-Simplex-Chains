@@ -25,11 +25,11 @@ var HEIGHT = 10.0;
 var EXAMPLE_GENERATORS = {
     beam: {
         name: "Beam",
-        src: '(n) => { return ((n < 10) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }'
+        src: '(n) => { return ((n < 12) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }'
     },
     hex: {
         name: "Small Hexagon",
-        src: '(n) => { return ((n < 6) ?  "L" : "S"); }'
+        src: '(n) => { return ((n < 5) ?  "L" : "S"); }'
     },
     rand: {
         name: "Random Walk",
@@ -41,11 +41,11 @@ var EXAMPLE_GENERATORS = {
     },
     hexagon: {
         name: "Large Hexagon",
-        src: '(n) => {  return (n > 41) ? "S" :  ((n % 7) == 0) ? "L" : ((((n + Math.round(n / 7) )% 2) == 0 ) ? "L" : "R"); }'
+        src: '(n) => {  return (n > 40) ? "S" :  ((n % 7) == 0) ? "L" : ((((n + Math.round(n / 7) )% 2) == 0 ) ? "L" : "R"); }'
     },
     trefoil: {
         name: "Trefoil",
-        src: '(n) => {  return (n > 71) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
+        src: '(n) => {  return (n > 70) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
     }
 };
 
