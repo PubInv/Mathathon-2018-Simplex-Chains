@@ -56,6 +56,8 @@ var funcStatus = document.getElementById("function-status");
 var generatorText = document.getElementById("user-defined-generator");
 var generatorsSelector = document.getElementById("generators-selector");
 var spiralButton = document.getElementById("spiral-button");
+var startX = document.getElementById("start-x");
+var startY = document.getElementById("start-y");
 var visualSection = document.getElementById('visualsection');
 
 // Global Variables
@@ -106,12 +108,17 @@ function onExecute() {
 
     two.clear();
     drawEmptyGrid();
-    // To this list we will push the triangles that are part of the history.
-    var acc = [];
-    acc.push([0,0]);
-    // Note: Currently we consider [0,0] a part of every chain.
-    renderTriangle(0, 0, color(0));    
-    setTimeout(step, INTERVAL, 0, 0, 90, generatorFn, 0, acc);
+
+    tx = parseInt(startX.value);
+    tx = isNaN(tx) ? 0 : tx;
+    ty = parseInt(startY.value);
+    ty = isNaN(ty) ? 0 : ty;
+
+    var acc = []; // List of occupied triangles.
+    acc.push([0,0]); // initial position is a part of every chain.
+    renderTriangle(tx, ty, color(0));
+
+    setTimeout(step, INTERVAL, tx, ty, 90, generatorFn, 0, acc);
 }
 
 function onGeneratorChanged() {
@@ -277,10 +284,10 @@ function step(tx, ty, dir, f, n, acc) {
         // If tx,ty has occurred in the accumulator, render as black.
 
         if (acc_contains(acc,tx,ty)) {
-            renderTriangle(tx, ty, "#000000");                    
+            renderTriangle(tx, ty, "#000000");
         } else {
             renderTriangle(tx, ty, color(n));
-            acc.push([tx,ty]);            
+            acc.push([tx,ty]);
         }
 
 
