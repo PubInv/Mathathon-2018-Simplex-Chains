@@ -52,7 +52,7 @@ function main() {
     executeButton.addEventListener("click", onExecute);
     generatorsSelector.addEventListener("change", onGeneratorChanged);
     spiralButton.addEventListener("click", onDrawGoldenSpiral);
-    
+
     // Create a Two canvas and draw a grid on it.
     two = new Two(TWO_PARAMS).appendTo(visualSection);
     drawEmptyGrid();
@@ -76,14 +76,14 @@ function onExecute() {
     try {
         generatorFn = eval(generatorText.value);
     } catch(err) {
-    	funcStatus.innerHTML = "On Compilation:" + err.message;
-	    return;
+        funcStatus.innerHTML = "On Compilation:" + err.message;
+        return;
     }
     funcStatus.innerHTML = "Function Compiled."
 
     two.clear();
     drawEmptyGrid();
-    setTimeout(step, INTERVAL, 0, 0, 90, generatorFn, 0);	    
+    setTimeout(step, INTERVAL, 0, 0, 90, generatorFn, 0);
 }
 
 function onGeneratorChanged() {
@@ -103,11 +103,11 @@ function onStop() {
 
 function color(c) {
     switch(c % 3) {
-	case 0: return "#ff0000";
-	case 1: return "#00ff00";
-	case 2: return "#0000ff";
+    case 0: return "#ff0000";
+    case 1: return "#00ff00";
+    case 2: return "#0000ff";
     default:
-	alert("failure");
+    alert("failure");
     }
 }
 
@@ -173,7 +173,7 @@ function renderTriangle(x, y, c) {
     var v = verticesOfTriangle(x, y);
     var vpa = transformToViewport(new THREE.Vector2(v[0], v[1]));
     var vpb = transformToViewport(new THREE.Vector2(v[2], v[3]));
-    var vpc = transformToViewport(new THREE.Vector2(v[4], v[5]));    
+    var vpc = transformToViewport(new THREE.Vector2(v[4], v[5]));
     var path = two.makePath(vpa[0], vpa[1], vpb[0], vpb[1], vpc[0], vpc[1], false);
     path.linewidth = 2;
     path.stroke = "#000000";
@@ -184,8 +184,8 @@ function renderTriangle(x, y, c) {
 
 function step(tx, ty, dir, f, n) {
 
-    // Call the generator function, which returns a direction, 'L' for left or 'R' for right, 
-    // or ''S' for stop.
+    // Call the generator function, which returns a direction, 'L' for left or 'R' for right,
+    // or 'S' for stop.
     // If we have reached the maximum number of steps, then assume 'S'.
     var action;
     try {
@@ -216,7 +216,7 @@ function step(tx, ty, dir, f, n) {
         case 270:
             ty--; break;
         }
-    
+
         // Draw the triangle at the new (tx, ty) coordinates.
         renderTriangle(tx, ty, n);
 
@@ -241,7 +241,7 @@ function step(tx, ty, dir, f, n) {
 //     y = y - (TWO_PARAMS.height)/2;
 //     // then unscale..
 //     x = x / (TWO_PARAMS.width / (2*WIDTH));
-//     y = - y / (TWO_PARAMS.height / (2*HEIGHT));    
+//     y = - y / (TWO_PARAMS.height / (2*HEIGHT));
 //     return [x, y];
 // }
 
@@ -252,7 +252,7 @@ function transformToViewport(pnt) {
     var y = pnt.y;
     // first scale appropriately
     x = x * (TWO_PARAMS.width / (2 * WIDTH));
-    y = y * (TWO_PARAMS.height / (2 * HEIGHT));    
+    y = y * (TWO_PARAMS.height / (2 * HEIGHT));
     // now move to origin....
     x += TWO_PARAMS.width/2;
     y = (-y) + TWO_PARAMS.height/2;
@@ -280,7 +280,7 @@ function verticesOfTriangle(x, y) {
         cy = y - 1.0;
     } else {
         // this is down
-        ax = (x/2.0);	
+        ax = (x/2.0);
         ay = y - 1.0;
         bx = ax + 0.5;
         by = y;
