@@ -103,6 +103,7 @@ function onExecute() {
         generatorFn = eval(generatorText.value);
     } catch(err) {
         funcStatus.innerHTML = err.message;
+        executeButton.disabled = false;
         return;
     }
 
