@@ -6,7 +6,7 @@ hosted by Public Invention.
 
 ## Usage of the Software
 
-We have written a [web page](platforms/index.html) for testing interactively
+We have written a [web page](https://pubinv.github.io/Mathathon-2018-Simplex-Chains/platforms/index.html) for testing interactively
 testing the easiest class of problems: building chains of equilateral triangles.
 We call instructions for building such a chain is called a **2D simplex generator**.
 
@@ -45,7 +45,7 @@ The purpose of the mathathon is to foster cooperation, not competition. We welco
 in making this repo more fun, and in getting ready for the Mathathon. All sorts of
 suggestions are welcome.
 
-With respect to the current [experimentation page](platforms/index.html),
+With respect to the current [experimentation page](https://pubinv.github.io/Mathathon-2018-Simplex-Chains/platforms/index.html),
 we would like to:
 * Allow the grid size to be controlled (in particular, increased.)
 * The starting point and direction could be better specified.
