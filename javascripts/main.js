@@ -102,10 +102,9 @@ function onExecute() {
     try {
         generatorFn = eval(generatorText.value);
     } catch(err) {
-        funcStatus.innerHTML = "On Compilation:" + err.message;
+        funcStatus.innerHTML = err.message;
         return;
     }
-    funcStatus.innerHTML = "Function Compiled."
 
     two.clear();
     drawEmptyGrid();
@@ -113,6 +112,7 @@ function onExecute() {
 }
 
 function onGeneratorChanged() {
+    funcStatus.innerHTML = '';
     generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value].src || '';
 }
 
@@ -217,7 +217,7 @@ function step(tx, ty, dir, f, n) {
     try {
         action = f(n);
     } catch(err) {
-        funcStatus.innerHTML = "On Evaluation:" + err.message;
+        funcStatus.innerHTML = "Step " + n + ": " + err.message;
         action = 'S';
     }
 
@@ -254,7 +254,7 @@ function step(tx, ty, dir, f, n) {
 
     } else {
         if (action != 'S') {
-            funcStatus.innerHTML = "Unexpected generator return value: " + action.toString();
+            funcStatus.innerHTML = "Step " + n + ": Unexpected return value " + JSON.stringify(action);
         }
         onStop();
     }

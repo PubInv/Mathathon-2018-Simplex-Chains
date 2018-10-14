@@ -17,28 +17,35 @@
 
 <!DOCTYPE html>
 <html>
+    <head>
+        <title> Simplex Generator</title>
+        <style>
+            #function-status { color: darkred; font-family: "Courier New"; font-weight: bold }
+            #user-defined-generator { font-family: "Courier New" }
+            #visual-section { border: red }
+        </style>
+    </head>
     <body>
       <h1>Simplex Generator</h1>
       <h3>Instructions</h3>
       <p>
-        Select or write your own javascript snippet that takes an integer and returns the string "L", "R", or "S" for "turn left", "turn right", or "stop" to build a <it> regular 2D simplex chain</it>. 
+        Select or write your own javascript snippet that takes an integer and returns the string "L", "R", or "S" for "turn left", "turn right", or "stop" to build a <it> regular 2D simplex chain</it>.
       <p>
-        Play with ideas such as filling all space or matching a geometric shape.         
+        Play with ideas such as filling all space or matching a geometric shape.
         For more information, see the <a href="https://github.com/PubInv/Mathathon-2018-Simplex-Chains"> GitHub Readme</a>.
         </p>
-        <select id="generators-selector" style="display: block">
-            <option value="default" selected="selected">Select...</option>
-        </select>
         <div style="display: flex; flex-direction: row" >
+            <select id="generators-selector" style="display: block">
+                <option value="default" selected="selected">Select...</option>
+            </select>
             <button type="button" id="execute-button">Execute Generator</button>
             <button type="button" id="spiral-button">Show Golden Spiral</button>
         </div>
         <div style="display: flex; flex-direction: row" >
-        <textarea id="user-defined-generator" rows="5" cols="60" placeholder="Select a generator, above, or create your own.">
-        </textarea>
-        Function Status: <span id="function-status"> </span>
+            <textarea id="user-defined-generator" rows="5" cols="60" placeholder="Select a generator, above, or create your own."></textarea>
         </div>
-        <section id="visualsection" style="border: red;" class="xscrollable">
+        <div id="function-status"></div>
+        <section id="visualsection" class="xscrollable">
     </body>
     <script src="../javascripts/two.min.js"></script>
     <script src="../javascripts/three.js"></script>
