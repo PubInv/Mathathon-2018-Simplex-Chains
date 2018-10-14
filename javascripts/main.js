@@ -98,12 +98,10 @@ function onDrawGoldenSpiral() {
 
 function onExecute() {
     executeButton.disabled = true;
-    var generatorFn;
-    try {
-        generatorFn = eval(generatorText.value);
-    } catch(err) {
-        funcStatus.innerHTML = err.message;
-        retrun;
+    generatorFn = compileGenerator(generatorText.value);
+    if (!generatorFn) {
+        executeButton.disabled = false;
+        return;
     }
 
     two.clear();
@@ -141,6 +139,25 @@ function color(c) {
     alert("failure");
     }
 }
+
+// Returns the compiled function, or undefined if the function cannot be compiled.
+// As a side effect, this will put an error message in funcStatus.
+function compileGenerator(src) {
+    var fn;
+    try { fn = eval(src); }
+    catch(err) {
+        funcStatus.innerHTML = err.message;
+        return undefined;
+    }
+    var fnType = typeof fn;
+    if (fnType != 'function') {
+        funcStatus.innerHTML = "Generator needs to be a function, not " + fnType;
+        return undefined;
+    }
+    funcStatus.innerHTML = "";
+    return fn;
+}
+
 
 function createGrid(s) {
     var size = s || 30;
