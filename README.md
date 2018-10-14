@@ -6,23 +6,26 @@ hosted by Public Invention.
 
 ## Usage of the Software
 
-We have written a [platform](platforms/index.html) for testing 2D simplex generators, which
-are an important (and simple) subset of the open problems we have defined.
+We have written a [web page](platforms/index.html) for testing interactively
+testing the easiest class of problems: building chains of equilateral triangles.
+We call instructions for building such a chain is called a **2D simplex generator**.
 
-The page allows you to dynamically load a JavaScript function which an generate
+The page allows you to dynamically load a JavaScript function which can generate
 a simplex chain made of equilateral triangles joined edge-to-edge.
 
 The JavaScript function takes a natural number (starting at 0) and tells which edge of the
 last triangle in the chain the next triangle should be joined to. These edges are simply
 named "L" and "R" for left and right. The string "S" is returned when it is time to stop.
+Every chain starts with one triangle.
 
-As an example, consider this JavaScript which generates a **beam** or **ladder**.
+As an example, consider this JavaScript function which generates a **beam** or **ladder**.
 
 ```
 (n) => { return ((n < 10) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }
 ```
 
 By turning left and then right, a straight "ladder" is constructed.
+This is one of the simpler generators.
 
 A number of sample generators can be selected, but the goal is to right your own!
 Play around and see what you can create. For example, can you write a generator
@@ -38,11 +41,11 @@ by the mathathon.
 
 ## Improvements
 
-The purpose of the mathathon is foster cooperation, not competition. We welcome cooperation
+The purpose of the mathathon is to foster cooperation, not competition. We welcome cooperation
 in making this repo more fun, and in getting ready for the Mathathon. All sorts of
 suggestions are welcome.
 
-With respect to the current [experimetnation page](platforms/index.html)experimentation page,
+With respect to the current [experimentation page](platforms/index.html),
 we would like to:
 * Allow the grid size to be controlled (in particular, increased.)
 * The starting point and direction could be better specified.
@@ -58,7 +61,7 @@ or unbounded, or minimal?
 
 ## Open Problems
 
-In an attempt to make that Mathathon serious--seriously fun--we have defined a
+In an attempt to make that Mathathon serious and seriously fun we have defined a
 large set of **open problems** tagged with particular numbers.
 You can find these in our [pdf](https://github.com/PubInv/Mathathon-2018-Simplex-Chains/blob/master/SimplexChains.pdf). Precisely defining interesting problems is a major part of this
 effort; if you can suggest a problem, please send it to us in an issue.
