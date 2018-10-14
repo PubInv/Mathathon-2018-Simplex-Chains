@@ -16,7 +16,7 @@
 // Constants
 
 var INTERVAL = 25; // Milliseconds between steps
-var MAX_STEPS = 100;
+var MAX_STEPS = 300;
 var TWO_PARAMS = { width: 1000, height: 1000 };
 var WIDTH = 10.0;
 var HEIGHT = 10.0;
@@ -37,7 +37,7 @@ var EXAMPLE_GENERATORS = {
     },
     triangle: {
         name: "Triangle",
-        src: '(n) => {  return ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
+        src: '(n) => {   return (n > 34) ? "S" :  ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
     },
     hexagon: {
         name: "Large Hexagon",
@@ -45,7 +45,7 @@ var EXAMPLE_GENERATORS = {
     },
     trefoil: {
         name: "Trefoil",
-        src: '(n) => {  return (n > 270) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
+        src: '(n) => {  return (n > 71) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
     }
 };
 
@@ -103,12 +103,17 @@ function onExecute() {
         generatorFn = eval(generatorText.value);
     } catch(err) {
         funcStatus.innerHTML = err.message;
-        return;
+        retrun;
     }
 
     two.clear();
     drawEmptyGrid();
-    setTimeout(step, INTERVAL, 0, 0, 90, generatorFn, 0);
+    // To this list we will push the triangles that are part of the history.
+    var acc = [];
+    acc.push([0,0]);
+    // Note: Currently we consider [0,0] a part of every chain.
+    renderTriangle(0, 0, color(0));    
+    setTimeout(step, INTERVAL, 0, 0, 90, generatorFn, 0, acc);
 }
 
 function onGeneratorChanged() {
@@ -203,12 +208,21 @@ function renderTriangle(x, y, c) {
     var path = two.makePath(vpa[0], vpa[1], vpb[0], vpb[1], vpc[0], vpc[1], false);
     path.linewidth = 2;
     path.stroke = "#000000";
-    path.fill = color(c);
+    path.fill = c;
     two.add(path);
     two.update();
 }
 
-function step(tx, ty, dir, f, n) {
+// tx - x coordinate of current triangle
+// ty - y coordinate of current triangle
+// dir -direction current triangle enterred from
+// f  - generator function
+// n - nth turn
+// acc -- accumulated set of triangles as part of the system.
+function step(tx, ty, dir, f, n, acc) {
+    function acc_contains(acc,x,y) {
+        return acc.filter( tri => (tri[0] == x) && (tri[1] == y)).length > 0;
+    }
 
     // Call the generator function, which returns a direction, 'L' for left or 'R' for right,
     // or 'S' for stop.
@@ -222,7 +236,6 @@ function step(tx, ty, dir, f, n) {
     }
 
     if (action == 'L' || action == 'R') {
-
         // Update our direction of travel.
         // Left is a counter-clockwise turn of 60 degrees.
         // Right is a clockwise turn of 60 degrees.
@@ -244,10 +257,18 @@ function step(tx, ty, dir, f, n) {
         }
 
         // Draw the triangle at the new (tx, ty) coordinates.
-        renderTriangle(tx, ty, n);
+        // If tx,ty has occurred in the accumulator, render as black.
+
+        if (acc_contains(acc,tx,ty)) {
+            renderTriangle(tx, ty, "#000000");                    
+        } else {
+            renderTriangle(tx, ty, color(n));
+            acc.push([tx,ty]);            
+        }
+
 
         if (n+1<MAX_STEPS) {
-            setTimeout(step, INTERVAL, tx, ty, dir, f, n+1);
+            setTimeout(step, INTERVAL, tx, ty, dir, f, n+1, acc);
         } else {
             onStop();
         }
