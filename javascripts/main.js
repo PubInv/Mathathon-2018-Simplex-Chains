@@ -143,30 +143,30 @@ function createTriangleGrid(s) {
     var size = s || 30;
     for(var i = -s; i < s; i++) {
         for(var j = -s; j < s; j++) {
-            renderSpot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue');
+            renderSpot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue',1);
         }
     }
 }
 
 function drawEmptyGrid() {
     createGrid(TWO_PARAMS.width / (2 * 10.0));
-    createTriangleGrid(30);
-    renderSpot(0.0, 0.0, 'red');
+//    createTriangleGrid(30);
+    renderSpot(0.0, 0.0, 'red',2);
     two.update();
 }
 
 function plotPolar(r, theta) {
     var y = r*Math.sin(theta);
     var x = r*Math.cos(theta);
-    renderSpot(x, y, "black");
+    renderSpot(x, y, "black",1);
 }
 
-function renderSpot(x, y, color) {
+function renderSpot(x, y, color,w) {
     var pnt = transformToViewport(new THREE.Vector2(x, y));
     var circle = two.makeCircle(pnt[0], pnt[1], 3);
     circle.fill = color;
     circle.stroke = color; // Accepts all valid css color
-    circle.linewidth = 2;
+    circle.linewidth = w;
 }
 
 function renderTriangle(x, y, c) {
