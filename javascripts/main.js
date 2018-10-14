@@ -44,13 +44,60 @@ var visualSection = document.getElementById('visualsection');
 
 var two; // The Two canvas for our 2D drawing.
 
+// Main
+
+function main() {
+
+    // Attach our event handlers
+    executeButton.addEventListener("click", onExecute);
+    generatorsSelector.addEventListener("change", onGeneratorChanged);
+    spiralButton.addEventListener("click", onDrawGoldenSpiral);
+    
+    // Create a Two canvas and draw a grid on it.
+    two = new Two(TWO_PARAMS).appendTo(visualSection);
+    drawEmptyGrid();
+}
+
 // Event Handlers
 
-executeButton.addEventListener("click", executeGenerator);
-generatorsSelector.addEventListener("change", function() {
+function onDrawGoldenSpiral() {
+    const phi = (1 + Math.sqrt(5))/2.0;
+    const contraction = 2;
+    for(var theta = 0; theta < 20; theta += 0.05) {
+        r = Math.pow(phi, theta*2/Math.PI)/contraction;
+        plotPolar(r, theta);
+    }
+    two.update();
+}
+
+function onExecute() {
+    executeButton.disabled = true;
+    var generatorFn;
+    try {
+        generatorFn = eval(generatorText.value);
+    } catch(err) {
+    	funcStatus.innerHTML = "On Compilation:" + err.message;
+	    return;
+    }
+    funcStatus.innerHTML = "Function Compiled."
+
+    two.clear();
+    drawEmptyGrid();
+    setTimeout(step, INTERVAL, 0, 0, 90, generatorFn, 0);	    
+}
+
+function onGeneratorChanged() {
     generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value] || '';
-});
-spiralButton.addEventListener("click", drawGoldenSpiral);
+}
+
+// Called when execution of the generator has completed because
+// 1. The generator returned 'S'
+// 2. We reached the maximum number of steps.
+// 3. The generator threw an exception.
+// 4. The generator returned a value other then 'L', 'R', or 'S'.
+function onStop() {
+    executeButton.disabled = false;
+}
 
 // Helper Functions
 
@@ -108,41 +155,6 @@ function drawEmptyGrid() {
     two.update();
 }
 
-function drawGoldenSpiral() {
-    const phi = (1 + Math.sqrt(5))/2.0;
-    const contraction = 2;
-    for(var theta = 0; theta < 20; theta += 0.05) {
-        r = Math.pow(phi, theta*2/Math.PI)/contraction;
-        plotPolar(r, theta);
-    }
-    two.update();
-}
-
-function executeGenerator() {
-    executeButton.disabled = true;
-    var new_func;
-    try {
-        new_func = eval(generatorText.value);
-    } catch(err) {
-    	funcStatus.innerHTML = "On Compilation:" + err.message;
-	    return;
-    }
-    funcStatus.innerHTML = "Function Compiled."
-
-    two.clear();
-    drawEmptyGrid();
-    setTimeout(step, INTERVAL, 0, 0, 90, new_func, 0);	    
-}
-
-// Called when execution of the generator has completed either because
-// 1. The generator returned 'S'
-// 2. We reached the maximum number of steps.
-// 3. The generator threw an exception.
-// 4. The generator returned a value other then 'L', 'R', or 'S'.
-function onStop() {
-    executeButton.disabled = false;
-}
-
 function plotPolar(r, theta) {
     var y = r*Math.sin(theta);
     var x = r*Math.cos(theta);
@@ -189,7 +201,7 @@ function step(tx, ty, dir, f, n) {
         // Left is a counter-clockwise turn of 60 degrees.
         // Right is a clockwise turn of 60 degrees.
         if (action == 'L') { dir = (dir + 60)%360 }
-        else { dir = (dir - 60)%360; }
+        else { dir = (dir + 300)%360; }
 
         // Update the triangle (tx, ty) coordinates based on our new direction
         switch(dir) {
@@ -276,13 +288,6 @@ function verticesOfTriangle(x, y) {
         cy = y;
     }
     return [ax, ay, bx, by, cx, cy];
-}
-
-// Main
-
-function main() {
-    two = new Two(TWO_PARAMS).appendTo(visualSection);
-    drawEmptyGrid();
 }
 
 main();
