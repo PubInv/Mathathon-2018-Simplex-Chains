@@ -137,6 +137,10 @@ function onStop() {
 
 // Helper Functions
 
+function accContains(acc, x, y) {
+    return acc.filter( tri => (tri[0] == x) && (tri[1] == y)).length > 0;
+}
+
 function color(c) {
     switch(c % 3) {
     case 0: return "#ff0000";
@@ -244,9 +248,6 @@ function renderTriangle(x, y, c) {
 // n - nth turn
 // acc -- accumulated set of triangles as part of the system.
 function step(tx, ty, dir, f, n, acc) {
-    function acc_contains(acc,x,y) {
-        return acc.filter( tri => (tri[0] == x) && (tri[1] == y)).length > 0;
-    }
 
     // Call the generator function, which returns a direction, 'L' for left or 'R' for right,
     // or 'S' for stop.
@@ -283,7 +284,7 @@ function step(tx, ty, dir, f, n, acc) {
         // Draw the triangle at the new (tx, ty) coordinates.
         // If tx,ty has occurred in the accumulator, render as black.
 
-        if (acc_contains(acc,tx,ty)) {
+        if (accContains(acc,tx,ty)) {
             renderTriangle(tx, ty, "#000000");
         } else {
             renderTriangle(tx, ty, color(n));
