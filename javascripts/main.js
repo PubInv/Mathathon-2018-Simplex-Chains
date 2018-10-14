@@ -85,9 +85,18 @@ function main() {
     // Create a Two canvas and draw a grid on it.
     two = new Two(TWO_PARAMS).appendTo(visualSection);
     drawEmptyGrid();
+    renderStartTri();
 }
 
 // Event Handlers
+
+function onStartXChange(x) {
+    renderStartTri();
+}
+
+function onStartYChange(y) {
+    renderStartTri();    
+}
 
 function onDrawGoldenSpiral() {
     const phi = (1 + Math.sqrt(5))/2.0;
@@ -230,6 +239,17 @@ function renderSpot(x, y, color,w) {
     circle.fill = color;
     circle.stroke = color; // Accepts all valid css color
     circle.linewidth = w;
+}
+
+function renderStartTri() {
+    two.clear();
+    drawEmptyGrid();
+    
+    tx = parseInt(startX.value);
+    tx = isNaN(tx) ? 0 : tx;
+    ty = parseInt(startY.value);
+    ty = isNaN(ty) ? 0 : ty;
+    renderTriangle(tx, ty, "#ffffff");
 }
 
 function renderTriangle(x, y, c) {

@@ -27,6 +27,9 @@ As an example, consider this JavaScript function which generates a **beam** or *
 By turning left and then right, a straight "ladder" is constructed.
 This is one of the simpler generators.
 
+If you create a generator which causes a simplex chain to self-collide, the colliding
+triangles will be rendered as black.
+
 A number of sample generators can be selected, but the goal is to write your own!
 Play around and see what you can create. For example, can you write a generator
 that fills all space? If you find a good generator, make a pull request or just
