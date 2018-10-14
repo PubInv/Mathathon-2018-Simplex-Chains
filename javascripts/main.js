@@ -20,6 +20,7 @@ var MAX_STEPS = 300;
 var TWO_PARAMS = { width: 1000, height: 1000 };
 var WIDTH = 10.0;
 var HEIGHT = 10.0;
+var TRIANGLE_HEIGHT = Math.sqrt(3)/2;
 
 // The rand generator is not guaranteed not to self-collide!
 var EXAMPLE_GENERATORS = {
@@ -172,21 +173,24 @@ function compileGenerator(src) {
 
 function createGrid(s) {
     var size = s || 30;
+    // Draw the horizontals
     for(var j = -s; j < s; j++) {
         var x0 = -s;
-        var y0 = j;
+        var y0 = j*TRIANGLE_HEIGHT;
         var x1 = s;
-        var y1 = j;
+        var y1 = j*TRIANGLE_HEIGHT;
         var p0 = transformToViewport(new THREE.Vector2(x0, y0));
         var p1 = transformToViewport(new THREE.Vector2(x1, y1));
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
     }
+
+    // draw the slants
     for(var j = -s; j < s; j++) {
         var x0 = j;
-        var y0 = s;
+        var y0 = s * TRIANGLE_HEIGHT;
         var x1 = j+s;
-        var y1 = -s;
+        var y1 = -s * TRIANGLE_HEIGHT;
         var p0 = transformToViewport(new THREE.Vector2(x0, y0));
         var p1 = transformToViewport(new THREE.Vector2(x1, y1));
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
@@ -345,19 +349,19 @@ function verticesOfTriangle(x, y) {
     if (((x+y) % 2) == 0) {
         // this is up
         ax = x/2.0;
-        ay = y;
+        ay = y * TRIANGLE_HEIGHT;
         bx = ax - 0.5;
-        by = y - 1.0;
+        by = (y - 1.0) * TRIANGLE_HEIGHT;
         cx = ax + 0.5;
-        cy = y - 1.0;
+        cy = (y - 1.0) * TRIANGLE_HEIGHT;
     } else {
         // this is down
         ax = (x/2.0);
-        ay = y - 1.0;
+        ay = (y - 1.0) * TRIANGLE_HEIGHT;
         bx = ax + 0.5;
-        by = y;
+        by = y * TRIANGLE_HEIGHT;
         cx = ax - 0.5;
-        cy = y;
+        cy = y * TRIANGLE_HEIGHT;
     }
     return [ax, ay, bx, by, cx, cy];
 }
