@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// Make an instance of two and place it on the page.
-
 // Constants
 
 var INTERVAL = 100; // Milliseconds between steps
@@ -36,7 +34,7 @@ var EXAMPLE_GENERATORS = {
 // Page Elements
 
 var executeButton = document.getElementById("execute-button");
-var funcstatus = document.getElementById("function-status");
+var funcStatus = document.getElementById("function-status");
 var generatorText = document.getElementById("user-defined-generator");
 var generatorsSelector = document.getElementById("generators-selector");
 var spiralButton = document.getElementById("spiral-button");
@@ -122,23 +120,27 @@ function drawGoldenSpiral() {
 
 function executeGenerator() {
     executeButton.disabled = true;
-    var fsrc = generatorText.value;
-    console.log(fsrc);
+    var new_func;
     try {
-        var new_func = eval(fsrc);
-        try {
-            two.clear();
-            drawEmptyGrid();
-            setTimeout(step, INTERVAL, 0, 0, 90, new_func, 0);	    
-        } catch(err) {
-            funcstatus.innerHTML = "On Evaluation:" + err.message;
-        }
+        new_func = eval(generatorText.value);
+    } catch(err) {
+    	funcStatus.innerHTML = "On Compilation:" + err.message;
+	    return;
     }
-    catch(err) {
-    	funcstatus.innerHTML = "On Compilation:" + err.message;
-	    return ;
-    }
-    funcstatus.innerHTML = "Function Compiled."
+    funcStatus.innerHTML = "Function Compiled."
+
+    two.clear();
+    drawEmptyGrid();
+    setTimeout(step, INTERVAL, 0, 0, 90, new_func, 0);	    
+}
+
+// Called when execution of the generator has completed either because
+// 1. The generator returned 'S'
+// 2. We reached the maximum number of steps.
+// 3. The generator threw an exception.
+// 4. The generator returned a value other then 'L', 'R', or 'S'.
+function onStop() {
+    executeButton.disabled = false;
 }
 
 function plotPolar(r, theta) {
@@ -169,46 +171,55 @@ function renderTriangle(x, y, c) {
 }
 
 function step(tx, ty, dir, f, n) {
-    
+
     // Call the generator function, which returns a direction, 'L' for left or 'R' for right, 
     // or ''S' for stop.
     // If we have reached the maximum number of steps, then assume 'S'.
-    var action = n < MAX_STEPS ? f(n) : 'S';
-
-    // Update our direction of travel.
-    // Left is a counter-clockwise turn of 60 degrees.
-    // Right is a clockwise turn of 60 degrees.
-    switch(action) {
-    case 'L':
-        dir = (dir + 60)%360;
-        break;
-    case 'R':
-        dir = (dir + 300)%360;
-    break;
-    case 'S':
-        executeButton.disabled = false;
-        return;
+    var action;
+    try {
+        action = f(n);
+    } catch(err) {
+        funcStatus.innerHTML = "On Evaluation:" + err.message;
+        action = 'S';
     }
 
-    // Update the triangle (tx, ty) coordinates based on our new direction
-    switch(dir) {
-    case 30:
-    case 330:
-        tx++; break;
-    case 90:
-        ty++; break;
-    case 150:
-    case 210:
-        tx--; break;
-    case 270:
-        ty--; break;
+    if (action == 'L' || action == 'R') {
+
+        // Update our direction of travel.
+        // Left is a counter-clockwise turn of 60 degrees.
+        // Right is a clockwise turn of 60 degrees.
+        if (action == 'L') { dir = (dir + 60)%360 }
+        else { dir = (dir - 60)%360; }
+
+        // Update the triangle (tx, ty) coordinates based on our new direction
+        switch(dir) {
+        case 30:
+        case 330:
+            tx++; break;
+        case 90:
+            ty++; break;
+        case 150:
+        case 210:
+            tx--; break;
+        case 270:
+            ty--; break;
+        }
+    
+        // Draw the triangle at the new (tx, ty) coordinates.
+        renderTriangle(tx, ty, n);
+
+        if (n+1<MAX_STEPS) {
+            setTimeout(step, INTERVAL, tx, ty, dir, f, n+1);
+        } else {
+            onStop();
+        }
+
+    } else {
+        if (action != 'S') {
+            funcStatus.innerHTML = "Unexpected generator return value: " + action.toString();
+        }
+        onStop();
     }
-
-    // Draw the triangle at the new (tx, ty) coordinates.
-    renderTriangle(tx, ty, n);
-
-    // Do the next step after a short interval.
-    setTimeout(step, INTERVAL, tx, ty, dir, f, n+1);
 }
 
 // Not currently used:
