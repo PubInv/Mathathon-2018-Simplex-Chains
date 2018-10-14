@@ -15,7 +15,7 @@
 
 // Constants
 
-var INTERVAL = 100; // Milliseconds between steps
+var INTERVAL = 25; // Milliseconds between steps
 var MAX_STEPS = 100;
 var TWO_PARAMS = { width: 1000, height: 1000 };
 var WIDTH = 10.0;
@@ -23,12 +23,30 @@ var HEIGHT = 10.0;
 
 // The rand generator is not guaranteed not to self-collide!
 var EXAMPLE_GENERATORS = {
-    beam: '(n) => { return ((n < 10) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }',
-    hex: '(n) => { return ((n < 6) ?  "L" : "S"); }',
-    rand: '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }',
-    triangle: '(n) => {  return ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }',
-    hexagon: '(n) => {  return (n > 41) ? "S" :  ((n % 7) == 0) ? "L" : ((((n + Math.round(n / 7) )% 2) == 0 ) ? "L" : "R"); }',
-    trefoil: '(n) => {  return (n > 270) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
+    beam: {
+        name: "Beam",
+        src: '(n) => { return ((n < 10) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }'
+    },
+    hex: {
+        name: "Small Hexagon",
+        src: '(n) => { return ((n < 6) ?  "L" : "S"); }'
+    },
+    rand: {
+        name: "Random Walk",
+        src: '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }'
+    },
+    triangle: {
+        name: "Triangle",
+        src: '(n) => {  return ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
+    },
+    hexagon: {
+        name: "Large Hexagon",
+        src: '(n) => {  return (n > 41) ? "S" :  ((n % 7) == 0) ? "L" : ((((n + Math.round(n / 7) )% 2) == 0 ) ? "L" : "R"); }'
+    },
+    trefoil: {
+        name: "Trefoil",
+        src: '(n) => {  return (n > 270) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
+    }
 };
 
 // Page Elements
@@ -52,6 +70,14 @@ function main() {
     executeButton.addEventListener("click", onExecute);
     generatorsSelector.addEventListener("change", onGeneratorChanged);
     spiralButton.addEventListener("click", onDrawGoldenSpiral);
+
+    // Fill the example selector
+    for (var key in EXAMPLE_GENERATORS) {
+        if (EXAMPLE_GENERATORS.hasOwnProperty(key)) {
+            var entry = EXAMPLE_GENERATORS[key];
+            generatorsSelector.options[generatorsSelector.options.length] = new Option(entry.name, key);
+        }
+    }
 
     // Create a Two canvas and draw a grid on it.
     two = new Two(TWO_PARAMS).appendTo(visualSection);
@@ -87,7 +113,7 @@ function onExecute() {
 }
 
 function onGeneratorChanged() {
-    generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value] || '';
+    generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value].src || '';
 }
 
 // Called when execution of the generator has completed because
