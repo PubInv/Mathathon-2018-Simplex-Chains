@@ -27,7 +27,7 @@ As an example, consider this JavaScript function which generates a **beam** or *
 By turning left and then right, a straight "ladder" is constructed.
 This is one of the simpler generators.
 
-A number of sample generators can be selected, but the goal is to right your own!
+A number of sample generators can be selected, but the goal is to write your own!
 Play around and see what you can create. For example, can you write a generator
 that fills all space? If you find a good generator, make a pull request or just
 place it in an issue and we will add it to our library of sample generators.
