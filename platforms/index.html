@@ -49,10 +49,12 @@
 height: 50px;
 border-width: 3px;
 boder-color: black;
+background: lime;
 }
 .btn {
 font-size: small;
 margin: 3px;
+background: lime;
 
 }
 
@@ -88,18 +90,18 @@ background: red;
         </div>
 
         <div class="panel panel-default">
-  <div class="panel-heading">Basic Usage</div>
-  <div class="panel-body">
-        <p  id="instructions">
-            Select or write your own javascript snippet that takes an integer and returns the string "L", "R", or "S" for "turn left", "turn right", or "stop" to build a <i>regular 2D simplex chain</i>.
-            Play with ideas such as filling all space or matching a geometric shape.
-            For more information, see the <a href="https://github.com/PubInv/Mathathon-2018-Simplex-Chains"> GitHub Readme</a>; but to be really awesome join our free, online <a href="https://www.eventbrite.com/e/mathathon-a-cooperative-virtual-mathathon-tickets-50181898409"> Mathathon</a>.
+          <div class="panel-heading">Basic Usage</div>
+          <div class="panel-body">
+            <p  id="instructions">
+              Select or write your own javascript snippet that takes an integer and returns the string "L", "R", or "S" for "turn left", "turn right", or "stop" to build a <i>regular 2D simplex chain</i>.
+              Play with ideas such as filling all space or matching a geometric shape.
+              For more information, see the <a href="https://github.com/PubInv/Mathathon-2018-Simplex-Chains"> GitHub Readme</a>; but to be really awesome join our free, online <a href="https://www.eventbrite.com/e/mathathon-a-cooperative-virtual-mathathon-tickets-50181898409"> Mathathon</a>.
             </p>
             <p>
               If you develop a neat new generator, consider <a href="mailto:read.robert@gmail.com">emailing</a> it to us.
-              </p>
-  </div>
-</div>
+            </p>
+          </div>
+        </div>
         <div class="row">
           <div class="col-md-4">
             <!-- Left column of generator controls -->
@@ -141,22 +143,22 @@ background: red;
               (<input type="text" id="start-x" size="2" value="0" oninput="onStartXChange(this.value)"/>,
               <input type="text" id="start-y" size="2" value="0" oninput="onStartYChange()"/>)
             </div>
+          </div>
+          <div class="col-md-5">
+
+            <!-- Center column of generator code -->
+            <div class="form-group">
+              <label for="exampleFormControlTextarea2">Javascript Generator Snippet</label>
+              <textarea class="form-control rounded-0" id="user-defined-generator" rows="5" laceholder="Select a generator, above, or create your own."></textarea>
+              <div style="display: flex; flex-direction: row, justify-content: center">
+                <button type="button" id="execute-button"
+                        style="font-size: x-large; margin: 0 auto;">GO!</button>
+              </div>
             </div>
-            <div class="col-md-5">
-              <!--               <button type="button" id="execute-button" style="font-size: x-large">&#x25b6;</button> -->
-              <!-- Center column of generator code -->
-              <div class="form-group">
-    <label for="exampleFormControlTextarea2">Javascript Generator Snippet</label>
-    <textarea class="form-control rounded-0" id="user-defined-generator" rows="5" laceholder="Select a generator, above, or create your own."></textarea>
-    <div style="display: flex; flex-direction: row, justify-content: center">
-    <button type="button" id="execute-button"
-            style="font-size: x-large">GO!</button>
-    </div>
-</div>
-              <div id="function-status"></div>
-            </div>
-            <div class="col-md-3">
-              <!-- Right column of other controls -->
+            <div id="function-status"></div>
+          </div>
+          <div class="col-md-3">
+            <!-- Right column of other controls -->
             <div class="panel-heading">
               <h3 class="panel-title">Playfield Dimensions</h3>
             </div>
@@ -168,23 +170,23 @@ background: red;
                 <button type="button" id="size-xl" class="btn btn-default">XL</button>
               </div>
             </div>
-              <!-- <select id="gridsize-selector" style="display: block; width: 200px;"> -->
-              <!--   <option value="default" selected="selected">Select Grid Playfield...</option> -->
-              <!-- </select> -->
+            <!-- <select id="gridsize-selector" style="display: block; width: 200px;"> -->
+            <!--   <option value="default" selected="selected">Select Grid Playfield...</option> -->
+            <!-- </select> -->
             <div class="panel-heading">
               <h3 class="panel-title">Reference Geometry</h3>
             </div>
             <div class="panel-body" id="reference-buttons">
               <button type="button" id="spiral-button" class="btn btn-default">Draw Golden Spiral</button>
             </div>              
-            </div>
+          </div>
         </div>
-        </div>
-        <section id="visualsection" class="xscrollable"></section>
-        <script src="../javascripts/two.min.js"></script>
-        <script src="../javascripts/three.js"></script>
-        <script src="../javascripts/main.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+      </div>
+      <section id="visualsection" class="xscrollable"></section>
+      <script src="../javascripts/two.min.js"></script>
+      <script src="../javascripts/three.js"></script>
+      <script src="../javascripts/main.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     </body>
 </html>

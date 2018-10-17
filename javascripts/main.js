@@ -63,8 +63,6 @@ var EXAMPLE_GENERATORS = {
 var executeButton = document.getElementById("execute-button");
 var funcStatus = document.getElementById("function-status");
 var generatorText = document.getElementById("user-defined-generator");
-var generatorsSelector = document.getElementById("generators-selector");
-var gridSizeSelector = document.getElementById("gridsize-selector");
 var spiralButton = document.getElementById("spiral-button");
 var gridSizeButtons = document.getElementById("gridsize-buttons");
 var startDir = document.getElementById("start-dir");
@@ -92,40 +90,10 @@ function main() {
 
     // Attach our event handlers
     executeButton.addEventListener("click", onExecute);
- //   generatorsSelector.addEventListener("change", onGeneratorChanged);
-//    gridSizeSelector.addEventListener("change", onGridSizeChanged);    
     spiralButton.addEventListener("click", onDrawGoldenSpiral);
     startX.addEventListener("input", onStartXChange);
     startY.addEventListener("input", onStartYChange);
 
-    // Fill the example selector
-    for (var key in EXAMPLE_GENERATORS) {
-        if (EXAMPLE_GENERATORS.hasOwnProperty(key)) {
-            var entry = EXAMPLE_GENERATORS[key];
-//            var node = document.createElement("LI");
-//            var textnode = document.createTextNode(entry.name);  
-//            node.appendChild(textnode); 
-//            generatorsSelector.appendChild(node);
-            // var li = document.createElement("li");
-            // var link = document.createElement("a");             
-            // var text = document.createTextNode(entry.name);
-            // link.appendChild(text);
-            // link.href = "#";
-            // li.appendChild(link);
-            // generatorsSelector.appendChild(li);
-//            generatorsSelector.options[generatorsSelector.options.length] = new Option(entry.name, key);
-        }
-    }
-    
-    // Fill the gridsize selector
-    // for (var key in GRID_CONFIGS) {
-    //     if (GRID_CONFIGS.hasOwnProperty(key)) {
-    //         var entry = GRID_CONFIGS[key];
-    //         console.log(entry.name,key);
-    //         gridSizeSelector.options[ gridSizeSelector.options.length] = new Option(entry.name, key);
-    //     }
-    // }
-    
     // Create a Two canvas and draw a grid on it.
     var w = document.getElementById('visualsection').offsetWidth;
     TWO_PARAMS.width = w;
@@ -165,13 +133,8 @@ function main() {
             DIRECTION = 150;
             break;            
         };
-        console.log("direction",DIRECTION);
     });
-    // $(".btn-group > button.btn").on("click", function(){
-    //     value = this.innerHTML;
-    //     alert("Value is " + value);
-    //     generatorText.value = Object.values(EXAMPLE_GENERATORS).find(el => (el.name == value)).src;
-    // });
+
     $('#selector button').click(function() {
         $(this).addClass('active').siblings().removeClass('active');
         // TODO: insert whatever you want to do with $(this) here
@@ -239,7 +202,7 @@ function onExecute() {
     generatorFn = compileGenerator(generatorText.value);
     if (!generatorFn) {
         executeButton.disabled = false;
-        gridSizeSelector.disabled = false;        
+//        gridSizeSelector.disabled = false;        
         return;
     }
 
@@ -270,7 +233,6 @@ function onGeneratorChanged() {
 // 4. The generator returned a value other then 'L', 'R', or 'S'.
 function onStop() {
     executeButton.disabled = false;
-    gridSizeSelector.disabled = false;    
 }
 
 // Helper Functions
@@ -504,9 +466,6 @@ function transformToViewport(pnt) {
     // now move to origin....
     x += TWO_PARAMS.width/2;
     y = (-y) + TWO_PARAMS.height/2;
-    // These adjust our weird grid background to the origin...
-    //    y = y + params.height / (2 *(2 * h));
-    //    x = x + params.width / (2 * (2 * w)) ;
     return [x, y];
 }
 
