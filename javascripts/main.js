@@ -20,10 +20,10 @@ var MAX_STEPS = 300;
 var TWO_PARAMS = { width: 1000, height: 1000 };
 var TRIANGLE_HEIGHT = Math.sqrt(3)/2;
 
-var GRID_CONFIGS = { small: { name: "Small", w: 10.0, h: 10.0},
-                     medium: { name: "Medium", w: 20.0, h: 20.0},
-                     large: { name: "Large", w: 40.0, h: 40.0},
-                     xlarge: { name: "X-large", w: 80.0, h: 80.0}}
+var GRID_CONFIGS = { "S": { name: "S", w: 10.0, h: 10.0},
+                     "M": { name: "M", w: 20.0, h: 20.0},
+                     "L": { name: "L", w: 40.0, h: 40.0},
+                     "XL": { name: "XL", w: 80.0, h: 80.0}}
 var initial_grid = "small";
 
 var WIDTH = 10.0;
@@ -66,7 +66,16 @@ var generatorText = document.getElementById("user-defined-generator");
 var generatorsSelector = document.getElementById("generators-selector");
 var gridSizeSelector = document.getElementById("gridsize-selector");
 var spiralButton = document.getElementById("spiral-button");
+var gridSizeButtons = document.getElementById("gridsize-buttons");
 var startDir = document.getElementById("start-dir");
+var SDoptions = [
+    document.getElementById("start-dir-n"),
+    document.getElementById("start-dir-ne"),        
+    document.getElementById("start-dir-se"),
+    document.getElementById("start-dir-s"),        
+    document.getElementById("start-dir-sw"),
+    document.getElementById("start-dir-nw")        
+    ]
 var startX = document.getElementById("start-x");
 var startY = document.getElementById("start-y");
 var visualSection = document.getElementById('visualsection');
@@ -75,14 +84,16 @@ var visualSection = document.getElementById('visualsection');
 
 var two; // The Two canvas for our 2D drawing.
 
+var DIRECTION = 90;
+
 // Main
 
 function main() {
 
     // Attach our event handlers
     executeButton.addEventListener("click", onExecute);
-    generatorsSelector.addEventListener("change", onGeneratorChanged);
-    gridSizeSelector.addEventListener("change", onGridSizeChanged);    
+ //   generatorsSelector.addEventListener("change", onGeneratorChanged);
+//    gridSizeSelector.addEventListener("change", onGridSizeChanged);    
     spiralButton.addEventListener("click", onDrawGoldenSpiral);
     startX.addEventListener("input", onStartXChange);
     startY.addEventListener("input", onStartYChange);
@@ -91,18 +102,29 @@ function main() {
     for (var key in EXAMPLE_GENERATORS) {
         if (EXAMPLE_GENERATORS.hasOwnProperty(key)) {
             var entry = EXAMPLE_GENERATORS[key];
-            generatorsSelector.options[generatorsSelector.options.length] = new Option(entry.name, key);
+//            var node = document.createElement("LI");
+//            var textnode = document.createTextNode(entry.name);  
+//            node.appendChild(textnode); 
+//            generatorsSelector.appendChild(node);
+            // var li = document.createElement("li");
+            // var link = document.createElement("a");             
+            // var text = document.createTextNode(entry.name);
+            // link.appendChild(text);
+            // link.href = "#";
+            // li.appendChild(link);
+            // generatorsSelector.appendChild(li);
+//            generatorsSelector.options[generatorsSelector.options.length] = new Option(entry.name, key);
         }
     }
     
     // Fill the gridsize selector
-    for (var key in GRID_CONFIGS) {
-        if (GRID_CONFIGS.hasOwnProperty(key)) {
-            var entry = GRID_CONFIGS[key];
-            console.log(entry.name,key);
-            gridSizeSelector.options[ gridSizeSelector.options.length] = new Option(entry.name, key);
-        }
-    }
+    // for (var key in GRID_CONFIGS) {
+    //     if (GRID_CONFIGS.hasOwnProperty(key)) {
+    //         var entry = GRID_CONFIGS[key];
+    //         console.log(entry.name,key);
+    //         gridSizeSelector.options[ gridSizeSelector.options.length] = new Option(entry.name, key);
+    //     }
+    // }
     
     // Create a Two canvas and draw a grid on it.
     var w = document.getElementById('visualsection').offsetWidth;
@@ -113,6 +135,49 @@ function main() {
     two = new Two(TWO_PARAMS).appendTo(visualSection);
     drawEmptyGrid();
     renderStartTri();
+    var value = null;
+    $("#generator-buttons .btn-group > button.btn").on("click", function(){
+        value = this.innerHTML;
+        generatorText.value = Object.values(EXAMPLE_GENERATORS).find(el => (el.name == value)).src;
+    });
+
+    $("#gridsize-buttons .btn-group > button.btn").on("click", onGridSizeChanged);
+    
+    $("#direction-buttons .btn-group > button.btn").on("click", function(){
+        value = this.innerHTML;
+        switch(value) {
+        case "N":
+            DIRECTION = 90;
+            break;
+        case "NE":
+            DIRECTION = 30;
+            break;            
+        case "SE":
+            DIRECTION = 330;
+            break;            
+        case "S":
+            DIRECTION = 270;
+            break;            
+        case "SW":
+            DIRECTION = 210;
+            break;            
+        case "NW":
+            DIRECTION = 150;
+            break;            
+        };
+        console.log("direction",DIRECTION);
+    });
+    // $(".btn-group > button.btn").on("click", function(){
+    //     value = this.innerHTML;
+    //     alert("Value is " + value);
+    //     generatorText.value = Object.values(EXAMPLE_GENERATORS).find(el => (el.name == value)).src;
+    // });
+    $('#selector button').click(function() {
+        $(this).addClass('active').siblings().removeClass('active');
+        // TODO: insert whatever you want to do with $(this) here
+        console.log(this);
+    });
+    
 }
 
 // Event Handlers
@@ -129,19 +194,32 @@ function onResizeBody() {
     renderStartTri();
  }
 
-function onGridSizeChanged(x) {
-    var gsize = GRID_CONFIGS[gridSizeSelector.value || 'small'];
+function onGridSizeChanged(e) {
+    var v = e.originalEvent.target.innerText;
+    var gsize = GRID_CONFIGS[v || 'S'];
     WIDTH = gsize.w;
     HEIGHT = gsize.h;
     drawEmptyGrid();
     renderStartTri();
 }
-
+// Need to make sure DIRECTION is valid....
+function ensure_valid_direction() {
+    var c = getStartingCoordinates();
+    var up = triangleIsUp(c.x, c.y);
+    if (up && ((DIRECTION == 30) || (DIRECTION == 270) || (DIRECTION == 150))) {
+        DIRECTION = ((DIRECTION + 120) % 360);
+    }
+    if (!up && ((DIRECTION == 90) || (DIRECTION == 330) || (DIRECTION == 210))) {
+        DIRECTION = ((DIRECTION + 60) % 360);
+    }
+}
 function onStartXChange(x) {
+    ensure_valid_direction();
     renderStartTri();
 }
 
 function onStartYChange(y) {
+    ensure_valid_direction();    
     renderStartTri();
 }
 
@@ -157,7 +235,7 @@ function onDrawGoldenSpiral() {
 
 function onExecute() {
     executeButton.disabled = true;
-    gridSizeSelector.disabled = true;
+    gridSizeButtons.disabled = true;
     generatorFn = compileGenerator(generatorText.value);
     if (!generatorFn) {
         executeButton.disabled = false;
@@ -170,16 +248,17 @@ function onExecute() {
 
     var c = getStartingCoordinates();
 
-    // console.log(`Starting at (${c.x},${c.y}) dir ${c.d}`);
+    console.log(`Starting at (${c.x},${c.y}) dir ${c.d}`);
 
     var acc = []; // List of occupied triangles.
     acc.push([c.x,c.y]); // initial position is a part of every chain.
-    renderTriangle(c.x, c.y, color(0));
+    renderTriangle(c.x, c.y, color(2));
 
     setTimeout(step, INTERVAL, c.x, c.y, c.d, generatorFn, 0, acc);
 }
 
 function onGeneratorChanged() {
+    alert("changed");
     funcStatus.innerHTML = '';
     generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value].src || '';
 }
@@ -286,7 +365,7 @@ function getStartingCoordinates() {
     return {
         x: getCoordinateFromInput(startX),
         y: getCoordinateFromInput(startY),
-        d: parseInt(startDir.options[startDir.selectedIndex].value)
+        d: DIRECTION
     };
 }
 
@@ -311,15 +390,15 @@ function renderStartTri() {
     var c = getStartingCoordinates();
 
     var up = triangleIsUp(c.x, c.y);
-    var options = startDir.options;
-    options[0].disabled = !up;
-    options[1].disabled = up;
-    options[2].disabled = !up;
-    options[3].disabled = up;
-    options[4].disabled = !up;
-    options[5].disabled = up;
-    options.selectedIndex = up ? 0 /* north */ : 3 /* south */;
-
+    console.log(up,DIRECTION);
+    
+//    var options = startDir.options;
+    SDoptions[0].disabled = !up;
+    SDoptions[1].disabled = up;
+    SDoptions[2].disabled = !up;
+    SDoptions[3].disabled = up;
+    SDoptions[4].disabled = !up;
+    SDoptions[5].disabled = up;
     renderTriangle(c.x, c.y, "#ffffff");
 }
 
