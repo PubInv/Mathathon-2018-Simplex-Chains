@@ -18,11 +18,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-
-        <title> 2D Simplex Chain Generator</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         <!-- Optional theme -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <title> 2D Simplex Chain Generator</title>
         <style>
             body { font-family: Arial; font-size: 10pt }
             h1 { font-size: 16pt; margin-bottom: 4pt }
@@ -41,35 +42,43 @@
             Play with ideas such as filling all space or matching a geometric shape.
             For more information, see the <a href="https://github.com/PubInv/Mathathon-2018-Simplex-Chains"> GitHub Readme</a>; but to be really awesome join our free, online <a href="https://www.eventbrite.com/e/mathathon-a-cooperative-virtual-mathathon-tickets-50181898409"> Mathathon</a>.
         </div>
-        <div style="display: flex; flex-direction: row" >
-            <select id="gridsize-selector" style="display: block; width: 200px;">
-                <option value="default" selected="selected">Select Grid Playfield...</option>
-            </select>
-            <select id="start-dir">
-                <option value="90" selected="selected">N</option>
-                <option value="30" disabled="disabled">NE</option>
-                <option value="330">SE</option>
-                <option value="270" disabled="disabled">S</option>
-                <option value="210">SW</option>
-                <option value="150" disabled="disabled">NW</option>
-            </select>
-            (<input type="text" id="start-x" size="2" value="0" oninput="onStartXChange(this.value)"/>,
-            <input type="text" id="start-y" size="2" value="0" oninput="onStartYChange()"/>)
+        <div class="container">
+            <div class="row">
+                <div class="col-2">
+                    <!-- Left column of generator controls -->
+                    <select id="generators-selector" style="display: block">
+                        <option value="default" selected="selected">Select Generator...</option>
+                    </select>
+                    <select id="start-dir">
+                        <option value="90" selected="selected">N</option>
+                        <option value="30" disabled="disabled">NE</option>
+                        <option value="330">SE</option>
+                        <option value="270" disabled="disabled">S</option>
+                        <option value="210">SW</option>
+                        <option value="150" disabled="disabled">NW</option>
+                    </select>
+                    (<input type="text" id="start-x" size="2" value="0" oninput="onStartXChange(this.value)"/>,
+                    <input type="text" id="start-y" size="2" value="0" oninput="onStartYChange()"/>)
+                    <button type="button" id="execute-button" style="font-size: x-large">&#x25b6;</button>
+                </div>
+                <div class="col-8">
+                    <!-- Center column of generator code -->
+                    <textarea id="user-defined-generator" rows="5" cols="60" placeholder="Select a generator, above, or create your own."></textarea>
+                    <div id="function-status"></div>
+                </div>
+                <div class="col-2">
+                    <!-- Right column of other controls -->
+                    <select id="gridsize-selector" style="display: block; width: 200px;">
+                        <option value="default" selected="selected">Select Grid Playfield...</option>
+                    </select>
+                    <button type="button" id="spiral-button">Draw Golden Spiral</button>
+                </div>
+            </div>
         </div>
-        <div style="display: flex; flex-direction: row" >
-            <textarea id="user-defined-generator" rows="5" cols="60" placeholder="Select a generator, above, or create your own."></textarea>
-        </div>
-        <div id="function-status"></div>
-
-        <select id="generators-selector" style="display: block">
-            <option value="default" selected="selected">Select Generator...</option>
-        </select>
-
-        <button type="button" id="execute-button" style="font-size: x-large">&#x25b6;</button>
-
-        <button type="button" id="spiral-button">Draw Golden Spiral</button>
         <section id="visualsection" class="xscrollable"></section>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
         <script src="../javascripts/two.min.js"></script>
         <script src="../javascripts/three.js"></script>
         <script src="../javascripts/main.js"></script>
