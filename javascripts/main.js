@@ -18,9 +18,17 @@
 var INTERVAL = 25; // Milliseconds between steps
 var MAX_STEPS = 300;
 var TWO_PARAMS = { width: 1000, height: 1000 };
+var TRIANGLE_HEIGHT = Math.sqrt(3)/2;
+
+var GRID_CONFIGS = { small: { name: "Small", w: 10.0, h: 10.0},
+                     medium: { name: "Medium", w: 20.0, h: 20.0},
+                     large: { name: "Large", w: 40.0, h: 40.0},
+                     xlarge: { name: "X-large", w: 80.0, h: 80.0}}
+var initial_grid = "small";
+
 var WIDTH = 10.0;
 var HEIGHT = 10.0;
-var TRIANGLE_HEIGHT = Math.sqrt(3)/2;
+
 
 // The rand generator is not guaranteed not to self-collide!
 var EXAMPLE_GENERATORS = {
@@ -56,6 +64,7 @@ var executeButton = document.getElementById("execute-button");
 var funcStatus = document.getElementById("function-status");
 var generatorText = document.getElementById("user-defined-generator");
 var generatorsSelector = document.getElementById("generators-selector");
+var gridSizeSelector = document.getElementById("gridsize-selector");
 var spiralButton = document.getElementById("spiral-button");
 var startX = document.getElementById("start-x");
 var startY = document.getElementById("start-y");
@@ -72,6 +81,7 @@ function main() {
     // Attach our event handlers
     executeButton.addEventListener("click", onExecute);
     generatorsSelector.addEventListener("change", onGeneratorChanged);
+    gridSizeSelector.addEventListener("change", onGridSizeChanged);    
     spiralButton.addEventListener("click", onDrawGoldenSpiral);
 
     // Fill the example selector
@@ -81,7 +91,16 @@ function main() {
             generatorsSelector.options[generatorsSelector.options.length] = new Option(entry.name, key);
         }
     }
-
+    
+    // Fill the gridsize selector
+    for (var key in GRID_CONFIGS) {
+        if (GRID_CONFIGS.hasOwnProperty(key)) {
+            var entry = GRID_CONFIGS[key];
+            console.log(entry.name,key);
+            gridSizeSelector.options[ gridSizeSelector.options.length] = new Option(entry.name, key);
+        }
+    }
+    
     // Create a Two canvas and draw a grid on it.
     two = new Two(TWO_PARAMS).appendTo(visualSection);
     drawEmptyGrid();
@@ -89,6 +108,15 @@ function main() {
 }
 
 // Event Handlers
+
+function onGridSizeChanged(x) {
+    var gsize = GRID_CONFIGS[gridSizeSelector.value || 'small'];
+    WIDTH = gsize.w;
+    HEIGHT = gsize.h;
+    drawEmptyGrid();
+    renderStartTri();
+    
+}
 
 function onStartXChange(x) {
     renderStartTri();
@@ -110,9 +138,11 @@ function onDrawGoldenSpiral() {
 
 function onExecute() {
     executeButton.disabled = true;
+    gridSizeSelector.disabled = true;
     generatorFn = compileGenerator(generatorText.value);
     if (!generatorFn) {
         executeButton.disabled = false;
+        gridSizeSelector.disabled = false;        
         return;
     }
 
@@ -143,6 +173,7 @@ function onGeneratorChanged() {
 // 4. The generator returned a value other then 'L', 'R', or 'S'.
 function onStop() {
     executeButton.disabled = false;
+    gridSizeSelector.disabled = false;    
 }
 
 // Helper Functions
@@ -221,7 +252,8 @@ function createTriangleGrid(s) {
 }
 
 function drawEmptyGrid() {
-    createGrid(TWO_PARAMS.width / (2 * 10.0));
+    //    createGrid(TWO_PARAMS.width / (2 * WIDTH));
+    createGrid(4*WIDTH);
 //    createTriangleGrid(30);
     renderSpot(0.0, 0.0, 'red',2);
     two.update();
