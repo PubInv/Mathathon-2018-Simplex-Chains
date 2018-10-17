@@ -36,15 +36,23 @@
             For more information, see the <a href="https://github.com/PubInv/Mathathon-2018-Simplex-Chains"> GitHub Readme</a>.
         </div>
         <div style="display: flex; flex-direction: row" >
-            <select id="generators-selector" style="display: block">
+            <select id="generators-selector">
                 <option value="default" selected="selected">Select Generator...</option>
             </select>
             <select id="gridsize-selector" style="display: block">
                 <option value="default" selected="selected">Select GridSie...</option>
             </select>
             <button type="button" id="execute-button">&#x25b6;</button>
-            (<input type="text" id="start-x" size="2" value="0" oninput="onStartXChange(this.value)"/>,
-            <input type="text" id="start-y" size="2" value="0" oninput="onStartYChange()"/>)
+            (<input type="text" id="start-x" size="2" value="0"/>,
+            <input type="text" id="start-y" size="2" value="0"/>)
+            <select id="start-dir">
+                <option value="90" selected="selected">N</option>
+                <option value="30" disabled="disabled">NE</option>
+                <option value="330">SE</option>
+                <option value="270" disabled="disabled">S</option>
+                <option value="210">SW</option>
+                <option value="150" disabled="disabled">NW</option>
+            </select>
             <button type="button" id="spiral-button">Golden Spiral</button>
         </div>
         <div style="display: flex; flex-direction: row" >

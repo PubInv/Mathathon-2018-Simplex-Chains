@@ -66,6 +66,7 @@ var generatorText = document.getElementById("user-defined-generator");
 var generatorsSelector = document.getElementById("generators-selector");
 var gridSizeSelector = document.getElementById("gridsize-selector");
 var spiralButton = document.getElementById("spiral-button");
+var startDir = document.getElementById("start-dir");
 var startX = document.getElementById("start-x");
 var startY = document.getElementById("start-y");
 var visualSection = document.getElementById('visualsection');
@@ -83,6 +84,8 @@ function main() {
     generatorsSelector.addEventListener("change", onGeneratorChanged);
     gridSizeSelector.addEventListener("change", onGridSizeChanged);    
     spiralButton.addEventListener("click", onDrawGoldenSpiral);
+    startX.addEventListener("input", onStartXChange);
+    startY.addEventListener("input", onStartYChange);
 
     // Fill the example selector
     for (var key in EXAMPLE_GENERATORS) {
@@ -123,7 +126,7 @@ function onStartXChange(x) {
 }
 
 function onStartYChange(y) {
-    renderStartTri();    
+    renderStartTri();
 }
 
 function onDrawGoldenSpiral() {
@@ -149,16 +152,15 @@ function onExecute() {
     two.clear();
     drawEmptyGrid();
 
-    tx = parseInt(startX.value);
-    tx = isNaN(tx) ? 0 : tx;
-    ty = parseInt(startY.value);
-    ty = isNaN(ty) ? 0 : ty;
+    var c = getStartingCoordinates();
+
+    // console.log(`Starting at (${c.x},${c.y}) dir ${c.d}`);
 
     var acc = []; // List of occupied triangles.
-    acc.push([0,0]); // initial position is a part of every chain.
-    renderTriangle(tx, ty, color(0));
+    acc.push([c.x,c.y]); // initial position is a part of every chain.
+    renderTriangle(c.x, c.y, color(0));
 
-    setTimeout(step, INTERVAL, tx, ty, 90, generatorFn, 0, acc);
+    setTimeout(step, INTERVAL, c.x, c.y, c.d, generatorFn, 0, acc);
 }
 
 function onGeneratorChanged() {
@@ -259,6 +261,19 @@ function drawEmptyGrid() {
     two.update();
 }
 
+function getCoordinateFromInput(inputBox) {
+    var c = parseInt(inputBox.value);
+    return !isNaN(c) ? c : 0;
+}
+
+function getStartingCoordinates() {
+    return {
+        x: getCoordinateFromInput(startX),
+        y: getCoordinateFromInput(startY),
+        d: parseInt(startDir.options[startDir.selectedIndex].value)
+    };
+}
+
 function plotPolar(r, theta) {
     var y = r*Math.sin(theta);
     var x = r*Math.cos(theta);
@@ -276,12 +291,20 @@ function renderSpot(x, y, color,w) {
 function renderStartTri() {
     two.clear();
     drawEmptyGrid();
-    
-    tx = parseInt(startX.value);
-    tx = isNaN(tx) ? 0 : tx;
-    ty = parseInt(startY.value);
-    ty = isNaN(ty) ? 0 : ty;
-    renderTriangle(tx, ty, "#ffffff");
+
+    var c = getStartingCoordinates();
+
+    var up = triangleIsUp(c.x, c.y);
+    var options = startDir.options;
+    options[0].disabled = !up;
+    options[1].disabled = up;
+    options[2].disabled = !up;
+    options[3].disabled = up;
+    options[4].disabled = !up;
+    options[5].disabled = up;
+    options.selectedIndex = up ? 0 /* north */ : 3 /* south */;
+
+    renderTriangle(c.x, c.y, "#ffffff");
 }
 
 function renderTriangle(x, y, c) {
@@ -340,7 +363,9 @@ function step(tx, ty, dir, f, n, acc) {
         // Draw the triangle at the new (tx, ty) coordinates.
         // If tx,ty has occurred in the accumulator, render as black.
 
-        if (accContains(acc,tx,ty)) {
+        var collision = accContains(acc,tx,ty);
+        // console.log(`${n}: ${action} (${tx},${ty}) dir ${dir}`);
+        if (collision) {
             renderTriangle(tx, ty, "#000000");
         } else {
             renderTriangle(tx, ty, color(n));
@@ -390,6 +415,8 @@ function transformToViewport(pnt) {
     return [x, y];
 }
 
+function triangleIsUp(x, y) { return (x+y)%2 == 0; }
+
 // compute the 3 vertices (in cartesian cooreds) of Triangle x, y
 function verticesOfTriangle(x, y) {
     // first let us decide if the triangle is upwardpointing..
@@ -398,7 +425,7 @@ function verticesOfTriangle(x, y) {
     var ay;
     var bx, by;
     var cx, cy;
-    if (((x+y) % 2) == 0) {
+    if (triangleIsUp(x, y)) {
         // this is up
         ax = x/2.0;
         ay = y * TRIANGLE_HEIGHT;
