@@ -29,22 +29,24 @@
         </style>
     </head>
     <body>
-        <h1>2D Simplex Generator</h1>
-        <div id="instructions">
+      <div class="page-header">
+  <h1>2D Simplex Generator <small>For the Public Invention Mathathon</small></h1>
+     </div>
+        <div class="well" id="instructions">
             Select or write your own javascript snippet that takes an integer and returns the string "L", "R", or "S" for "turn left", "turn right", or "stop" to build a <i>regular 2D simplex chain</i>.
             Play with ideas such as filling all space or matching a geometric shape.
-            For more information, see the <a href="https://github.com/PubInv/Mathathon-2018-Simplex-Chains"> GitHub Readme</a>.
+            For more information, see the <a href="https://github.com/PubInv/Mathathon-2018-Simplex-Chains"> GitHub Readme</a>; but to be really awesome join our free, online <a href="https://www.eventbrite.com/e/mathathon-a-cooperative-virtual-mathathon-tickets-50181898409"> Mathathon</a>.
+            
+            
         </div>
         <div style="display: flex; flex-direction: row" >
+
             <select id="generators-selector">
                 <option value="default" selected="selected">Select Generator...</option>
             </select>
-            <select id="gridsize-selector" style="display: block">
-                <option value="default" selected="selected">Select GridSie...</option>
+            <select id="gridsize-selector" style="display: block, width: 200px;">
+                <option value="default" selected="selected">Select Grid Playfield...</option>
             </select>
-            <button type="button" id="execute-button">&#x25b6;</button>
-            (<input type="text" id="start-x" size="2" value="0"/>,
-            <input type="text" id="start-y" size="2" value="0"/>)
             <select id="start-dir">
                 <option value="90" selected="selected">N</option>
                 <option value="30" disabled="disabled">NE</option>
@@ -53,15 +55,34 @@
                 <option value="210">SW</option>
                 <option value="150" disabled="disabled">NW</option>
             </select>
-            <button type="button" id="spiral-button">Golden Spiral</button>
+            (<input type="text" id="start-x" size="2" value="0" oninput="onStartXChange(this.value)"/>,
+            <input type="text" id="start-y" size="2" value="0" oninput="onStartYChange()"/>)
+
         </div>
         <div style="display: flex; flex-direction: row" >
             <textarea id="user-defined-generator" rows="5" cols="60" placeholder="Select a generator, above, or create your own."></textarea>
         </div>
         <div id="function-status"></div>
+        
+    <select id="generators-selector" style="display: block">
+                <option value="default" selected="selected">Select Generator...</option>
+    </select>
+    
+    <button type="button" id="execute-button" style="font-size: x-large">&#x25b6;</button>
+    
+    <button type="button" id="spiral-button">Draw Golden Spiral</button>
         <section id="visualsection" class="xscrollable"></section>
         <script src="../javascripts/two.min.js"></script>
         <script src="../javascripts/three.js"></script>
         <script src="../javascripts/main.js"></script>
+        
+        <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     </body>
 </html>
