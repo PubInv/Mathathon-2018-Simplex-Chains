@@ -313,7 +313,7 @@ function renderTriangle(x, y, c) {
     var vpb = transformToViewport(new THREE.Vector2(v[2], v[3]));
     var vpc = transformToViewport(new THREE.Vector2(v[4], v[5]));
     var path = two.makePath(vpa[0], vpa[1], vpb[0], vpb[1], vpc[0], vpc[1], false);
-    path.linewidth = 2;
+    path.linewidth = 1;
     path.stroke = "#000000";
     path.fill = c;
     two.add(path);
