@@ -105,12 +105,29 @@ function main() {
     }
     
     // Create a Two canvas and draw a grid on it.
+    var w = document.getElementById('visualsection').offsetWidth;
+    TWO_PARAMS.width = w;
+    TWO_PARAMS.height = w;
+
+    // We need to read window width to create this....
     two = new Two(TWO_PARAMS).appendTo(visualSection);
     drawEmptyGrid();
     renderStartTri();
 }
 
 // Event Handlers
+function onResizeBody() {
+    var vs= document.getElementById('visualsection'); 
+    var w = vs.offsetWidth;
+    vs.removeChild(vs.childNodes[0]);
+    TWO_PARAMS.width = w;
+    TWO_PARAMS.height = w;
+
+    // We need to read window width to create this....
+    two = new Two(TWO_PARAMS).appendTo(visualSection);
+    drawEmptyGrid();
+    renderStartTri();
+ }
 
 function onGridSizeChanged(x) {
     var gsize = GRID_CONFIGS[gridSizeSelector.value || 'small'];
@@ -118,7 +135,6 @@ function onGridSizeChanged(x) {
     HEIGHT = gsize.h;
     drawEmptyGrid();
     renderStartTri();
-    
 }
 
 function onStartXChange(x) {
