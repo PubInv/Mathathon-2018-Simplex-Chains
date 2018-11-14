@@ -157,9 +157,10 @@ However, in this research-a-thon, many of the open problems are probably easy---
 cared to look very closely at them.  However, they are still valuable. Hopefully the problems in this research-a-thon are ``real'', even if they
 not as ``hard'' as those professional researchers talk about.
 
-We will give opinions about problems on a scale of $1-10$, with $1$ being quite easy and $10$ being very difficult. Problems of difficulty $1,2,3$
+We will give opinions about problems on a scale\footnote{This scale is inspired by Prof. Norman J Wildberger, who has ranked true open problem using a similar
+  (but much more difficult!) gamut.} of $1-10$, with $1$ being quite easy and $10$ being very difficult. Problems of difficulty $1,2,3$
 are generally ``easy'', those of ``8,9,10'' hard.  A problem of difficulty $10$ is assumed to be publishable in a non-very-prestigous forum, though
-possibly easier problems will also be of interest..
+possibly easier problems will also be of interest. 
 
 \section{Some problems of Regular 2D Simplex Chains}
 
@@ -208,9 +209,9 @@ pointing either upward or downward at posigion $x/2$.
   \label{fig:equitetrabeam}
 \end{figure}
 
-\begin{footnote} Amit proposes a different numbering scheme for regular triangles:
+\footnote{ Amit proposes a different numbering scheme for regular triangles:
   \url{http://www-cs-students.stanford.edu/~amitp/game-programming/grids/})
-  \end{footnote}
+}
 
 
 
@@ -272,15 +273,14 @@ Two-dimensional shapes are much easier to draw and think about than three-dimens
 some interesting open problems.
 
 \begin{itemize}
-\item Can we produce more interesting shapes by creating chain rules? (This is largely a recreational problem.)
-\item Assuming that all lengths in a regular simplex are of size $1$ and we seek to approximate a circle of radius $r$ with a simplex chain,
+\item (Easy 3 R2D-07) Can we produce more interesting shapes by creating chain rules? (This is largely a recreational problem.)
+\item (Medium 4 R2D-08) Assuming that all lengths in a regular simplex are of size $1$ and we seek to approximate a circle of radius $r$ with a simplex chain,
   what rule best does that?  What is the best definition of ``best''?
-\item If we consider irregular simplices, how do we best approximate a circle?
-\item What is the best way to define ``approximating'' a curve with a simplex chain? Is it the sum of the distances of the centroid to the curve?
+\item (Easy 3 R2D-09) If we consider irregular simplices, how do we best approximate a circle?
+\item (Medium 4 R2D-10) What is the best way to define ``approximating'' an arbitrary  curve with a simplex chain? Is it the sum of the distances of the centroid to the curve?
   Or some notion based on completely covering the curve and not self-colliding?
-\item How do we best approximate an Archimedian spiral? A logarithmic spiral? A Fibonacci spiral?
-\item Given an arbitrary curve, how do we best approximate it with a simplex chain, either regular or not?
-\item Can we define a notional of ``translational periodicity'' of a regular simplex chain? That is, can we prove that
+\item (Easy 3 R2D-11) How do we best approximate an Archimedian spiral? A logarithmic spiral? A Fibonacci spiral?
+\item (Hard 7 R2D-08) Can we define a notional of ``translational periodicity'' of a regular simplex chain? That is, can we prove that
   a given rule for producing a simplex chain produces of series of translations of a smaller simplex chain? For example,
   if we have a simplex chain which approximates a sine wave or sawtooth wave, can prove that with a periodicity of $k$ it
   is self-similar?
@@ -291,7 +291,6 @@ some interesting open problems.
 The problem of simplex chains in three dimensions is much more interesting. In particular, there is a structure known as the
 tetrahelix which is analogous to 2D ladder: it fits inside a cylinder. That is, it is a ``straight'', uncurved stack
 of tetrahedra extending infinitely.
-
 
 
 \begin{figure}
@@ -320,14 +319,14 @@ It is curious that the rotation about the center of the cylinder is an irrationa
 never come back to precisely the same point.
 
 \begin{itemize}
-\item Problem: Can we produce more interesting shapes by adopting more complex rules?
-\item Problem: Can we find a rule that fills all space?
-\item Problem: If we forbid collisions, can we find a rule that eventually comes near to all points?
-\item Problem: What is the maximum fraction of the total volume of 3-Space can we fill (without collisions)?
-\item Problem: Can we define a rule that fits inside a torus?
-\item Problem: Can we define a rule that follows a helix (that is, that stays close to a helix, as if we took a cylinder and bent it into a helical shape, like a thick wire of
+\item (Hard 8 R3D-01) Can we produce more interesting shapes by adopting more complex rules?
+\item (Hard 9 I3D-02) Can we find a rule that fills all space with irregular tetrahedra?
+\item (Hard 8 R3D-03) If we forbid collisions, can we find a rule that eventually comes near to all points?
+\item (Hard 7 R3D-04) What is the maximum fraction of the total volume of 3-Space can we fill (without collisions)?
+\item (Hard 7 R3D-05) Can we define a rule that fits optimally inside a torus?
+\item (Hard 7 R3D-06) Can we define a rule that follows a helix (that is, that stays close to a helix, as if we took a cylinder and bent it into a helical shape, like a thick wire of
 steel coiled into a spring?
-\item Problem: Can we define ANY shape that forms a closed loop with no gaps? If not, can we prove that we cannot?
+\item (Hard 9 R3D-07) Can we define ANY rule using only regular tetrahedra that forms a closed loop with no gaps? If not, can we prove that we cannot?
 \end{itemize}
 
 Note: We use the term ``equitetrabeam'' to refer to an irregular tetrahelix that has uncurved ``rails'', as in the figure belows:
@@ -340,38 +339,35 @@ Note: We use the term ``equitetrabeam'' to refer to an irregular tetrahelix that
 \end{figure}
 
 \begin{itemize}
-\item What change length is required to make a finger ring?
-\item Clearly Equitetrabeams are stackable, in fact you can make a hexagon of them.
-\item Can we make a twisted Equitetrabeam with 3 or 6 columns that is even more efficient?
-\item What change length is required to make a  wheel?
-\item What is the minimum change length to make a torus?
-\item What is the minimum change length of a tetrobot that can touch its toe?
-\item What is the densest way to pack a tetrobot into a given volume? (Bounds acceptable)
+\item (Medium 6 I3D-07) What change length is required to make a finger ring?
+\item (Hard 8 I3D-08) Clearly Equitetrabeams are stackable, in fact you can make a hexagon of them. Can we make a twisted tetrabeam with 3 or 6 columns that is even more efficient (in terms of the ratios of edge lenghts)?
+\item (Medium 7 I3D-09) What is the minimum change length to make a torus?
+\item (Medium 6 I3D-10) What is the minimum change length of a tetrobot that can touch its toe?
+\item (Hard 8 I3D-11) What is the densest way to pack a tetrobot into a given volume? (Bounds acceptable)
 \item Can we develop easy math for a tetrahelical ``disc touching''?
-\item Can we develop math for ``regular variations'' (no kinks)?
-\item Can we develop math for ``one kink'' regular variations?
-\item Can we make a torus that turns itself inside out, creating circular motion of a point around cross-section of torus?
-\item Is there a formula for producing a helix of helices?
-\item Is there a way to ``knit'' Tetrahelices into  a slab?
-\item Is there a way to ``wind'' tetrahelices into column?
-\item Can we do a finite element analysis quickly? What can we discover?
-\item Is there a way to build a tensegrity tetrahedron?
+\item (Hard 8 R3D-12) Can we develop math for ``regular variations'' (no kinks)?
+\item (Hard 8 R3D-13) Can we develop math for ``one kink'' regular variations?
+\item (Hard 10 I3D-14) Can we make a torus that turns itself inside out via continuous changes of edge lengths,
+  creating circular motion of a point around cross-section of torus? (In a sense, this would be a nano-technology motor.)\footnote{I might attack this problem by attempting to disprove it, and then writing code to make it happen if I could not disprove it/}
+\item (Hard 8 I3D-15) Is there a formula for producing a helix of tetrahelices?
+\item (Hard 8 I3D-16) Is there a way to ``knit'' Tetrahelices into  a slab?\footnote{This is poorly defined.}
+\item (Hard 8 I3D-17)Is there a way to ``wind'' tetrahelices into column?
+\item (Hard 8 XXX) Is there a way to build a tensegrity tetrahedron?\footnote{This problem has been well-researched, it should start with a literature search in robotics.}
 \item If there is a tensegrity tetrahedron, how do we mathematically relate to edge lengths?
-\item What is the best tetrahelical rail gun?
-\item How fast can the tip of a tetrahelix move given a rate of change of member length?
-\item Can we improve a software toolkit that let's us play with composing tetrahelices.
-\item If we mate tetrahelices face to face, how regular a ``tetrahelical tetrahedron'' can we make?
-\item Is it possible to make a perfectly regular structure that has a ``hole''?
-\item If it is not possible, what is most regular system that an make a ``hole''?
+\item (Hard 8 I3D-03) How fast can the tip of a tetrahelix move given a rate of change of member length? Can we define a this derivative with a closed form expression, rather than using matrix-based arbitrary Jacobians?
+\item (Hard 8 I3D-18) Can we improve a software toolkit that let's us play with composing tetrahelices.
+\item (Hard 9 I3D-19) If we mate tetrahelices face to face, how regular a ``tetrahelical tetrahedron'' can we make?
+\item (Hard 8 R3D-20) Is it possible to make a perfectly regular structure that has a ``hole''?
+\item (Medium 7 R3D-21) If it is not possible, what is most regular system that an make a ``hole''?
 \end{itemize}
 
 Define {\em point reachability} to mean place the apex of a simplex chain near a point.
 \begin{itemize}
-\item In 2D, give an algorithm that produces the shortest simplex chain coming as close as possible to a point.
-\item In 3D, are the spaces that cannot be reached with any number of simplices?
-\item Given a limit to the number of simplices, what is the reacheable space to with distance $x$?
-\item What is the shape of reachable points for $N$ simplices?
-  \item In 3D, given an algorithm that produces the shortest simplex chain that comes with $x$ of a target point.
+\item  (Medium 7 R2D-03) In 2D, give an algorithm that produces the shortest regular simplex chain coming as close as possible to a point.
+\item  (Hard 7 R3D-22) In 3D, define spaces which are not reachable by a simplex chain of regular tetrahedra of any length, assuming the first tetrahedra is fixed at the origin.
+\item (Hard 7 R3D-22) Given a limit to the number of simplices, what is the reacheable space to with distance $x$?
+\item (Hard 9 I3D-23) What is the shape of reachable points for $N$ simplices?
+  \item (Hard 9 I3D-24) In 3D, given an algorithm that produces the shortest simplex chain that comes with $x$ of a target point.
   \end{itemize}
 
 
