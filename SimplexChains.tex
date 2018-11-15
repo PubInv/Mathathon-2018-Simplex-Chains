@@ -356,6 +356,30 @@ place the fourth on the face that does not touch the spine, we start to create a
 In fact if we carry on this way we can place 6 such tetrahedral, with a 10\% gap remaining. If we carry on, we just keep
 going around, creating a solid of revolution.
 
+\subsection{Numbering a tetrahedral chain}
+
+If we imagine a chain generator for tetrahedral chains, the fundamental decision at step is which face the next node should be attached to in order
+to form the next tetrahedra. This is analogous to our generators for triangle chains, which only had to make a decision \{left, right, stop\}, but
+now we must decide which face to attach to.
+
+In order to do this we need a way to ``name'' or ``number'' faces. I propose the following scheme for (unbranched) tetrahedral chains.
+
+First, we will number the nodes in the order in which they are added. The the starting tetreadron has nodes ${0,1,2,3}$, and the next
+node will definitely attach to node $3$ (the highest-numbered node). The question is, to which of the other nodes should it attach,
+and how should we name it?
+
+I propsoe that we name the faces connected to a vertex numberd $N$ high, medium, and low, as per:
+\begin{enumerate}
+\item {\em high} when the face has vertices ${N, N-1, N-2}$,
+\item {\em medium} when the face has vertices ${N, N-1, N-3}$,
+  \item {\em low} when the face has vertices ${N, N-2, N-3}$,    
+\end{enumerate}
+
+In this way a {\em generator} could be a function from the naturals to the set ${H,M,L,S}$ (high, medium, low, stop). If this is to be
+a generator for irregular tetrahedron, it is a function from the naturals to the 4-tuple,$[f,l_0,l_1,l_2]$, where the $l_x$ is a positive length.
+In another style, $\mathbb{N} \mapsto [\{H,M,L,S\},\mathbb{R},\mathbb{R},\mathbb{R}]$). The lengths $l_0$ goes to the lowest numbered node, $l_1$ to the middle-numbered node,
+and $l_2$ to the highest numbered node (which will always be $N$).
+
 \begin{problem}[IMPROVE 3D RULE GENERATOR]
   The author has given an informal description of 3D Generator rules, can you make these definitions crisp?
 \end{problem}
