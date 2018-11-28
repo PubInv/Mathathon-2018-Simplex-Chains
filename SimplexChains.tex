@@ -94,7 +94,7 @@ in a straight line. That is, the whole figure is contained with in two parallel 
 With the help of David Jeschke, we have written a website\url{https://pubinv.github.io/Mathathon-2018-Simplex-Chains/platforms/index.html}
 designed to allow graphic and interactive play of these concepts.  Specifically it should assist in solving this exercise:
 
-\begin{problem}
+\begin{problem}[TILE-THE-PLANE]
   There is probably a simplex chain rule which tiles the entire plane with equilateral triangles. Can you define it?
 \end{problem}
 
@@ -105,7 +105,7 @@ This website will likely evolve faster than this document!
 The problems posed here to make the Public Invention Mathathon interesting exist at the intersection of mathematics and
 computer science. The work is motivated by mechanical engineering and robotics. In particular, there is an entire class
 of robots, called the {\em tetrobot}, built entirely out of simplices which can change their member lengths. A few
-dozen academic papers have been published on this subject in the last 25 years.
+dozen academic papers have been published on this subject in the last 25 years\cite{read2018transforming,sanderson1996modular,lee2002dynamic,NTRT}.
 
 \subsection{The mechanically interesting shapes}
 
@@ -276,12 +276,12 @@ is more of a challenge. This is a very interesting problem to mechanical enginee
 
 Now if instead of merely {\em intersecting} a point with the body of simplex we instead seek to move the {\em apex} of a tetrahedra close
 to the point, we have a real challenge.
-\begin{problem}
+\begin{problem}[SHORTEST REGULAR WITH d]
   (Hard 9) Given a point in 3-space and a distance $d$, produce a shortest regular simplex chain starting at the origin whose apex
   is within $d$ of the point.
 \end{problem}
 
-\begin{problem}
+\begin{problem}[ARBITRARY APPROACH]
 (Hard 9) Can we come arbitrarily close to a point with arbitrary length chains?
 \end{problem}
 
@@ -394,7 +394,7 @@ never come back to precisely the same point.
 \end{problem}
 
 
-\begin{problem}
+\begin{problem}[MAXIMUM FRACTION OF VOLUME]
 (Hard 7) What is the maximum fraction of the total volume of 3-Space can we fill with regular tetrahedal chains?
 \end{problem}
 
@@ -414,11 +414,11 @@ of three new lengths with the addition of each new tetrahedron.
   of a simplex chain on any point? If not, can we characterize the unreachable space?
 \end{problem}
 
-\begin{problem}
-(Hard 7) Can we define a rule that fits $k$-bounded tetrahelices optimally inside a torus (as a function of the innder and out diameter of the torus)?  
+\begin{problem}[RULE FOR $k$-BOUNDED INSIDE TORUS]
+(Hard 7) Can we define a rule that fits a $k$-bounded tetrahelices optimally inside a torus (as a function of the innder and out diameter of the torus)?  
 \end{problem}
 
-\begin{problem}
+\begin{problem}[RULE FOR $k$-BOUNDED INSIDE HELIX]
 \item (Hard 7) Can we define a rule that createsa $k$-bounded tetrahelix that follows a helix (that is, that stays close to a helix, as if we took a cylinder and bent it into a helical shape, like a thick wire of
 steel coiled into a spring? Ideally, this would be a simple algebraic expression. If no such expression is possible, show why.
 \end{problem}
@@ -505,8 +505,9 @@ It is preferable to name one file in each repo ``FinalSubmission.pdf'', with the
 will be the first file read by the judges, and that this file may be included in proceedings, if the
 organizers choose to create a proceedings publication.
 
-However, to be considered for an
-award all material must be placed in public GitHub repo, or emailed in a pdf before a deadline.
+If you don't know or can't learn how to use GitHub, you can simply email a submission,
+either as an image of hand-writing, as a PDF, or a plain text file or a Word file or something.
+
 The deadline for email submissions may be early than the deadline for GitHub repo-based submissions.
 
 \subsection{Awards}
@@ -518,7 +519,7 @@ If sufficient people volunteer, judging will be by a panel of judges.
 
 Awards will be given for:
 \begin{itemize}
-\item Crowd favorite (to be determined by email vote)
+\item Crowd favorite (to be determined by gold stars or emails)
 \item Best contribution by someone without a post-baccalaureate degree
 \item Best contribution by someone without a college degree
 \item Best contribution by someone without a High School degree
@@ -537,20 +538,17 @@ Awards will be given for:
 \item Best contribution of graphic art, figure, or diagram
 \end{itemize}
 
+Awards will be announced after the hackathon, at a prompt but unspecified time, in the form of an
+awards file in the GitHub file. Judging will be performed by a committee of the key personnel.
+
 \section{Key Personnel}
 
-Robert L. Read, PhD
-
-\subsection{Potential Key Personnel}
-
 \begin{itemize}
+\item Robert L. Read, PhD  <read.robert@gmail.com>
 \item David Jeschke
   \item Stephanie Liu
 \end{itemize}
 
-
-\bibliographystyle{unsrt}
-\bibliography{gluss}
 
 \section{Acknowledgement}
 
@@ -580,6 +578,10 @@ of them. A ``simple'' rule could be considered a function only of the number ``n
 
 If you consider only simple rules, how does a 4D simplex chain behave? Does it spiral out of control, or remain within
 a finite region of space? 
+
+
+\bibliographystyle{unsrt}
+\bibliography{gluss}
 
 
 \end{document}
