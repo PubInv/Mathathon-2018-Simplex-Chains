@@ -4,6 +4,21 @@ This repo holds information defining open problems, and hopefully solutions to t
 Nov. 30th through Dec. 2nd, free of charge, free-libre all-virtual [mathathon/hackathon](https://www.eventbrite.com/e/mathathon-a-cooperative-virtual-mathathon-tickets-50181898409)
 hosted by Public Invention.
 
+## Introduction and What to Expect
+
+We've prepared an [introductory slide deck](https://github.com/PubInv/Mathathon-2018-Simplex-Chains/blob/master/Welcome%20to%20the%20Public%20Invention%20Mathathon!.pdf) that will be presented on Friday night to introduce the weekend's cooperation.
+
+When you come to the [zoom room](https://github.com/PubInv/Mathathon-2018-Simplex-Chains/blob/master/anti-harrassment-policy.txt) on Friday at 7:00 Central, David and I will go over the slide deck introduction. After that, we will be ready to answer any questions you may, and also to help people form teams.
+
+I can't be sure, but I suspect people will want help finding problems appropriate to their interest and skill levels.
+
+Throughout the weekend, I and others will be in the Zoom Room at all times (except sleeping and short breaks) to answer questions and help with any work. If your interent connectiong doesn't support the Audio/Video in Zoom or you just prefer
+chat, please join the [slack team](https://join.slack.com/t/pubinv-mathathon-2018/shared_invite/enQtNDQwMTgxOTE0MTAyLTc5ZWM5ZmEzZmY1YjA2ZDE4ZTE5YzliNjViY2JmZjhhYTIyMjFiNDY4OWUyYzdmYWY1NTg2ODBmMzk0ODdkOGU) devoted to this purpose.  David and I will be monitoring the slack channell all weekend.
+
+It is our deepest hope that some teams will form and people will have fun, and maybe solve some interesting problem. We'll try to make that happen, if you are willing to share with us what you are most interested in.
+
+Math is not easy; but it is fun.  We have some very hard problems, but we have identified some problems that we think an advanced High School student can work on.
+
 ## Usage of the Software
 
 We have written a [web page](https://pubinv.github.io/Mathathon-2018-Simplex-Chains/platforms/index.html) for testing interactively
@@ -68,6 +83,10 @@ In an attempt to make that Mathathon serious and seriously fun we have defined a
 large set of **open problems** tagged with particular numbers.
 You can find these in our [pdf](https://github.com/PubInv/Mathathon-2018-Simplex-Chains/blob/master/SimplexChains.pdf). Precisely defining interesting problems is a major part of this
 effort; if you can suggest a problem, please send it to us in an issue.
+
+## Code of Conduct
+
+We have published a [code of conduct](https://github.com/PubInv/Mathathon-2018-Simplex-Chains/blob/master/anti-harrassment-policy.txt).
 
 ## License
 
