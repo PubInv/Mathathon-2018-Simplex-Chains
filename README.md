@@ -8,7 +8,7 @@ hosted by Public Invention.
 
 We've prepared an [introductory slide deck](https://github.com/PubInv/Mathathon-2018-Simplex-Chains/blob/master/Welcome%20to%20the%20Public%20Invention%20Mathathon!.pdf) that will be presented on Friday night to introduce the weekend's cooperation.
 
-When you come to the [zoom room](https://github.com/PubInv/Mathathon-2018-Simplex-Chains/blob/master/anti-harrassment-policy.txt) on Friday at 7:00 Central, David and I will go over the slide deck introduction. After that, we will be ready to answer any questions you may, and also to help people form teams.
+When you come to the [zoom room](https://zoom.us/j/5249851441) on Friday at 7:00 Central, David and I will go over the slide deck introduction. After that, we will be ready to answer any questions you may, and also to help people form teams.
 
 I can't be sure, but I suspect people will want help finding problems appropriate to their interest and skill levels.
 
