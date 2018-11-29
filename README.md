@@ -50,6 +50,10 @@ Play around and see what you can create. For example, can you write a generator
 that fills all space? If you find a good generator, make a pull request or just
 place it in an issue and we will add it to our library of sample generators.
 
+## Draft of 3D Playground
+
+We are currently attempting to develop a similar piece of code for [3D regular tetrahedra](https://pubinv.github.io/Mathathon-2018-Simplex-Chains/3Dplayground/index.html).
+
 ## Motivation and More Math
 
 To understand why problems like this, and in particular 3D versions of these
