@@ -21,7 +21,7 @@ Math is not easy; but it is fun.  We have some very hard problems, but we have i
 
 ## Usage of the Software
 
-We have written a [web page](https://pubinv.github.io/Mathathon-2018-Simplex-Chains/platforms/index.html) for testing interactively
+We have written a 2D [web page](https://pubinv.github.io/Mathathon-2018-Simplex-Chains/platforms/index.html) for testing interactively
 testing the easiest class of problems: building chains of equilateral triangles.
 We call instructions for building such a chain is called a **2D simplex generator**.
 
