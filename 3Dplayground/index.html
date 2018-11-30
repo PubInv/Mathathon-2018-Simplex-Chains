@@ -55,82 +55,10 @@
     <section id="visualsection" style="{border: red;}">
     </section>
 
-    <table id="trialrecord">
-    <tr>
-    <th>trial </th>
-    <th>optimal </th>        
-    <th>rho </th>
-    <th>r</th>
-    <th>len</th>
-    <th>d</th>    
-    <th>one-hop</th>
-    <th>two-hop</th>
-    <th>pitch</th>
-    <th>inradius</th>
-    <th>minmax ratio (%)</th>
-    </tr>
-    </table>
-
-<p>
-    <label for="rail_angle_rho">Rail Angle Rho (degrees)</label>
-  <input type="text" id="rail_angle_rho" readonly style="border:0; color:#f6931f; font-weight:bold;">
-    <div id="rail_angle_slider"></div>
-</p>
-
     <p>
-    <div id ="validpitch">
-    <label for="pitch_input_min">Min. Pitch (meters/rev)</label>
-    <input type="text" size="6" id="pitch_input_min" readonly style="border:0; color:#f6931f; font-weight:bold;">
-    <label for="pitch_input">Pitch Above Min. (meters/rev)</label>
-  <input type="text" size="6" id="pitch_input" readonly style="border:0; color:#f6931f; font-weight:bold;">
-    <label for="actual_pitch">Actual Pitch (meters/rev)</label>
-  <input type="text" size="6"  id="actual_pitch" readonly style="border:0; color:#f6931f; font-weight:bold;">
-    <label for="actual_pitch">Pitch (tets/rev)</label>
-  <input type="text" size="6"  id="tet_pitch" readonly style="border:0; color:#f6931f; font-weight:bold;">
-    <div id="pitch_input_slider"></div>
-    </div>
-    <div id="pitchundefined" display="hidden">
-    PITCH IS UNDEFINED WHEN RHO = 0
-    </div>
-</p>
+    <button onclick="renderComputed()">Render Computed Simplex Chain</button>
+    </p>
 
-
-    <p>
-    <label for="helix_radius_val">Helix Radius (meters)</label>
-  <input type="text" id="helix_radius_val" readonly style="border:0; color:#f6931f; font-weight:bold;">
-    <div id="helix_radius"></div>
-</p>    
-
-
-<p>
-    <label for="tet_distance_val">Rail Edge (meters)</label>
-  <input type="text" id="tet_distance_val" readonly style="border:0; color:#f6931f; font-weight:bold;">
-    <div id="tet_distance"></div>
-</p>    
-
-<table style="width:100%">
-  <tr>
-    <td>
-      <fieldset id="chiralityfs">
-    <legend>Chirality: </legend>
-    <label for="chi-1">Counter-Clockwise</label>
-    <input type="radio" name="chi" id="chi-1" >
-    <label for="chi-2">Clockwise</label>
-    <input type="radio" name="chi" id="chi-2" checked="true">
-    </fieldset>
-    </td>
-    <td>
-<fieldset>
-  <legend>Optimality: </legend>
-  <label for="optimal-1">Optimal</label>
-  <input type="radio" name="optimal" id="optimal-1" checked="true">
-  <label for="optimal-2">Free</label>
-  <input type="radio" name="optimal" id="optimal-2">
-</fieldset>
-    </td>
-  </tr>
-</table>
- 
 
         <section id="textsection" style="{border: red;}">    
       <h1 id="message_banner">
@@ -144,105 +72,16 @@ formulaic way of producing a continuum of untwisted tetrahelices.
 <p>
     All of the code on this site is released under the GNU General Public License, and I hope you will reuse it.
     </p>
-    <h2> Motivation </h2>
-<p>
-    Tetrahelixes are cool. R.W. Gray has a great
-    <a href="http://www.rwgrayprojects.com/rbfnotes/helix/helix01.html">site</a> about them.
-    Further motivation is described in an academic paper we are preparing that will
-be linked in draft form here.
-</p>
-<p>
-The math on this site creates three novel things:
-    <ol>
-    <li> The ability to untwist adn retwist the Boerdijk-Coxeter tetrahelix (BC helix) in an way that is smooth
-and optimal in terms the difference between the longest member and the shortest member.
-    </li>
-    <li> A new structure, the equitetrabeam, which is a fully untwisted BC helix.</li>
-    <li> Both the mathematics and an interactive GUI for designing tetrahelices to match a
-desired pitch.</li>    
-    </ol>
-    This is valuable because architects, engineers, and roboticists can now use the beautiful and
-regular structure of the BC helix. In fact, this application was driven by the Tetrobot project.
-    The BC helix happens to have an irrational pitch, which means that an architect of game
-designer who wanted to use this beautiful structure in a periodic and symmetric way could not do so.
-    However, using the software here they can use a slightly irregular but still in a sense optimal
-tetrahelix with a pitch of exactly 12 tetrahedral to a singel revolution, for example. Robotocists
-such as myself can dynmaicall make a tetrobot untwist, in order to lay flat on a plane, but still
-build the robot out of actuators of exactly the same size.
-    <h2> How to Use </h2>
+    <h1>
+    Draft Page for the Public Invention Mathathon 2018
+</h1>
     <p>
-    The site uses the so-called THREE.js "orbit" control.  Click on the scene and drag and you will find your self
-rotating, always looking at approximately the center point. Moving the middle mouse wheel or the Mac scrolling
-pattern will zoom you in or out.
-</p>
-
-    <h2> Accessing the Math  </h2>
-
-<p>
-    This site is coded in the file <a href="https://pubinv.github.io/tetrahelix/index.md">index.md</a>,
-which has the THREE.js rendering code and
-code to to use the fundamental math.  The math from our paper, however, is in
-    <a href="https://pubinv.github.io/tetrahelix/js/tetrahelix_math.js">tetrahelix_math.js</a>.
-    You are welcome to use tetrahelix_math.js in for your own purposes, such as in a computer game or to
-design your own physical structures.
+    This page is a very messy draft of a page meant to be a "playground" or "testbench" for playing with simplex chains in 3D, specifically chains of tetrahedra joined face-to face. 
     </p>
-<p>
-    <h2> Running the Test </h2>
-<p>
-    Although it is currently a work in progress, my goal is to make tetrahelix_math.js testable via
-Mocha. You will need to install npm, node, and <a href="https://mochajs.org/">mocha</a> for this to work.
-    </p>
-
     <p>
-    I am not a node expert, but basically I did:
-
-<blockquote><pre><code>
-npm install -g browserify
-npm install -g mocha
-</code></pre></blockquote>
-
-    In order to use the tetrahelix_math module in the browser.
-    I build the browser ready file with:
-<blockquote><pre><code>
-browserify tm_shim.js  -o bundle.js    
-</code></pre></blockquote>
-
-    In order to run the tests, in the main repo, type:
-
-<blockquote><pre><code>
-mocha
-</code></pre></blockquote>
-
-
+    We hope to expand this page into something useful. Right now, if you hit the "Render Computed Simplex Chain", you will see a very simple simplex chain
+computed in javascript by specifying the lengths of the new edges added to a starting triangle.  With enough hackery, this can become the basis of testing "generators" for complex simplex chains.
     </p>
-
-    <h2> Thanks and Open-Source software used </h2>
-    
-    <p> This page is using a lot of open source software, in particular Three.js. However,
-special thanks to Ricky Reusser for a simple little
-    <a href="https://github.com/scijs/newton-raphson-method">Newton-Raphson solver</a>.
-</p>     
-
-
-<div id="table-wrapper">
-  <div id="table-scroll">
-    <table id="trialrecords">
-    <tr>
-    <th>trial </th>
-    <th>optimal </th>
-    <th>rho </th>
-    <th>r</th>
-    <th>len</th>
-    <th>d</th>    
-    <th>one-hop</th>
-    <th>two-hop</th>
-    <th>pitch</th>
-    <th>inradius</th>    
-    <th>minmax ratio (%)</th>            
-    </tr>
-    </table>
-  </div>
-</div>    
 
     <script type="x-shader/x-vertex" id="vertexShader">
 
@@ -300,7 +139,9 @@ function handleOptimalityChange(e) {
 
 $( "[name='optimal']").on( "change", handleOptimalityChange );
 
-var CHIRALITY_CCW = 1;
+const CHIRALITY_CCW = 1;
+const CHIRALITY_CW = 0;
+
 function handleChiralityChange(e) {
     var target = $( e.target );
     CHIRALITY_CCW = (target[0].id == "chi-1") ? -1 : 1;
@@ -310,39 +151,6 @@ function handleChiralityChange(e) {
 }
 
 $( "[name='chi']").on( "change", handleChiralityChange );
-
-
-// function insert_trail_row(table,trial,optimal,angle,radius,d,len,one_hop,two_hop,pitch,inradius,score) {
-//     var row = table.insertRow(1);
-//     var cells = [];
-//     for (var i = 0; i < 11; i++) {
-// 	cells[i] = row.insertCell(i);	
-//     }
-//     cells[0].innerHTML = ""+trial;
-//     cells[1].innerHTML = ""+optimal;    
-//     cells[2].innerHTML = ""+angle.toFixed(4);    
-//     cells[3].innerHTML = ""+radius.toFixed(4) ;
-//     cells[4].innerHTML = ""+len.toFixed(4) ;
-//     cells[5].innerHTML = ""+d.toFixed(4) ;    
-//     cells[6].innerHTML = ""+one_hop.toFixed(4) ;
-//     cells[7].innerHTML = ""+two_hop.toFixed(4) ;    
-//     cells[8].innerHTML = ""+pitch.toFixed(4);
-//     cells[9].innerHTML = ""+inradius.toFixed(4);
-//     cells[10].innerHTML = ""+score.toFixed(4);
-// }
-
-// function register_recent_trial(trial,optimal,angle,radius,d,len,one_hop,two_hop,pitch,inradius,score) {
-//     var table = document.getElementById("trialrecord");
-//     if (table.rows.length > 1) 
-// 	table.deleteRow(1);
-//     insert_trail_row(table,trial,optimal,angle,radius,d,len,one_hop,two_hop,pitch,inradius,score);
-// }
-// function register_trials(trial,optimal,angle,radius,d,len,one_hop,two_hop,pitch,inradius,score) {
-//     var table = document.getElementById("trialrecords");
-//     insert_trail_row(table,trial,optimal,angle,radius,d,len,one_hop,two_hop,pitch,inradius,score);
-//     register_recent_trial(trial,optimal,angle,radius,d,len,one_hop,two_hop,pitch,inradius,score);
-// }
-
 
 var RAIL_ANGLE_RHO_d = tm.BCrho*180/Math.PI;
 var LAMBDA = 0;
@@ -623,9 +431,9 @@ function load_NTetHelix(am,helix,tets,pvec,hparams) {
     var chi = hparams.chirality;
     var n = tets+3;    
 
-    var colors = [ d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Blue") ];
-    var darkgreen = d3.color("#008000");
-    var dcolor = [null,darkgreen,d3.color("purple")];
+    var coords = [];
+
+    
     for(var i = 0; i < n; i++) {
 
 	var myRho = rho;
@@ -633,8 +441,21 @@ function load_NTetHelix(am,helix,tets,pvec,hparams) {
 	var num = Math.floor(i/3);
 	var q = tm.H_general(chi,num,rail,myRho,d,radius);
 	var v = new THREE.Vector3(q[0], q[1], q[2]);
-	v = v.add(pvec);
+        coords.push(v);
+    }
+    return load_NTetHelixAux(am,helix,tets,pvec,coords);
+}
+function load_NTetHelixAux(am,helix,tets,pvec,coords) {
+    var colors = [ d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Blue") ];
+    var darkgreen = d3.color("#008000");
+    var dcolor = [null,darkgreen,d3.color("purple")];
 
+    var n = tets+3;        
+    for(var i = 0; i < n; i++) {
+	var rail = i % 3;
+	var num = Math.floor(i/3);
+        var v = coords[i];
+	v = v.add(pvec);                
 	var pos = new THREE.Vector3();
 	pos.set( v.x, v.y, v.z);
 	var mesh = createSphere(am.JOINT_RADIUS,pos,smats[rail]);
@@ -1184,16 +1005,16 @@ function draw_central() {
 function draw_and_register() {
     var pvec0 = new THREE.Vector3(0,HELIX_RADIUS*3,-3);
     var hp = draw_new(pvec0);
-    var h = am.helices.slice(-1)[0];
-    var score = compute_helix_minimax(h)[2];
-    hp.score = score;
-    hp.inradius = tm.inradius_assumption1(hp.rho,hp.radius);
-    register_trials(trial++,OPTIMALITY,RAIL_ANGLE_RHO_d,HELIX_RADIUS,hp.d,TET_DISTANCE,
-		    hp.onehop,
-		    hp.twohop,
-		    hp.pitch,
-		    hp.inradius,
-		    hp.score);
+    // var h = am.helices.slice(-1)[0];
+    // var score = compute_helix_minimax(h)[2];
+    // hp.score = score;
+    // hp.inradius = tm.inradius_assumption1(hp.rho,hp.radius);
+    // register_trials(trial++,OPTIMALITY,RAIL_ANGLE_RHO_d,HELIX_RADIUS,hp.d,TET_DISTANCE,
+    //     	    hp.onehop,
+    //     	    hp.twohop,
+    //     	    hp.pitch,
+    //     	    hp.inradius,
+    //     	    hp.score);
 }
 
 function draw_new(pvec) {
@@ -1305,23 +1126,522 @@ function draw_helix(pvec,rail,hparams,factor,color,fudge,lw) {
 
 
 
-if (OPERATION == "normal") {
-    draw_and_register();
-    // draw_many();
 
+// This is an experiment. Instead of generating a tetrahelix chain
+// by on the surface of a cylinder via my formulae, I'm going to
+// begin computation, starting with a single tetrahedron.
 
-    for(var i = 0; i < am.helices.length; i++) {
-	console.log(am.helix_params[i]);
-	compute_helix_minimax(am.helices[i]);
-	console.log(am.helix_params[i]);    
+// This routine is an attempt to build a proper mesh construction
+// from coordinates for the nodes. After this, we will have
+// to do the same thing from face-determinations and length functions.
+function draw_generated(pvec,coords,helix) {
+    var n = coords.length;
+    var colors = [ d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Blue") ];
+    var darkgreen = d3.color("#008000");
+    var dcolor = [null,darkgreen,d3.color("purple")];
+    
+    for(var i = 0; i < n; i++) {
+//	var myRho = rho;
+	var rail = i % 3;
+	var num = Math.floor(i/3);
+//	var q = tm.H_general(chi,num,rail,myRho,d,radius);
+//	var v = new THREE.Vector3(q[0], q[1], q[2]);
+        v = coords[i];
+	v = v.add(pvec);
+
+	var pos = new THREE.Vector3();
+	pos.set( v.x, v.y, v.z);
+	var mesh = createSphere(am.JOINT_RADIUS,pos,smats[rail]);
+	mesh.castShadow = false;
+	mesh.receiveShadow = false;
+	am.scene.add(mesh);
+	
+	var body = {};
+	body.rail =  rail;
+	body.number = i / 3;
+	body.name = alphabetic_name(i);
+	body.mesh = mesh;
+	helix.helix_joints.push(body);
+	am.push_body_mesh_pair(body,mesh);
+	
+	for(var k = 0; k < Math.min(3,i) && k < i; k++) {
+	    var h = i-(k+1);
+
+	    // Sadly, increasing the mass of the members seems to be
+	    // necessary to keep the edges from passing through the obstacles.
+	    // This is a very unfortunate tuning...I suspect it is a weakness
+	    // in the solver of physics engine.
+	    var pos = new THREE.Vector3();
+	    var quat = new THREE.Quaternion();
+
+	    var b_z = helix.helix_joints[i];
+	    var b_a = helix.helix_joints[h];
+	    var o_a = b_a.mesh.position;
+	    var o_z = b_z.mesh.position;
+	    
+	    var v_z = new THREE.Vector3(o_a.x,o_a.y,o_a.z);
+	    var v_a = new THREE.Vector3(o_z.x,o_z.y,o_z.z);
+	    var dist = v_a.distanceTo(v_z);
+	    
+	    var v_avg = new THREE.Vector3(v_z.x,v_z.y,v_z.z);
+	    v_avg.add(v_a);
+	    v_avg.multiplyScalar(0.5);
+	    
+	    pos.set( v_avg.x, v_avg.y, v_avg.z);
+            quat.set( 0, 0, 0, 1 );
+
+	    var diff = ((b_a.rail - b_z.rail)+3) % 3;
+	    var cmat;
+	    var tcolor;
+	    if (diff != 0) {
+		if (OPERATION == "helices") {
+		    // What we really want to do here is to interpolate the
+		    // color of the end nodes!
+		    tcolor = new THREE.Color(0x008800);
+		    cmat  = memo_color_mat(tcolor);	
+		} else {
+		    if (diff == 2) {
+		        tcolor = new THREE.Color(0x9400D3);
+		        cmat  = memo_color_mat(tcolor);
+		    }
+		    if (diff== 1) {
+		        tcolor = new THREE.Color(0x008000);
+		        cmat  = memo_color_mat(tcolor);	
+		    }
+		}
+	    } else {
+		var cm = smats[b_a.rail]
+		cmat = new THREE.MeshPhongMaterial( {color : cm } );
+	    }
+	    var member_color = (diff != 0) ? dcolor[diff] : colors[b_a.rail];
+
+	    var mesh = create_actuator(dist,v_a,v_z,pos,cmat);
+	    if (b_a.name > b_z.name) {
+		var t = b_a;
+		b_a = b_z;
+		b_z = t;
+	    }
+	    var memBody = {};
+	    memBody.name = b_a.name + " " + b_z.name;
+	    memBody.link_a = b_a;
+	    memBody.link_z = b_z;
+	    memBody.endpoints = [];
+	    memBody.endpoints[0] = b_a;
+	    memBody.endpoints[1] = b_z;
+
+	    for(var x = helix.helix_members.length -1; x >= 0; x--) {
+		if (helix.helix_members[x].body.name == memBody) {
+		    helix.helix_member.splice(x,1);
+		}
+	    }
+	    var link = { a: b_a, b: b_z, body: memBody};	    
+	    helix.helix_members.push(link);
+	    am.push_body_mesh_pair(memBody,mesh);
+	}
     }
-} else if (OPERATION == "helices") {
-    am.NUMBER_OF_TETRAHEDRA  = 7;
-    am.INITIAL_EDGE_WIDTH /= 0.5;
-    am.JOINT_RADIUS /= 1;
-    //    this.jointGeo = new THREE.SphereGeometry( this.JOINT_RADIUS,32,32);
-    draw_helices();
 }
+function renderComputedObsolete() {
+    var pvec = new THREE.Vector3(0,1,0);
+    am.helices.push(
+	{
+	    helix_joints: [],
+	    helix_members: []
+	});
+    var coords = [];
+
+    coords[0] = new THREE.Vector3(0,0,0);
+    coords[1] = new THREE.Vector3(0,0,1);
+    coords[2] = new THREE.Vector3(1,0,0);
+    coords[3] = new THREE.Vector3(0.5,0.5,0.5);
+    var tets = 1;
+
+    am.INITIAL_EDGE_WIDTH *= 4;
+    am.JOINT_RADIUS *= 3;
+    
+    load_NTetHelixAux(am,am.helices[0],tets,pvec,coords);
+//    draw_generated(pvec,coords,am.helices[0]);
+}
+
+function renderComputed() {
+    var pvec = new THREE.Vector3(0,1,0);
+    am.helices.push(
+	{
+	    helix_joints: [],
+	    helix_members: []
+	});
+
+    am.INITIAL_EDGE_WIDTH *= 4;
+    am.JOINT_RADIUS *= 3;
+    
+    var cs = [];
+    var pa = cs[0] = new THREE.Vector3(-1,0,0);
+    var pb = cs[1] = new THREE.Vector3(1,0,0);
+    var pc = cs[2] = new THREE.Vector3(0,1,0);
+    var valid = { v: true};
+    var ad = 1;
+    var bd = 1;
+    var cd = 1;
+    var pd = find_fourth_point_given_three_points_and_three_distances(
+    CHIRALITY_CCW,
+    pa, pb, pc,
+    ad, bd, cd,
+        valid);
+    cs.push(pd);
+
+    var pe = find_fourth_point_given_three_points_and_three_distances(
+    CHIRALITY_CCW,
+    pb, pc, pd,
+    1, 1, 1,
+        valid);
+    cs.push(pe);
+    var tets = 2;
+    load_NTetHelixAux(am,am.helices[0],tets,pvec,cs);    
+}
+
+// if (OPERATION == "normal") {
+//      draw_and_register();
+//      // draw_many();
+
+
+//     for(var i = 0; i < am.helices.length; i++) {
+// 	console.log(am.helix_params[i]);
+// 	compute_helix_minimax(am.helices[i]);
+// 	console.log(am.helix_params[i]);    
+//     }
+// } else if (OPERATION == "helices") {
+//     am.NUMBER_OF_TETRAHEDRA  = 7;
+//     am.INITIAL_EDGE_WIDTH /= 0.5;
+//     am.JOINT_RADIUS /= 1;
+//     //    this.jointGeo = new THREE.SphereGeometry( this.JOINT_RADIUS,32,32);
+//     draw_helices();
+// }
+
+
+// for testing, we need to know when somethigns is "closeto a target"
+// to deal with roundoff error
+
+function near(x,y,e) {
+    return Math.abs(x-y) <= e;
+}
+
+// Find the normal to a triangle in 3space: https://stackoverflow.com/questions/19350792/calculate-normal-of-a-single-triangle-in-3d-space
+// arguments THREE.js Vector3's
+function normal(a,b,c) {
+    var U = b.sub(a);
+    var V = c.sub(a);
+    return U.cross(V);
+}
+
+
+// Very useful for debugging, determine the "handedness" or chirality
+// of a tetrahedron: Is the 4th point to the "right" (CCW) of the plane of the
+// first three, or the left? (CW)
+// arguments are THREE.js Vector3's
+function tet_chirality(a,b,c,d)
+{
+    var N = normal(a,b,c);
+    var prod = N.dot(d);
+    return (prod > 0) ? CHIRALITY_CCW : CHIRALITY_CW;
+}
+
+function test_tet_chirality() {
+    var c = [];
+    c[0] = new THREE.Vector3(0,0,0);
+    c[1] = new THREE.Vector3(1,0,0);
+    c[2] = new THREE.Vector3(0,1,0);
+    c[3] = new THREE.Vector3(0,0,1);
+    var chi0 = tet_chirality(c[0],c[1],c[2],c[3]);
+    // This should be different,
+    var chi1 = tet_chirality(c[0],c[2],c[1],c[3]);    
+    console.assert(chi0 == CHIRALITY_CCW);
+    console.assert(chi1 == CHIRALITY_CW);
+    console.log("TEST CHIRALITY",chi0,chi1);
+}
+
+// This is a tricky but essential routine. Given a triangle abc and three distances
+// to a point d (da, db, dc), we have to find the point d.
+// The best way to do this is to translate and rotate the point to
+// the origin in a specific way, then comupte things simply, then perform the inverse transport.
+// We are using the right-hand rule. Following computer graphichs convention, is condidered "up"
+// and the Z dimenstion is considered depth.
+// A is at the origin
+// B is on the x axis (positive)
+// C is in the x-y plane
+// D is in the positive Z semiplane
+// I need to work out the naming very clearly! That is a task for tomorrow.
+// The input is the 6 distances.
+// This code inspired by Dave Barber: view-source:http://tamivox.org/redbear/tetra_calc/index.html
+
+function find_point_from_transformed(sense, AB,  AC,  AD,  BC,  BD,  CD, v) {
+  // _m2 means "squared"
+  var AB_m2 = AB * AB; var AC_m2 = AC * AC;
+  var AD_m2 = AD * AD; var BC_m2 = BC * BC;
+  var BD_m2 = BD * BD; var CD_m2 = CD * CD;
+  var qx = AB;
+  var rx = (AB_m2 + AC_m2 - BC_m2) / (2.0 * AB);    
+  var ry = Math.sqrt (AC_m2 - rx * rx);
+  var sx = (AB_m2 + AD_m2 - BD_m2) / (2.0 * AB);
+  var sy = (BD_m2 - (sx - qx) * (sx - qx) - CD_m2 + (sx - rx) * (sx - rx) + ry * ry) / (2 * ry);
+  var factor = AD_m2 - sx * sx - sy * sy;
+  var sz = 0;
+  var debug = 0;
+  if (factor < 0) {
+    if (debug) {
+        console.log("INTERNAL ERROR: this is not a legal tetrahedron\n");
+        console.log("AB AC AD BC BD CD\n");
+        console.log(AB,AC,AD,BC,BD,CD);
+    }
+    // I have no idea what to return here -- I'll return half the average distance.
+    sz = (AB + AC + AD + BC + BD + CD) / (6*2);
+    v.valid = false;
+  } else {
+    sz = Math.sqrt (AD_m2 - sx * sx - sy * sy);
+    v.valid = true;
+  }
+    A = new THREE.Vector3(0.0,0.0,0.0);
+    B = new THREE.Vector3(qx,0.0,0.0);
+    D = new THREE.Vector3(sx,sy,(sense == CHIRALITY_CCW) ? sz : -sz);
+    // We compute this only for debugging purposesn
+    C = new THREE.Vector3(rx,ry,0.0);
+
+    // if (debug) {
+    //   Chirality senseABC = tet_chirality(A,B,C,D);
+    //     console.log("chirality (demanded, computed) ",sense,", ",senseABC,"\n");
+    //   if (sense != senseABC) {
+    //       console.log("SENSE CHECK ON TET FAILED!\n");
+    //       console.log(A,B,C,D);
+    //   }
+    //   assert(sense == senseABC);	      
+    // }
+    return D;
+
+}
+
+// This tries to rotate the vector A-B on to the X-Axis. C should end up in the XY plane.
+// I think if the the vector A-B points in the negative x direction, we have a special case
+// that causes a problem here. In that case we are 180 degrees out of sync. I need to think
+// carefully about how to handle this.
+function compute_transform_to_axes2(pa,pb,pc) {
+    var m = new THREE.Matrix4();
+    // Translate a to the origin...
+    m.makeTranslation(-pa.x,-pa.y,-pa.z);
+
+    var a0 = new THREE.Vector3(pa.x,pa.y,pa.z);
+    var b0 = new THREE.Vector3(pb.x,pb.y,pb.z);
+    var c0 = new THREE.Vector3(pc.x,pc.y,pc.z);
+    
+    a0.applyMatrix4(m);
+    b0.applyMatrix4(m);
+    c0.applyMatrix4(m);
+
+    // now a0 should be at the origin;
+    console.log("a0b0c0",a0,b0,c0);
+
+    var xaxis = new THREE.Vector3(1,0,0);
+    var yaxis = new THREE.Vector3(0,1,0);
+    var zaxis = new THREE.Vector3(0,0,1);
+
+    var b0norm = new THREE.Vector3(b0.x,b0.y,b0.z).normalize();
+    console.log("b0norm",b0norm);
+
+    var q = new THREE.Quaternion()
+    q.setFromUnitVectors(b0norm,xaxis);
+    console.log("quaternion",q);
+    var b1 = new THREE.Vector3(b0.x,b0.y,b0.z);
+    console.log("b1",b1);
+    var c1 = new THREE.Vector3(c0.x,c0.y,c0.z);
+
+    b1 = b1.applyQuaternion(q);
+    
+    console.log("b1",b1);    
+    c1 = c1.applyQuaternion(q);
+    // now b1 should be on the x axis..
+    console.log("b1",b1);
+    var m1 = new THREE.Matrix4();
+    m1.setRotationFromQuaternion(q);
+
+    var m2 = new THREE.Matrix4();
+    
+    m2.multiplyMatrices(m1,m);
+    // m2 applied to our original points should give us b1,c1
+    var ct = new THREE.Vector3(pc.x,pc.y,pc.z);
+    ct.applyMatrix4(m2);
+    console.log("===",ct,c1);
+    
+
+    // Now finally, we need to rotate point c into the xy plane
+    var c2 = new THREE.Vector3(pc.x,pc.y,pc.z);
+    
+    
+    console.log("c2 first",c2);    
+    c2.applyMatrix4(m2);
+
+    console.log("c2 trans",c2);
+    
+    var theta = Math.atan2(c2.z,c2.y);
+    console.log("theta",theta);
+
+    var m3 = new THREE.Matrix4();
+    m3.makeRotationX(-theta);
+
+    // If this is applied to C, it should place it in the XY plane (z = 0);
+    c2.applyMatrix4(m3);
+    console.log("C2 after rotation",c2);
+
+//    m4.multiplyMatrices(m2,m3);
+//    console.log(m,m3,m4);
+
+    // m4 applied to our stating point must place it in the XY plane
+    var c3 = new THREE.Vector3(pc.x,pc.y,pc.z);
+    c3.applyMatrix4(m);
+    c3.applyMatrix4(m1);
+    c3.applyMatrix4(m3);        
+    console.log("POINT C3 FINAL",c3);
+    
+    var c4 = new THREE.Vector3(pc.x,pc.y,pc.z);
+        var m4 = new THREE.Matrix4();
+    m4.identity()
+    m4.premultiply(m);
+    m4.premultiply(m1);    
+    m4.premultiply(m3);
+    c4.applyMatrix4(m4);
+    console.log("POINT C4 FINAL",c4);
+    
+    return m4;
+}
+
+function test_compute_transform_to_axes2() {
+    var c = [];
+
+    c[0] = new THREE.Vector3(0,-0.5,0.5);
+    c[1] = new THREE.Vector3(1,1,4);
+    c[2] = new THREE.Vector3(0,10,10);
+
+    var trans = compute_transform_to_axes2(c[0],c[1],c[2]);
+
+    c[1].applyMatrix4(trans);
+    console.log("point b transformed",c[1]);
+    
+    console.assert(near(c[1].y,0,1e-5)  && near(c[1].z,0,1e-5));
+    c[2].applyMatrix4(trans);
+    console.log("point c transformed",c[2]);    
+    console.assert(near(c[2].z,0,1e-5));    
+    console.log(trans);
+}
+
+test_compute_transform_to_axes2();
+
+function find_fourth_point_given_three_points_and_three_distances(
+    sense,
+    pa, pb, pc,
+    ad, bd, cd,
+    valid) {
+
+    var debug = 0;
+    if (debug) console.log("ad bd cd\n");
+    if (debug) console.log(ad,bd,cd);
+    
+    // First compute all 6 distances....
+    var ab = pa.distanceTo(pb);
+    var ac = pa.distanceTo(pc);
+    var bc = pb.distanceTo(pc);
+    
+    // Now find transformation that rotates and translates to axes...
+    if (debug) console.log("pa pb pc \n");
+    if (debug) console.log(pa,pb,pc);
+    
+    var tform = compute_transform_to_axes2(pa,pb,pc);
+
+    var Ap,Bp,Cp;
+
+    var Ap = pa.clone();
+    var Bp = pb.clone();
+    var Cp = pc.clone();
+    
+    Ap = Ap.applyMatrix4(tform);
+    if (debug) console.log("Ap \n");
+    if (debug) console.log(Ap);
+  
+    Bp = Bp.applyMatrix4(tform);    
+    if (debug) console.log("Bp \n");
+    if (debug) console.log(Bp);
+  
+    Cp = Cp.applyMatrix4(tform);        
+    if (debug) console.log("Cp \n");
+    if (debug) console.log(Cp);
+
+    // Not written yet!
+    //    point_transform_affine3d tform_inv = inv(tform);
+    var tform_inv = new THREE.Matrix4();    
+    tform_inv.getInverse(tform);
+    
+    if (debug) console.log("tform inv\n");
+    if (debug) console.log(tform_inv.get_m());
+
+    // Now get the fourth point...
+    if (debug) console.log("INPUT YYY\n");
+    if (debug) console.log(ab,ac,ad,bc,bd,cd);
+    // TODO: Need to translate this
+    var D = find_point_from_transformed(sense,ab,ac,ad,bc,bd,cd,valid);
+  
+    if (isNaN(D.x) || isNaN(D.y) || isNaN(D.z)) {
+        console.log("INPUT YYY\n");
+                    console.log(D.x);
+        console.log(D.y);
+        console.log(D.z);
+        console.log(ab,ac,ad,bc,bd,cd);
+  }
+  // if (debug) {
+  //     Chirality untransformed = tet_chirality(pa,pb,pc,tform_inv(D));
+  //     Chirality transformed = tet_chirality(Ap,Bp,Cp,D);
+
+  //     console.log("Chirality demanded: " << sense << "\n";  
+  //                 console.log("Chirality of transformed computations: " << transformed << "\n";
+  //                             console.log("Chirality of untransformed computations: " << untransformed << "\n";
+    // }
+    var D_inv = D.clone();
+    D_inv.applyMatrix4(tform_inv);
+    return D_inv;
+}
+
+function test_find_point_from_transformed() {
+    var v = { valid: true};
+    var chi = CHIRALITY_CCW;
+    var AB = 1;
+    var AC = 1;
+    var AD = 1;
+    var BC = 1;
+    var BD = 1;
+    var CD = 1;
+    
+    var D = find_point_from_transformed(chi, AB,  AC,  AD,  BC,  BD,  CD, v)
+    console.log(D,v);
+    
+}
+test_find_point_from_transformed();
+test_tet_chirality();
+
+
+
+function test_find_fourth_point_given_three_points_and_three_distance() {
+    var c = [];
+    var pa = c[0] = new THREE.Vector3(-1,0,0);
+    var pb = c[1] = new THREE.Vector3(1,0,0);
+    var pc = c[2] = new THREE.Vector3(0,1,0);
+    var valid = { v: true};
+    var ad = 1;
+    var bd = 1;
+    var cd = 1;
+    var d = find_fourth_point_given_three_points_and_three_distances(
+    CHIRALITY_CCW,
+    pa, pb, pc,
+    ad, bd, cd,
+        valid);
+    console.log("computed point",d,valid);
+}
+
+test_find_fourth_point_given_three_points_and_three_distance();
+
 
 </script>
 
