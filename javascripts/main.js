@@ -16,7 +16,7 @@
 // Constants
 
 var INTERVAL = 25; // Milliseconds between steps
-var MAX_STEPS = 300;
+// var MAX_STEPS = 300;
 var TWO_PARAMS = { width: 1000, height: 1000 };
 var TRIANGLE_HEIGHT = Math.sqrt(3)/2;
 
@@ -55,6 +55,10 @@ var EXAMPLE_GENERATORS = {
     trefoil: {
         name: "Trefoil",
         src: '(n) => {  return (n > 70) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
+    },
+    tile: {
+        name: "Tile",
+        src: '(n) => { if (n > 94) return "S"; var k = n + 1; var h = Math.floor(Math.sqrt(k/6)); var j = k - h * h * 6; if (j == 0) return "R"; else if (j == 1) return "L"; return (j % (2 * h + 1) % 2 == 0) ? "L" : "R"; }'
     }
 };
 
@@ -430,11 +434,11 @@ function step(tx, ty, dir, f, n, acc) {
         }
 
 
-        if (n+1<MAX_STEPS) {
+        // if (n+1<MAX_STEPS) {
             setTimeout(step, INTERVAL, tx, ty, dir, f, n+1, acc);
-        } else {
-            onStop();
-        }
+        // } else {
+        //    onStop();
+        // }
 
     } else {
         if (action != 'S') {
