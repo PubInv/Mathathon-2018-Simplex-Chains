@@ -1233,7 +1233,19 @@ function drawTetrahedron(dir, i, other_params) {
     // STEP FUNCTION
     
     function step(fn, i, other_params) {
-        var dir = generatorFn(i);
+        var dir;
+        try {
+            dir = generatorFn(i);
+        } catch (err) {
+           funcStatus.innerHTML = "Step " + i + ": " + err.message;
+           dir = -1;
+        }
+        
+        if (dir!==-1 && dir!==0 && dir!==1 && dir!==2) {
+            funcStatus.innerHTML = "Step " + i + ": Unexpected return value " + dir;
+            dir = -1;    
+        }
+        
         console.log('Step ' + i + ' direction ' + dir);
         if (dir != -1) {
             other_params = drawTetrahedron(dir, i, other_params);
