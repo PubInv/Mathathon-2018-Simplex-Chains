@@ -16,7 +16,7 @@
 // Constants
 
 var INTERVAL = 25; // Milliseconds between steps
-var MAX_STEPS = 300;
+// var MAX_STEPS = 300;
 var TWO_PARAMS = { width: 1000, height: 1000 };
 var TRIANGLE_HEIGHT = Math.sqrt(3)/2;
 
@@ -430,11 +430,11 @@ function step(tx, ty, dir, f, n, acc) {
         }
 
 
-        if (n+1<MAX_STEPS) {
+        // if (n+1<MAX_STEPS) {
             setTimeout(step, INTERVAL, tx, ty, dir, f, n+1, acc);
-        } else {
-            onStop();
-        }
+        // } else {
+        //    onStop();
+        // }
 
     } else {
         if (action != 'S') {
