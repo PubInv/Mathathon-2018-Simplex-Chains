@@ -1,4 +1,6 @@
-// Copyright (C) 2018  Robert L. Read <read.robert@gmail.com>
+// Copyright (C) 2018 by
+//   Robert L. Read <read.robert@gmail.com>
+//   David Jeschke <djeschke@gmail.com>
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
