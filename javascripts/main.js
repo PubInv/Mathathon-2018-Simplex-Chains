@@ -289,8 +289,8 @@ function createGrid(s) {
         var y0 = j*TRIANGLE_HEIGHT;
         var x1 = s;
         var y1 = j*TRIANGLE_HEIGHT;
-        var p0 = transformToViewport(new THREE.Vector2(x0, y0));
-        var p1 = transformToViewport(new THREE.Vector2(x1, y1));
+        var p0 = transformToViewport(x0, y0);
+        var p1 = transformToViewport(x1, y1);
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
     }
@@ -301,12 +301,12 @@ function createGrid(s) {
         var y0 = s * TRIANGLE_HEIGHT;
         var x1 = j+s;
         var y1 = -s * TRIANGLE_HEIGHT;
-        var p0 = transformToViewport(new THREE.Vector2(x0, y0));
-        var p1 = transformToViewport(new THREE.Vector2(x1, y1));
+        var p0 = transformToViewport(x0, y0);
+        var p1 = transformToViewport(x1, y1);
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
         var x1 = j+-s;
-        var p1 = transformToViewport(new THREE.Vector2(x1, y1));
+        var p1 = transformToViewport(x1, y1);
         var a = two.makeLine(p0[0], p0[1], p1[0], p1[1]);
         a.stroke = '#6dcff6';
     }
@@ -349,7 +349,7 @@ function plotPolar(r, theta) {
 }
 
 function renderSpot(x, y, color,w) {
-    var pnt = transformToViewport(new THREE.Vector2(x, y));
+    var pnt = transformToViewport(x, y);
     var circle = two.makeCircle(pnt[0], pnt[1], 3);
     circle.fill = color;
     circle.stroke = color; // Accepts all valid css color
@@ -377,9 +377,9 @@ function renderStartTri() {
 
 function renderTriangle(x, y, c) {
     var v = verticesOfTriangle(x, y);
-    var vpa = transformToViewport(new THREE.Vector2(v[0], v[1]));
-    var vpb = transformToViewport(new THREE.Vector2(v[2], v[3]));
-    var vpc = transformToViewport(new THREE.Vector2(v[4], v[5]));
+    var vpa = transformToViewport(v[0], v[1]);
+    var vpb = transformToViewport(v[2], v[3]);
+    var vpc = transformToViewport(v[4], v[5]);
     var path = two.makePath(vpa[0], vpa[1], vpb[0], vpb[1], vpc[0], vpc[1], false);
     path.linewidth = 1;
     path.stroke = "#000000";
@@ -473,10 +473,8 @@ function step(tx, ty, dir, f, n, acc) {
 // }
 
 // Input is a THREE.Vector2, output an [x, y] array...
-function transformToViewport(pnt) {
+function transformToViewport(x,y) {
     // Let's assume our play space is from -10 to + 10, centered on the origin...
-    var x = pnt.x;
-    var y = pnt.y;
     // first scale appropriately
     x = x * (TWO_PARAMS.width / (2 * WIDTH));
     y = y * (TWO_PARAMS.height / (2 * HEIGHT));
