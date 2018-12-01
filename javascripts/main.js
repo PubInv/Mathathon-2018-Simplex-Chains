@@ -19,7 +19,7 @@
 
 var INTERVAL = 25; // Milliseconds between steps
 // var MAX_STEPS = 300;
-var TWO_PARAMS = { width: 1000, height: 1000 };
+var CANVAS_WIDTH, CANVAS_HEIGHT; // Initialized in main and updated in onResizeBody.
 var TRIANGLE_HEIGHT = Math.sqrt(3)/2;
 
 var GRID_CONFIGS = { "S": { name: "S", w: 10.0, h: 10.0},
@@ -107,17 +107,17 @@ function main() {
 
     // Attach our event handlers
     executeButton.addEventListener("click", onExecute);
-    spiralButton.addEventListener("click", onDrawGoldenSpiral);
+    spiralButton.addEventListener("click", onDrawParametricCurve);
     startX.addEventListener("input", onStartXChange);
     startY.addEventListener("input", onStartYChange);
 
     // Create a Two canvas and draw a grid on it.
     var w = document.getElementById('visualsection').offsetWidth;
-    TWO_PARAMS.width = w;
-    TWO_PARAMS.height = w;
+    CANVAS_WIDTH = w;
+    CANVAS_HEIGHT = w;
 
     // We need to read window width to create this....
-    two = new Two(TWO_PARAMS).appendTo(visualSection);
+    two = new Two({ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }).appendTo(visualSection);
     drawEmptyGrid();
     renderStartTri();
     var value = null;
@@ -169,11 +169,11 @@ function onResizeBody() {
     var vs= document.getElementById('visualsection'); 
     var w = vs.offsetWidth;
     vs.removeChild(vs.childNodes[0]);
-    TWO_PARAMS.width = w;
-    TWO_PARAMS.height = w;
+    CANVAS_WIDTH = w;
+    CANVAS_HEIGHT = w;
 
     // We need to read window width to create this....
-    two = new Two(TWO_PARAMS).appendTo(visualSection);
+    two = new Two({ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }).appendTo(visualSection);
     drawEmptyGrid();
     renderStartTri();
  }
@@ -207,7 +207,7 @@ function onStartYChange(y) {
     renderStartTri();
 }
 
-function onDrawGoldenSpiral() {
+function onDrawParametricCurve() {
     const phi = (1 + Math.sqrt(5))/2.0;
     const contraction = 2;
     for(var theta = 0; theta < 20; theta += 0.05) {
@@ -322,7 +322,7 @@ function createTriangleGrid(s) {
 }
 
 function drawEmptyGrid() {
-    //    createGrid(TWO_PARAMS.width / (2 * WIDTH));
+    //    createGrid(CANVAS_WIDTH / (2 * WIDTH));
     createGrid(4*WIDTH);
 //    createTriangleGrid(30);
     renderSpot(0.0, 0.0, 'red',2);
@@ -464,11 +464,11 @@ function step(tx, ty, dir, f, n, acc) {
 // Not currently used:
 // function transformFromViewport(x, y) {
 //     // now move to origin...
-//     x = x - (TWO_PARAMS.width)/2;
-//     y = y - (TWO_PARAMS.height)/2;
+//     x = x - (CANVAS_WIDTH)/2;
+//     y = y - (CANVAS_HEIGHT)/2;
 //     // then unscale..
-//     x = x / (TWO_PARAMS.width / (2*WIDTH));
-//     y = - y / (TWO_PARAMS.height / (2*HEIGHT));
+//     x = x / (CANVAS_WIDTH / (2*WIDTH));
+//     y = - y / (CANVAS_HEIGHT / (2*HEIGHT));
 //     return [x, y];
 // }
 
@@ -476,11 +476,11 @@ function step(tx, ty, dir, f, n, acc) {
 function transformToViewport(x,y) {
     // Let's assume our play space is from -10 to + 10, centered on the origin...
     // first scale appropriately
-    x = x * (TWO_PARAMS.width / (2 * WIDTH));
-    y = y * (TWO_PARAMS.height / (2 * HEIGHT));
+    x = x * (CANVAS_WIDTH / (2 * WIDTH));
+    y = y * (CANVAS_HEIGHT / (2 * HEIGHT));
     // now move to origin....
-    x += TWO_PARAMS.width/2;
-    y = (-y) + TWO_PARAMS.height/2;
+    x += CANVAS_WIDTH/2;
+    y = (-y) + CANVAS_HEIGHT/2;
     return [x, y];
 }
 
