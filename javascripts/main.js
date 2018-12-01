@@ -55,6 +55,10 @@ var EXAMPLE_GENERATORS = {
     trefoil: {
         name: "Trefoil",
         src: '(n) => {  return (n > 70) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
+    },
+    tile: {
+        name: "Tile",
+        src: '(n) => { if (n > 94) return "S"; var k = n + 1; var h = Math.floor(Math.sqrt(k/6)); var j = k - h * h * 6; if (j == 0) return "R"; else if (j == 1) return "L"; return (j % (2 * h + 1) % 2 == 0) ? "L" : "R"; }'
     }
 };
 
