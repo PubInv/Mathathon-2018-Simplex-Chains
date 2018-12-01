@@ -1141,16 +1141,25 @@ function test_find_fourth_point_given_three_points_and_three_distance() {
 
 test_find_fourth_point_given_three_points_and_three_distance();
 
+function initialParameters() { 
+    return { foo: 'bar' };    
+}
+
+function drawTetrahedron(dir, i, other_params) {
+    // ... do stuff
+    return other_params;
+}
+
 (function () {
 
     var EXAMPLE_GENERATORS = {
         alert: {
-            name: "Alert",
-            src: '(i) => { alert("Step " + i); }'
+            name: "Random",
+            src: '(i) => { return i<6 ? Math.floor(Math.random(3)): -1; }'
         },
         console: {
-            name: "Console",
-            src: '(i) => { console.log("Step " + i); }'
+            name: "Regular",
+            src: '(i) => { return i<20 ? [ 2,1,0,1,2][i%5]: -1; }'
         }
     };
 
@@ -1197,9 +1206,15 @@ test_find_fourth_point_given_three_points_and_three_distance();
 
     // STEP FUNCTION
     
-    function step(fn, i) {
-        generatorFn(i);
-        executeButton.disabled = false;
+    function step(fn, i, other_params) {
+        console.log('Step ' + i);
+        var dir = generatorFn(i);
+        if (dir != -1) {
+            other_params = drawTetrahedron(dir, i, other_params);
+            setTimeout(step, INTERVAL, fn, i+1, other_params);
+        } else {
+            executeButton.disabled = false;
+        }
     }
     
     // EVENT HANDLERS
@@ -1211,7 +1226,8 @@ test_find_fourth_point_given_three_points_and_three_distance();
             executeButton.disabled = false;
             return;
         }
-        setTimeout(step, INTERVAL, generatorFn, 0);
+        var other_params = initialParameters();
+        setTimeout(step, INTERVAL, generatorFn, 0, other_params);
     }
 
     function onGeneratorChanged() {
