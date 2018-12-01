@@ -215,6 +215,25 @@ The following {\em emergent problems} were discovered during the mathathon in an
 (Easy 2) Can you create a generator which fills the plane?  
 \end{problem}
 
+Note: at 10:00 am Central, GEN-PLANE was solved by Nathan, Sanchi, Neil, and Rob, based on rings of hexagons of increasing size.
+
+\begin{verbatim}
+(n) => {
+  if (n > 10000) return "S"; 
+  var k = n + 1;
+  var h = Math.floor(Math.sqrt(k/6));
+  var j = k - h * h * 6;
+  if (j == 0) return "R";
+  else if (j == 1) return "L";
+  return (j % (2 * h + 1) % 2 == 0) ? "L" : "R";
+}
+\end{verbatim}
+
+\begin{eproblem}[NO-CORNERS]
+  Prove that no 2D figure created by a generator can have a sharp point (that is, an exteranl 60-degree edge.
+  \end{eproblem}
+
+
 \begin{problem}[GEN-CIRCLE]
   (Easy 3) Can you create a generator which completely covers a circle or radius $r$ with no unnecessary triangles?
   In discussions with Prannoy, a mathathon participant, this problem was clarified: Suppose you took a compass and
@@ -423,6 +442,20 @@ clockwise or counterclockwise tetrahelix, respectively, and the we can go on for
 It is curious that the rotation about the center of the cylinder is an irrational fraction of circle, so we will
 never come back to precisely the same point.
 
+These problems were discovered during the Mathathon:
+\begin{eproblem}[PARAMETRIC-CURVE-3D] (Medium 6)
+  Supoose we have a parametric curve in 3d that gives coordinates as a function of $t$ $(x,y,z)(t)$.
+  Now if that curves intersects a tetrahedron, we can ask: Which face does it exit onto? Presumably we could
+  simply choose that face in our generator, and have a generator that can follow any parametric curve.
+  Paradoxically, this might be easier, in a way, than some of the specific problems. Note that some curves
+  might force self-intersection, but it might possible in this way to solve some problems with well-behaved
+  parametric curves.
+\end{eproblem}
+During the Mathathon, Nathan produced a ``regular beam-like conglomeration of tetrahedra'' as a generator. This
+led me define the following emergent problem
+\begin{eproblem}[GENERATE-TETRAHELIX]
+(Medium 4)  Now that we have a 3D generator page, is there a simple generator that defines the famous Boerdijk-Coxeter Tetrahelix?
+\end{eproblem}
 \begin{problem}[IS THERE A CLOSED REGULAR FIGURE]
 (Hard 9) Can we define ANY rule using only regular tetrahedra that forms a closed loop with no gaps? If not, can we prove that we cannot?  
 \end{problem}
@@ -472,6 +505,19 @@ extremely useful.
 \begin{problem}[SOFTWARE FOR REGULAR/IRREGULAR TETRAHEDRAL CHAINS]
 (Hard 8) Can we create a browser-based software toolkit that allows us to with regular or irregular tetrahedral simplex chains.  
 \end{problem}
+
+Note: By Saturday, this problem was largely sovled by Rob, Nathan and David, in that they build a generator for Regular 3D stuff. This allowed us to define a number of emergent problems:
+
+\begin{eproblem}[PERIODIC-REGULAR-GENERATORS]
+  In playing with periodic regular tenerators, we found toriodal (self-intersecting) shapes and shapes that were linear (with twists like the Boerdijk-Coxeter helix.
+  When does a periodic generator produce linear (fitting inside a cylinder structures)?
+  When does a periodic generator produce ring-like stuctures?
+\end{eproblem}
+
+\begin{eproblem}[NON-CYLINDRICAL EXISTENCE]
+  Is there a simple generator for regular tetrahedral changes which generates a shape which cannot be containe within any cylinder?  That is, is unbounded in more than one dimension.
+\end{eproblem}
+
 
 \begin{itemize}
 \item (Medium 6 I3D-07) What change length is required to make a finger ring?
