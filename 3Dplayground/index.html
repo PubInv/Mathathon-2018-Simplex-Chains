@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.theme.min.css">
     -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="./css/main.css">
 
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -37,7 +38,10 @@
 <body>
     <div id="threecontainer"></div>
     <section id="main-content">
-        <p><button onclick="renderComputed()">Render Computed Simplex Chain</button></p>
+        <label id="user-defined-generator-label" for="user-defined-generator">Javascript Generator Snippet</label>
+        <textarea id="user-defined-generator" rows="5" cols="80"></textarea>
+        <button id="execute-button" type="button">GO!</button>
+        <button onclick="renderComputed()">Render Computed Simplex Chain</button>
     </section>
     <section id="textsection">
         <h1 id="message_banner">Untwisting the Tetrahelix </h1>
