@@ -132,17 +132,18 @@ function load_NTetHelix(am, helix, tets, pvec, hparams) {
     }
     return load_NTetHelixAux(am, helix, tets, pvec, coords);
 }
-function load_NTetHelixAux(am, helix, tets, pvec, coords) {
+
+
+function add_vertex(am, d, i, params) {
     var colors = [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Blue")];
     var darkgreen = d3.color("#008000");
     var dcolor = [null, darkgreen, d3.color("purple")];
 
-    var n = tets + 3;
     var base = get_base();
-    var vertices = [];
-    var indices = [];
-    var prev = [];
-    for (var i = 0; ; i++) {
+    var vertices = params.vertices;
+    var indices = params.indices;
+    var prev = params.prev;
+    var helix = params.helix;
         var v;
         var c;
         var th;
@@ -155,13 +156,12 @@ function load_NTetHelixAux(am, helix, tets, pvec, coords) {
             }
             vertices.push(v);
             indices.push(th);
-            console.log("" + i + " th " + th);
         }
         else {
             if (i == 3)
                 th = [0, 1, 2, 3];
             else {
-                var d = get_direction(i - 3, vertices, indices);
+//                var d = get_direction(i - 3, vertices, indices);
                 switch (d) {
                     case -1: return;
                     case 0: th = [prev[1], prev[2], prev[3], i]; break;
@@ -170,17 +170,11 @@ function load_NTetHelixAux(am, helix, tets, pvec, coords) {
                     case 3: th = [prev[2], prev[1], prev[0], i]; break;
                 }
             }
-            console.log(d);
-            console.log("" + i + " th " + th);
-            console.log(vertices[th[0]]);
-            console.log(vertices[th[1]]);
-            console.log(vertices[th[2]]);
             v = get_vertex(i, vertices, indices, vertices[th[0]], vertices[th[1]], vertices[th[2]]);
             vertices.push(v);
             indices.push(th);
             c = get_colors(i, vertices, indices);
         }
-        console.log("Vertex " + i + " Color " + c[3].hex());
         //        v = v.add(pvec);                
         var pos = new THREE.Vector3();
         pos.set(v.x, v.y, v.z);
@@ -240,17 +234,15 @@ function load_NTetHelixAux(am, helix, tets, pvec, coords) {
             memBody.endpoints[1] = b_z;
 
             for (var x = helix.helix_members.length - 1; x >= 0; x--) {
-                if (helix.helix_members[x].body.name == memBody) {
-                    helix.helix_member.splice(x, 1);
+                if (helix.helix_members[x].body.name == memBody.name) {
+                    helix.helix_members.splice(x, 1);
                 }
             }
             var link = { a: b_a, b: b_z, body: memBody };
             helix.helix_members.push(link);
             am.push_body_mesh_pair(memBody, mesh);
         }
-        console.log("th " + th);
-        prev = th;
-    }
+        params.prev = th;
 }
 
 function get_random_int(max) {
@@ -1141,7 +1133,44 @@ function test_find_fourth_point_given_three_points_and_three_distance() {
 
 test_find_fourth_point_given_three_points_and_three_distance();
 
+function clearAm() {
+    am.clear_non_floor_body_mesh_pairs();
+    for (var i = am.scene.children.length - 1; i >= 0; i--) {
+        var obj = am.scene.children[i];
+        if (obj.type == "Mesh" && obj.name != "GROUND") {
+            am.scene.remove(obj);
+        }
+    }
+    am.helices = [];
+    am.helix_params = [];
+}
+
+function initialParameters() { 
+    var params = { vertices: [], indices: [], prev: [], helix: {helix_joints: [], helix_members: []}};
+    for (var i = 0; i < 3; i++) {
+        add_vertex(am, 0, i, params);
+    }
+    return params;
+}
+
+function drawTetrahedron(dir, i, other_params) {
+    // ... do stuff
+    add_vertex(am, dir, i + 3, other_params);
+    return other_params;
+}
+
 (function () {
+
+    var EXAMPLE_GENERATORS = {
+        alert: {
+            name: "Random",
+            src: '(i) => { return i<6 ? Math.floor(Math.random() * 3): -1; }'
+        },
+        console: {
+            name: "Regular",
+            src: '(i) => { return i<20 ? [ 2,1,0,1,2][i%5]: -1; }'
+        }
+    };
 
     // CONSTANTS
     
@@ -1155,6 +1184,8 @@ test_find_fourth_point_given_three_points_and_three_distance();
     
     var executeButton;
     var funcStatus;
+    var generatorsSelector;
+    var generatorText;
     
     // MAIN FUNCTION
     
@@ -1162,33 +1193,58 @@ test_find_fourth_point_given_three_points_and_three_distance();
     function main() {
         executeButton = document.getElementById('execute-button');
         funcStatus = document.getElementById('function-status');
+        generatorsSelector = document.getElementById("generators-selector");
+        generatorText = document.getElementById('user-defined-generator');
         
         executeButton.addEventListener('click', onExecute);
+        generatorsSelector.addEventListener("change", onGeneratorChanged);
 
+        // TEMPORARY: Render button is placeholder until example generators are working.
         var renderButton = document.getElementById('render-button');
         renderButton.addEventListener('click', renderComputed);
+        
+        // Fill the generators selector
+        for (var key in EXAMPLE_GENERATORS) {
+            if (EXAMPLE_GENERATORS.hasOwnProperty(key)) {
+                var entry = EXAMPLE_GENERATORS[key];
+                generatorsSelector.options[generatorsSelector.options.length] = new Option(entry.name, key);
+            }
+        }
+
     }
 
     // STEP FUNCTION
     
-    function step(fn, i) {
-        generatorFn(i);
-        executeButton.disabled = false;
+    function step(fn, i, other_params) {
+        var dir = generatorFn(i);
+        console.log('Step ' + i + ' direction ' + dir);
+        if (dir != -1) {
+            other_params = drawTetrahedron(dir, i, other_params);
+            setTimeout(step, INTERVAL, fn, i+1, other_params);
+        } else {
+            executeButton.disabled = false;
+        }
     }
     
     // EVENT HANDLERS
     
     function onExecute() {
         executeButton.disabled = true;
-        var generatorSource = document.getElementById('user-defined-generator').value;
-        generatorFn = compileGenerator(generatorSource);
+        generatorFn = compileGenerator(generatorText.value);
         if (!generatorFn) { 
             executeButton.disabled = false;
             return;
         }
-        setTimeout(step, INTERVAL, generatorFn, 0);
+        clearAm();
+        var other_params = initialParameters();
+        setTimeout(step, INTERVAL, generatorFn, 0, other_params);
     }
 
+    function onGeneratorChanged() {
+        funcStatus.innerHTML = '';
+        generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value].src || '';
+    }
+    
     // HELPER FUNCTIONS
     
     function compileGenerator(src) {
