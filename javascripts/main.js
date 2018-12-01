@@ -28,8 +28,10 @@ var GRID_CONFIGS = { "S": { name: "S", w: 10.0, h: 10.0},
                      "XL": { name: "XL", w: 80.0, h: 80.0}}
 var initial_grid = "small";
 
-var WIDTH = 10.0;
-var HEIGHT = 10.0;
+var MAX_X = 10.0; // Visible logical x coordinates are -MAX_X to MAX_X.
+var MAX_Y = 10.0; // Visible logical y coordinates are -MAX_Y to MAX_Y.
+
+const MAX_PARAMETRIC_STEPS = 1000;
 
 var RED = "#ff0000";
 var ORANGE = "#ff7f00";
@@ -78,7 +80,6 @@ var EXAMPLE_GENERATORS = {
 var executeButton = document.getElementById("execute-button");
 var funcStatus = document.getElementById("function-status");
 var generatorText = document.getElementById("user-defined-generator");
-var spiralButton = document.getElementById("spiral-button");
 var gridSizeButtons = document.getElementById("gridsize-buttons");
 var startDir = document.getElementById("start-dir");
 var SDoptions = [
@@ -107,7 +108,11 @@ function main() {
 
     // Attach our event handlers
     executeButton.addEventListener("click", onExecute);
-    spiralButton.addEventListener("click", onDrawParametricCurve);
+    
+    document.getElementById("circle-button").addEventListener("click", function(){ drawParametricCurve(parametricCircle); });
+    document.getElementById("sine-button").addEventListener("click", function(){ drawParametricCurve(parametricSineWave); });
+    document.getElementById("spiral-button").addEventListener("click", function(){ drawParametricCurve(parametricGoldenSpiral); });
+
     startX.addEventListener("input", onStartXChange);
     startY.addEventListener("input", onStartYChange);
 
@@ -181,8 +186,8 @@ function onResizeBody() {
 function onGridSizeChanged(e) {
     var v = e.originalEvent.target.innerText;
     var gsize = GRID_CONFIGS[v || 'S'];
-    WIDTH = gsize.w;
-    HEIGHT = gsize.h;
+    MAX_X = gsize.w;
+    MAX_Y = gsize.h;
     drawEmptyGrid();
     renderStartTri();
 }
@@ -205,16 +210,6 @@ function onStartXChange(x) {
 function onStartYChange(y) {
     ensure_valid_direction();    
     renderStartTri();
-}
-
-function onDrawParametricCurve() {
-    const phi = (1 + Math.sqrt(5))/2.0;
-    const contraction = 2;
-    for(var theta = 0; theta < 20; theta += 0.05) {
-        r = Math.pow(phi, theta*2/Math.PI)/contraction;
-        plotPolar(r, theta);
-    }
-    two.update();
 }
 
 function onExecute() {
@@ -312,20 +307,21 @@ function createGrid(s) {
     }
 }
 
-function createTriangleGrid(s) {
-    var size = s || 30;
-    for(var i = -s; i < s; i++) {
-        for(var j = -s; j < s; j++) {
-            renderSpot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue',1);
-        }
-    }
+function drawEmptyGrid() {
+    createGrid(4*MAX_X);
+    renderSpot(0.0, 0.0, 'red',2);
+    two.update();
 }
 
-function drawEmptyGrid() {
-    //    createGrid(CANVAS_WIDTH / (2 * WIDTH));
-    createGrid(4*WIDTH);
-//    createTriangleGrid(30);
-    renderSpot(0.0, 0.0, 'red',2);
+function drawParametricCurve(curveFn) {
+    var onCanvas = true;
+    for (var i=0; i<MAX_PARAMETRIC_STEPS && onCanvas; i++) {
+        const pnt = curveFn(i);
+        onCanvas = pnt && pointIsVisible(pnt);
+        if (onCanvas) {
+            renderSpot(pnt[0], pnt[1], "black", 1);
+        }
+    }
     two.update();
 }
 
@@ -342,18 +338,48 @@ function getStartingCoordinates() {
     };
 }
 
-function plotPolar(r, theta) {
-    var y = r*Math.sin(theta);
-    var x = r*Math.cos(theta);
-    renderSpot(x, y, "black",1);
+function parametricCircle(i) {
+    if (i>=360) { return false; }
+    var theta = i/360*2*Math.PI;
+    var radius = MAX_X * 0.75;
+    var x = radius * Math.cos(theta);
+    var y = radius * Math.sin(theta);
+    return [x,y];
 }
 
-function renderSpot(x, y, color,w) {
+// Takes integer i parameter 0,1,2,..., returns [x,y] curve coordinate.
+function parametricGoldenSpiral(i) {
+    const phi = (1 + Math.sqrt(5))/2.0;
+    const contraction = 2;
+    var theta = i*0.05;
+    var r = Math.pow(phi, theta*2/Math.PI)/contraction;
+    return polarToXY(r, theta);
+}
+
+// Takes integer i parameter 0,1,2,..., returns [x,y] curve coordinate.
+function parametricSineWave(i) {
+    var frac = i/360; // fraction between 0-1.
+    var x = -MAX_X + frac * 2 * MAX_X;
+    var y = Math.sin(frac * 2*Math.PI) * MAX_Y;
+    return [x,y];
+}
+
+function pointIsVisible(pnt) {
+    var x = pnt[0];
+    var y = pnt[1];
+    return x >= -MAX_X && x <= MAX_X && y >= -MAX_Y && y<= MAX_Y;
+}
+
+function polarToXY(r, theta) {
+    return [ r*Math.cos(theta), r*Math.sin(theta) ];
+}
+
+function renderSpot(x, y, color, lineWidth) {
     var pnt = transformToViewport(x, y);
     var circle = two.makeCircle(pnt[0], pnt[1], 3);
     circle.fill = color;
     circle.stroke = color; // Accepts all valid css color
-    circle.linewidth = w;
+    circle.linewidth = lineWidth;
 }
 
 function renderStartTri() {
@@ -461,23 +487,12 @@ function step(tx, ty, dir, f, n, acc) {
     }
 }
 
-// Not currently used:
-// function transformFromViewport(x, y) {
-//     // now move to origin...
-//     x = x - (CANVAS_WIDTH)/2;
-//     y = y - (CANVAS_HEIGHT)/2;
-//     // then unscale..
-//     x = x / (CANVAS_WIDTH / (2*WIDTH));
-//     y = - y / (CANVAS_HEIGHT / (2*HEIGHT));
-//     return [x, y];
-// }
-
-// Input is a THREE.Vector2, output an [x, y] array...
+// Input is x, y in logical coordinates, output an [x, y] array in canvas coordinates.
 function transformToViewport(x,y) {
     // Let's assume our play space is from -10 to + 10, centered on the origin...
     // first scale appropriately
-    x = x * (CANVAS_WIDTH / (2 * WIDTH));
-    y = y * (CANVAS_HEIGHT / (2 * HEIGHT));
+    x = x * (CANVAS_WIDTH / (2 * MAX_X));
+    y = y * (CANVAS_HEIGHT / (2 * MAX_Y));
     // now move to origin....
     x += CANVAS_WIDTH/2;
     y = (-y) + CANVAS_HEIGHT/2;
@@ -515,3 +530,26 @@ function verticesOfTriangle(x, y) {
 }
 
 main();
+
+// OBSOLETE CODE:
+
+// function createTriangleGrid(s) {
+//     var size = s || 30;
+//     for(var i = -s; i < s; i++) {
+//         for(var j = -s; j < s; j++) {
+//             renderSpot(i + (((j % 2) == 0) ? 0.0 : 0.5 ), j, 'blue',1);
+//         }
+//     }
+// }
+
+// function transformFromViewport(x, y) {
+//     // now move to origin...
+//     x = x - (CANVAS_WIDTH)/2;
+//     y = y - (CANVAS_HEIGHT)/2;
+//     // then unscale..
+//     x = x / (CANVAS_WIDTH / (2*MAX_X));
+//     y = - y / (CANVAS_HEIGHT / (2*MAX_Y));
+//     return [x, y];
+// }
+
+
