@@ -1,3 +1,0 @@
-"use strict";
-
-var tm = require("tetrhelix_math.js");
