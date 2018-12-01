@@ -1574,3 +1574,18 @@ function test_find_fourth_point_given_three_points_and_three_distance() {
 }
 
 test_find_fourth_point_given_three_points_and_three_distance();
+
+(function(){
+
+    $(function(){ main(); });
+    
+    function main(){
+        var executeButton = document.getElementById('execute-button');
+        executeButton.addEventListener('click', onExecute);
+    }
+    
+    function onExecute() {
+        alert("Execute pressed!");
+    }
+    
+})();
