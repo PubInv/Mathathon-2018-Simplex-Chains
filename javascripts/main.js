@@ -29,6 +29,15 @@ var initial_grid = "small";
 var WIDTH = 10.0;
 var HEIGHT = 10.0;
 
+var RED = "#ff0000";
+var ORANGE = "#ff7f00";
+var YELLOW = "#ffff00";
+var GREEN = "#00ff00";
+var BLUE = "#0000ff";
+var VIOLET = "#8b00ff";
+
+var RGB_COLORS = [RED, GREEN, BLUE];
+var RAINBOW_COLORS = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET];
 
 // The rand generator is not guaranteed not to self-collide!
 var EXAMPLE_GENERATORS = {
@@ -58,7 +67,7 @@ var EXAMPLE_GENERATORS = {
     },
     tile: {
         name: "Tile",
-        src: '(n) => { if (n > 94) return "S"; var k = n + 1; var h = Math.floor(Math.sqrt(k/6)); var j = k - h * h * 6; if (j == 0) return "R"; else if (j == 1) return "L"; return (j % (2 * h + 1) % 2 == 0) ? "L" : "R"; }'
+        src: '(n) => { if (n > Math.pow(8,2)*6-2) return "S"; var k = n + 1; var h = Math.floor(Math.sqrt(k/6)); var j = k - h * h * 6; if (j == 0) return "R"; else if (j == 1) return "L"; return (j % (2 * h + 1) % 2 == 0) ? "L" : "R"; }'
     }
 };
 
@@ -87,6 +96,8 @@ var visualSection = document.getElementById('visualsection');
 var two; // The Two canvas for our 2D drawing.
 
 var DIRECTION = 90;
+var COLOR_SCHEME = 'RGB'; // Color triangles alternately red, green, blue.
+                          // Alternately 'RRLG', "right red, left green"
 
 // Main
 
@@ -114,7 +125,11 @@ function main() {
     });
 
     $("#gridsize-buttons .btn-group > button.btn").on("click", onGridSizeChanged);
-    
+
+    $("#colorscheme-buttons .btn-group > button.btn").on("click", function(){
+        COLOR_SCHEME = this.innerHTML;
+    });
+
     $("#direction-buttons .btn-group > button.btn").on("click", function(){
         value = this.innerHTML;
         switch(value) {
@@ -219,7 +234,7 @@ function onExecute() {
 
     var acc = []; // List of occupied triangles.
     acc.push([c.x,c.y]); // initial position is a part of every chain.
-    renderTriangle(c.x, c.y, color(2));
+    renderTriangle(c.x, c.y, BLUE);
 
     setTimeout(step, INTERVAL, c.x, c.y, c.d, generatorFn, 0, acc);
 }
@@ -243,16 +258,6 @@ function onStop() {
 
 function accContains(acc, x, y) {
     return acc.filter( tri => (tri[0] == x) && (tri[1] == y)).length > 0;
-}
-
-function color(c) {
-    switch(c % 3) {
-    case 0: return "#ff0000";
-    case 1: return "#00ff00";
-    case 2: return "#0000ff";
-    default:
-    alert("failure");
-    }
 }
 
 // Returns the compiled function, or undefined if the function cannot be compiled.
@@ -429,10 +434,16 @@ function step(tx, ty, dir, f, n, acc) {
         if (collision) {
             renderTriangle(tx, ty, "#000000");
         } else {
-            renderTriangle(tx, ty, color(n));
+            var color;
+            switch (COLOR_SCHEME) {
+                case 'RRLG': color = (action == 'R' ? RED : GREEN); break;
+                case 'Rainbow': color = RAINBOW_COLORS[n%RAINBOW_COLORS.length]; break;
+                case 'RGB': // fall thru
+                default: color = RGB_COLORS[n%RGB_COLORS.length]; break;
+            }
+            renderTriangle(tx, ty, color);
             acc.push([tx,ty]);
         }
-
 
         // if (n+1<MAX_STEPS) {
             setTimeout(step, INTERVAL, tx, ty, dir, f, n+1, acc);
