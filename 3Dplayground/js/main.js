@@ -1216,8 +1216,8 @@ function drawTetrahedron(dir, i, other_params) {
     // STEP FUNCTION
     
     function step(fn, i, other_params) {
-        console.log('Step ' + i);
         var dir = generatorFn(i);
+        console.log('Step ' + i + ' direction ' + dir);
         if (dir != -1) {
             other_params = drawTetrahedron(dir, i, other_params);
             setTimeout(step, INTERVAL, fn, i+1, other_params);
