@@ -196,6 +196,8 @@ generators.
   (Easy 1) Can you create a generator which creates a beam?
 \end{problem}
 
+The following {\em emergent problems} were discovered during the mathathon in an attempt to solve $TILE-THE-PLANE$. They may be useful as decompositions of that problem.
+
 \begin{eproblem}[SIZE-N-HEXAGON]
   Define a generator that makes triangle whose ``hole'' has $n$ edges, starting at zero.
 \end{eproblem}
@@ -212,9 +214,26 @@ generators.
 \begin{problem}[GEN-PLANE]
 (Easy 2) Can you create a generator which fills the plane?  
 \end{problem}
+
 \begin{problem}[GEN-CIRCLE]
   (Easy 3) Can you create a generator which completely covers a circle or radius $r$ with no unnecessary triangles?
+  In discussions with Prannoy, a mathathon participant, this problem was clarified: Suppose you took a compass and
+  drew a razor thin circle of radius $r$. This circle would intersect some of the regular triangles in a grid,
+  and not others. Is there a generator which creates only the intersecting triangles and no others.
 \end{problem}
+
+This discussion led me to think of the problem emergent problem
+\begin{eproblem}[PARAMETRIC-CURVE]
+  Supoose we have a parametric curve in 2d that gives coordinates as a function of $t$ $(x,y)(t)$.
+  Now if that curves intersects a triangle, we can ask: Which edge does it exit onto? Presumably we could
+  simply choose that edge in our generator, and have a generator that can follow any parametric curve.
+  Paradoxically, this might be easier, in a way, than some of the specific problems.
+\end{eproblem}
+
+
+
+
+
 \begin{problem}[GEN-SPIRAL]
   (Medium 4) Can you create a generator which creates golden spiral?
 \end{problem}
