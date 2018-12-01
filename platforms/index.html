@@ -34,49 +34,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       
 
         <style>
-//            body { font-family: Arial; font-size: 10pt }
-//            h1 { font-size: 16pt; margin-bottom: 4pt }
+            /* body { font-family: Arial; font-size: 10pt } */
+            /* h1 { font-size: 16pt; margin-bottom: 4pt } */
             #function-status { color: darkred }
             #instructions { margin-bottom: 4pt }
             #user-defined-generator { font-family: "Courier New" }
             #visual-section { border: red }
             .controls {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-evenly;
-
-}
-#execute-button {
-height: 50px;
-border-width: 3px;
-boder-color: black;
-background: lime;
-}
-.btn {
-font-size: small;
-margin: 3px;
-background: lime;
-
-}
-
-#start-dir-n:active {
-background: red;
-}
-#start-dir-ne:active {
-background: red;
-}
-#start-dir-se:active {
-background: red;
-}
-#start-dir-s:active {
-background: red;
-}
-#start-dir-sw:active {
-background: red;
-}
-#start-dir-nw:active {
-background: red;
-}
+                display: flex;
+                flex-direction: row;
+                justify-content: space-evenly;
+            }
+            #execute-button {
+                height: 50px;
+                border-width: 3px;
+                background: lime;
+            }
+            .btn {
+                font-size: small;
+                margin: 3px;
+                background: lime;
+            }
+            #start-dir-n:active { background: red; }
+            #start-dir-ne:active { background: red; }
+            #start-dir-se:active { background: red; }
+            #start-dir-s:active { background: red; }
+            #start-dir-sw:active { background: red; }
+            #start-dir-nw:active { background: red; }
         </style>
         <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -152,7 +136,7 @@ background: red;
             <div class="form-group">
               <label for="exampleFormControlTextarea2">Javascript Generator Snippet</label>
               <textarea class="form-control rounded-0" id="user-defined-generator" rows="5" laceholder="Select a generator, above, or create your own."></textarea>
-              <div style="display: flex; flex-direction: row, justify-content: center">
+              <div style="display: flex; flex-direction: row; justify-content: center">
                 <button type="button" id="execute-button"
                         style="font-size: x-large; margin: 0 auto;">GO!</button>
               </div>
