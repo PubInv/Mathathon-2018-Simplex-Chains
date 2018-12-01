@@ -1600,6 +1600,9 @@ test_find_fourth_point_given_three_points_and_three_distance();
         funcStatus = document.getElementById('function-status');
         
         executeButton.addEventListener('click', onExecute);
+
+        var renderButton = document.getElementById('render-button');
+        renderButton.addEventListener('click', renderComputed);
     }
 
     // STEP FUNCTION
