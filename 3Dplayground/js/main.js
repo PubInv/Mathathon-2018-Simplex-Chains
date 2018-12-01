@@ -1143,6 +1143,17 @@ test_find_fourth_point_given_three_points_and_three_distance();
 
 (function () {
 
+    var EXAMPLE_GENERATORS = {
+        alert: {
+            name: "Alert",
+            src: '(i) => { alert("Step " + i); }'
+        },
+        console: {
+            name: "Console",
+            src: '(i) => { console.log("Step " + i); }'
+        }
+    };
+
     // CONSTANTS
     
     var INTERVAL = 25; // milliseconds between steps.
@@ -1155,6 +1166,8 @@ test_find_fourth_point_given_three_points_and_three_distance();
     
     var executeButton;
     var funcStatus;
+    var generatorsSelector;
+    var generatorText;
     
     // MAIN FUNCTION
     
@@ -1162,11 +1175,24 @@ test_find_fourth_point_given_three_points_and_three_distance();
     function main() {
         executeButton = document.getElementById('execute-button');
         funcStatus = document.getElementById('function-status');
+        generatorsSelector = document.getElementById("generators-selector");
+        generatorText = document.getElementById('user-defined-generator');
         
         executeButton.addEventListener('click', onExecute);
+        generatorsSelector.addEventListener("change", onGeneratorChanged);
 
+        // TEMPORARY: Render button is placeholder until example generators are working.
         var renderButton = document.getElementById('render-button');
         renderButton.addEventListener('click', renderComputed);
+        
+        // Fill the generators selector
+        for (var key in EXAMPLE_GENERATORS) {
+            if (EXAMPLE_GENERATORS.hasOwnProperty(key)) {
+                var entry = EXAMPLE_GENERATORS[key];
+                generatorsSelector.options[generatorsSelector.options.length] = new Option(entry.name, key);
+            }
+        }
+
     }
 
     // STEP FUNCTION
@@ -1180,8 +1206,7 @@ test_find_fourth_point_given_three_points_and_three_distance();
     
     function onExecute() {
         executeButton.disabled = true;
-        var generatorSource = document.getElementById('user-defined-generator').value;
-        generatorFn = compileGenerator(generatorSource);
+        generatorFn = compileGenerator(generatorText.value);
         if (!generatorFn) { 
             executeButton.disabled = false;
             return;
@@ -1189,6 +1214,11 @@ test_find_fourth_point_given_three_points_and_three_distance();
         setTimeout(step, INTERVAL, generatorFn, 0);
     }
 
+    function onGeneratorChanged() {
+        funcStatus.innerHTML = '';
+        generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value].src || '';
+    }
+    
     // HELPER FUNCTIONS
     
     function compileGenerator(src) {
