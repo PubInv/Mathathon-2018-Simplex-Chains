@@ -1,86 +1,88 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
+    <meta charset="utf-8">
 
-  <title>Mathathon 2018: Simplex Generators</title>
-  <meta name="description" content="Mathathon 2018: Simplex Generators">
-  <meta name="author" content="Robert L. Read">
+    <title>Mathathon 2018: Simplex Generators</title>
+    <meta name="description" content="Mathathon 2018: Simplex Generators">
+    <meta name="author" content="Robert L. Read">
 
-      <script type="text/javascript" charset="utf-8"></script>
-    
-        <link rel="stylesheet" href="./jquery-ui-1.11.4.custom/jquery-ui.min.css">
-<!--    <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.structure.min.css">    
+    <link rel="stylesheet" href="./jquery-ui-1.11.4.custom/jquery-ui.min.css">
+    <!--    
+    <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.structure.min.css">    
     <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.theme.min.css">
--->
+    -->
 
-     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
-
     <script src="./js/scijs-newton-raphson.js"></script>
-
-    <script src="./js/tm_bundle.js"></script>            
-    
+    <script src="./js/tm_bundle.js"></script>
     <script src="./js/axes.js"></script>
     <script src="./js/three.js"></script>
-    <script src="./js/THREE.MeshLine.js"></script>    
+    <script src="./js/THREE.MeshLine.js"></script>
     <script src="./js/OrbitControls.js"></script>
-    <script src="./js/Detector.js"></script>    
-    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>    
-   <script src="./js/d3-scale.min.js"></script>
-   <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="./js/Detector.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="./js/d3-scale.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
 
-<script src="https://d3js.org/d3-array.v1.min.js"></script>
-<script src="https://d3js.org/d3-collection.v1.min.js"></script>
-<script src="https://d3js.org/d3-color.v1.min.js"></script>
-<script src="https://d3js.org/d3-format.v1.min.js"></script>
-<script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
-<script src="https://d3js.org/d3-time.v1.min.js"></script>
-<script src="https://d3js.org/d3-time-format.v2.min.js"></script>
-<script src="https://d3js.org/d3-scale.v1.min.js"></script>
-
-</head>    
+    <script src="https://d3js.org/d3-array.v1.min.js"></script>
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-format.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+    <script src="https://d3js.org/d3-scale.v1.min.js"></script>
+</head>
 
 
 <div id="content-wrapper">
     <div class="inner clearfix">
 
-    <div id="threecontainer">
-    </div>
-    
+        <div id="threecontainer">
+        </div>
+
         <section id="main-content">
-    <section id="visualsection" style="{border: red;}">
-    </section>
+            <section id="visualsection" style="{border: red;}">
+            </section>
 
-    <p>
-    <button onclick="renderComputed()">Render Computed Simplex Chain</button>
-    </p>
+            <p>
+                <button onclick="renderComputed()">Render Computed Simplex Chain</button>
+            </p>
 
 
-        <section id="textsection" style="{border: red;}">    
-      <h1 id="message_banner">
-    Untwisting the Tetrahelix </h1>
-    <h2> This is an interactive 3D simulation.  To change the view, place your mouse in the view area, and hold and "drag" the mouse to rotate the image.
-    The mouse wheel or a drag on your trackpad should zoom you in or out.</h2>
-<p>
-    A mathematical investigation of the Tetrahelix and <a href="https://en.wikipedia.org/wiki/Boerdijk%E2%80%93Coxeter_helix">Boerdijk-Coxeter helix</a>, which provides a new
-formulaic way of producing a continuum of untwisted tetrahelices.
-    </p>
-<p>
-    All of the code on this site is released under the GNU General Public License, and I hope you will reuse it.
-    </p>
-    <h1>
-    Draft Page for the Public Invention Mathathon 2018
-</h1>
-    <p>
-    This page is a very messy draft of a page meant to be a "playground" or "testbench" for playing with simplex chains in 3D, specifically chains of tetrahedra joined face-to face. 
-    </p>
-    <p>
-    We hope to expand this page into something useful. Right now, if you hit the "Render Computed Simplex Chain", you will see a very simple simplex chain
-computed in javascript by specifying the lengths of the new edges added to a starting triangle.  With enough hackery, this can become the basis of testing "generators" for complex simplex chains.
-    </p>
+            <section id="textsection" style="{border: red;}">
+                <h1 id="message_banner">
+                    Untwisting the Tetrahelix </h1>
+                <h2> This is an interactive 3D simulation. To change the view, place your mouse in the view area, and
+                    hold and "drag" the mouse to rotate the image.
+                    The mouse wheel or a drag on your trackpad should zoom you in or out.</h2>
+                <p>
+                    A mathematical investigation of the Tetrahelix and <a href="https://en.wikipedia.org/wiki/Boerdijk%E2%80%93Coxeter_helix">Boerdijk-Coxeter
+                        helix</a>, which provides a new
+                    formulaic way of producing a continuum of untwisted tetrahelices.
+                </p>
+                <p>
+                    All of the code on this site is released under the GNU General Public License, and I hope you will
+                    reuse it.
+                </p>
+                <h1>
+                    Draft Page for the Public Invention Mathathon 2018
+                </h1>
+                <p>
+                    This page is a very messy draft of a page meant to be a "playground" or "testbench" for playing
+                    with simplex chains in 3D, specifically chains of tetrahedra joined face-to face.
+                </p>
+                <p>
+                    We hope to expand this page into something useful. Right now, if you hit the "Render Computed
+                    Simplex Chain", you will see a very simple simplex chain
+                    computed in javascript by specifying the lengths of the new edges added to a starting triangle.
+                    With enough hackery, this can become the basis of testing "generators" for complex simplex chains.
+                </p>
 
-<script src="./js/main.js"></script>
+                <script src="./js/main.js"></script>
