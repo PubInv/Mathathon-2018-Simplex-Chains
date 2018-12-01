@@ -330,105 +330,158 @@ function load_NTetHelixAux(am,helix,tets,pvec,coords) {
     var darkgreen = d3.color("#008000");
     var dcolor = [null,darkgreen,d3.color("purple")];
 
-    var n = tets+3;        
-    for(var i = 0; i < n; i++) {
-	var rail = i % 3;
-	var num = Math.floor(i/3);
-        var v = coords[i];
-	v = v.add(pvec);                
-	var pos = new THREE.Vector3();
-	pos.set( v.x, v.y, v.z);
-	var mesh = createSphere(am.JOINT_RADIUS,pos,smats[rail]);
-	mesh.castShadow = false;
-	mesh.receiveShadow = false;
-	am.scene.add(mesh);
-	
-	var body = {};
-	body.rail =  rail;
-	body.number = i / 3;
-	body.name = alphabetic_name(i);
-	body.mesh = mesh;
-	helix.helix_joints.push(body);
-	am.push_body_mesh_pair(body,mesh);
-	
-	for(var k = 0; k < Math.min(3,i) && k < i; k++) {
-	    var h = i-(k+1);
+    var n = tets+3;
+    var base = get_base();
+    var vertices = [];
+    var indices = [];
+    var prev = [];
+    for(var i = 0;; i++) {
+        var v;
+        var c;
+        var th;
+        if (i < 3) {
+            v = base.v[i];
+            switch (i) {
+                case 0: th = [0,0,0,i]; c = [0,0,0,base.vc[i]]; break;
+                case 1: th = [0,0,0,i]; c = [base.ec[0],0,0,base.vc[i]]; break;
+                case 2: th = [1,0,0,i]; c = [base.ec[1],base.ec[2],0,base.vc[i]]; break;
+            }
+            vertices.push(v);
+            indices.push(th);
+            console.log("" + i + " th " + th);
+        }
+        else {
+            if (i == 3)
+                th = [0, 1, 2, 3];
+            else {
+                var d = get_direction(i-3,vertices,indices);
+                switch (d) {
+                    case -1: return;
+                    case 0: th = [prev[1],prev[2],prev[3],i]; break;
+                    case 1: th = [prev[0],prev[3],prev[2],i]; break;
+                    case 2: th = [prev[3],prev[0],prev[1],i]; break;
+                    case 3: th = [prev[2],prev[1],prev[0],i]; break;
+                }
+            }
+            console.log(d);
+            console.log("" + i + " th " + th);
+            console.log(vertices[th[0]]);
+            console.log(vertices[th[1]]);
+            console.log(vertices[th[2]]);
+            v = get_vertex(i,vertices,indices,vertices[th[0]],vertices[th[1]],vertices[th[2]]);
+            vertices.push(v);
+            indices.push(th);
+            c = get_colors(i,vertices,indices);
+        }
+        console.log("Vertex " + i + " Color " + c[3].hex());
+//        v = v.add(pvec);                
+        var pos = new THREE.Vector3();
+        pos.set( v.x, v.y, v.z);
+        var mesh = createSphere(am.JOINT_RADIUS,pos,c[3].hex());
+        mesh.castShadow = false;
+        mesh.receiveShadow = false;
+        am.scene.add(mesh);
+        
+        var body = {};
+        body.rail =  i % 3;
+        body.number = i / 3;
+        body.name = alphabetic_name(i);
+        body.mesh = mesh;
+        helix.helix_joints.push(body);
+        am.push_body_mesh_pair(body,mesh);
+        
+        for(var k = 0; k < Math.min(3,i); k++) {
+//            var h = i-(k+1);
 
-	    // Sadly, increasing the mass of the members seems to be
-	    // necessary to keep the edges from passing through the obstacles.
-	    // This is a very unfortunate tuning...I suspect it is a weakness
-	    // in the solver of physics engine.
-	    var pos = new THREE.Vector3();
-	    var quat = new THREE.Quaternion();
+            // Sadly, increasing the mass of the members seems to be
+            // necessary to keep the edges from passing through the obstacles.
+            // This is a very unfortunate tuning...I suspect it is a weakness
+            // in the solver of physics engine.
+            var pos = new THREE.Vector3();
+            var quat = new THREE.Quaternion();
 
-	    var b_z = helix.helix_joints[i];
-	    var b_a = helix.helix_joints[h];
-	    var o_a = b_a.mesh.position;
-	    var o_z = b_z.mesh.position;
-	    
-	    var v_z = new THREE.Vector3(o_a.x,o_a.y,o_a.z);
-	    var v_a = new THREE.Vector3(o_z.x,o_z.y,o_z.z);
-	    var dist = v_a.distanceTo(v_z);
-	    
-	    var v_avg = new THREE.Vector3(v_z.x,v_z.y,v_z.z);
-	    v_avg.add(v_a);
-	    v_avg.multiplyScalar(0.5);
-	    
-	    pos.set( v_avg.x, v_avg.y, v_avg.z);
-            quat.set( 0, 0, 0, 1 );
+            var b_z = helix.helix_joints[i];
+            var b_a = helix.helix_joints[indices[i][k]];
+            var o_a = b_a.mesh.position;
+            var o_z = b_z.mesh.position;
+            
+            var v_z = new THREE.Vector3(o_a.x,o_a.y,o_a.z);
+            var v_a = new THREE.Vector3(o_z.x,o_z.y,o_z.z);
+            var dist = v_a.distanceTo(v_z);
+            
+            var v_avg = new THREE.Vector3(v_z.x,v_z.y,v_z.z);
+            v_avg.add(v_a);
+            v_avg.multiplyScalar(0.5);
+            
+            pos.set( v_avg.x, v_avg.y, v_avg.z);
+                quat.set( 0, 0, 0, 1 );
 
-	    var diff = ((b_a.rail - b_z.rail)+3) % 3;
-	    var cmat;
-	    var tcolor;
-	    if (diff != 0) {
-		if (OPERATION == "helices") {
-		    // What we really want to do here is to interpolate the
-		    // color of the end nodes!
-		    tcolor = new THREE.Color(0x008800);
-		    cmat  = memo_color_mat(tcolor);	
-		} else {
-		    if (diff == 2) {
-		        tcolor = new THREE.Color(0x9400D3);
-		        cmat  = memo_color_mat(tcolor);
-		    }
-		    if (diff== 1) {
-		        tcolor = new THREE.Color(0x008000);
-		        cmat  = memo_color_mat(tcolor);	
-		    }
-		}
-	    } else {
-		var cm = smats[b_a.rail]
-		cmat = new THREE.MeshPhongMaterial( {color : cm } );
-	    }
-	    var member_color = (diff != 0) ? dcolor[diff] : colors[b_a.rail];
+            var tcolor = new THREE.Color(c[k].hex());
+            var cmat = memo_color_mat(tcolor);
+            var mesh = create_actuator(dist,v_a,v_z,pos,cmat);
+            if (b_a.name > b_z.name) {
+            var t = b_a;
+            b_a = b_z;
+            b_z = t;
+            }
+            var memBody = {};
+            memBody.name = b_a.name + " " + b_z.name;
+            memBody.link_a = b_a;
+            memBody.link_z = b_z;
+            memBody.endpoints = [];
+            memBody.endpoints[0] = b_a;
+            memBody.endpoints[1] = b_z;
 
-	    var mesh = create_actuator(dist,v_a,v_z,pos,cmat);
-	    if (b_a.name > b_z.name) {
-		var t = b_a;
-		b_a = b_z;
-		b_z = t;
-	    }
-	    var memBody = {};
-	    memBody.name = b_a.name + " " + b_z.name;
-	    memBody.link_a = b_a;
-	    memBody.link_z = b_z;
-	    memBody.endpoints = [];
-	    memBody.endpoints[0] = b_a;
-	    memBody.endpoints[1] = b_z;
-
-	    for(var x = helix.helix_members.length -1; x >= 0; x--) {
-		if (helix.helix_members[x].body.name == memBody) {
-		    helix.helix_member.splice(x,1);
-		}
-	    }
-	    var link = { a: b_a, b: b_z, body: memBody};	    
-	    helix.helix_members.push(link);
-	    am.push_body_mesh_pair(memBody,mesh);
-	}
+            for(var x = helix.helix_members.length -1; x >= 0; x--) {
+            if (helix.helix_members[x].body.name == memBody) {
+                helix.helix_member.splice(x,1);
+            }
+            }
+            var link = { a: b_a, b: b_z, body: memBody};	    
+            helix.helix_members.push(link);
+            am.push_body_mesh_pair(memBody,mesh);
+        }
+        console.log("th " + th);
+        prev = th;
     }
 }
 
+function get_random_int(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
 
+function get_direction(n,v,i) {
+    if (n < 10)
+        return get_random_int(3);
+    else return -1;
+}
+
+function get_vertex(n,v,i,pa,pb,pc) {
+    var valid = { v: true};
+    var ad = 1;
+    var bd = 1;
+    var cd = 1;
+    var pd = find_fourth_point_given_three_points_and_three_distances(
+    CHIRALITY_CCW,
+    pa, pb, pc,
+    ad, bd, cd,
+        valid);
+    return pd;
+}
+var colors = [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Indigo"), d3.color("purple"), d3.color("black")];
+function get_colors(n,v,i) {
+    return [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Indigo"), d3.color("purple")];
+}
+
+var cs = [];
+cs[0] = new THREE.Vector3(0,0,0);
+cs[1] = new THREE.Vector3(1,0,0);
+cs[2] = new THREE.Vector3(.5,Math.sqrt(3)/2,0);
+
+// v [a, b, c], vc[a, b, c], ec[ab, bc, ac]
+function get_base() {
+    return {v: cs, vc: [colors[3],colors[3],colors[3]], ec: [colors[4],colors[4],colors[4]]};
+}
 
 var AM = function() {
     this.container,
