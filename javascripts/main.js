@@ -109,9 +109,9 @@ function main() {
     // Attach our event handlers
     executeButton.addEventListener("click", onExecute);
     
-    document.getElementById("circle-button").addEventListener("click", function(){ drawParametricCurve(parametricCircle); });
-    document.getElementById("sine-button").addEventListener("click", function(){ drawParametricCurve(parametricSineWave); });
-    document.getElementById("spiral-button").addEventListener("click", function(){ drawParametricCurve(parametricGoldenSpiral); });
+    document.getElementById("circle-button").addEventListener("click", function(){ drawParametricCurve(parametricCircle, false); });
+    document.getElementById("sine-button").addEventListener("click", function(){ drawParametricCurve(parametricSineWave, true); });
+    document.getElementById("spiral-button").addEventListener("click", function(){ drawParametricCurve(parametricGoldenSpiral, true); });
 
     startX.addEventListener("input", onStartXChange);
     startY.addEventListener("input", onStartYChange);
@@ -313,15 +313,21 @@ function drawEmptyGrid() {
     two.update();
 }
 
-function drawParametricCurve(curveFn) {
+function drawParametricCurve(curveFn, open) {
     var onCanvas = true;
+    var points = [];
     for (var i=0; i<MAX_PARAMETRIC_STEPS && onCanvas; i++) {
         const pnt = curveFn(i);
         onCanvas = pnt && pointIsVisible(pnt);
         if (onCanvas) {
-            renderSpot(pnt[0], pnt[1], "black", 1);
+            const canvasPnt = transformToViewport(pnt[0], pnt[1]);
+            const point = new Two.Anchor(canvasPnt[0], canvasPnt[1]);
+            points.push(point);
         }
     }
+    const path = two.makeCurve(points, open);
+    path.stroke = 'black';
+    path.noFill();
     two.update();
 }
 
@@ -360,7 +366,7 @@ function parametricGoldenSpiral(i) {
 function parametricSineWave(i) {
     var frac = i/360; // fraction between 0-1.
     var x = -MAX_X + frac * 2 * MAX_X;
-    var y = Math.sin(frac * 2*Math.PI) * MAX_Y;
+    var y = Math.sin(frac * 2*Math.PI) * MAX_Y * 0.75;
     return [x,y];
 }
 
