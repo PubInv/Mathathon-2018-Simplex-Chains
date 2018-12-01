@@ -1,20 +1,15 @@
 <!doctype html>
-
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-
     <title>Mathathon 2018: Simplex Generators</title>
     <meta name="description" content="Mathathon 2018: Simplex Generators">
     <meta name="author" content="Robert L. Read">
-
     <link rel="stylesheet" href="./jquery-ui-1.11.4.custom/jquery-ui.min.css">
-    <!--    
-    <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.structure.min.css">    
+    <!--
+    <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.structure.min.css">
     <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.theme.min.css">
     -->
-
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -29,7 +24,6 @@
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="./js/d3-scale.min.js"></script>
     <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
-
     <script src="https://d3js.org/d3-array.v1.min.js"></script>
     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
     <script src="https://d3js.org/d3-color.v1.min.js"></script>
@@ -40,31 +34,23 @@
     <script src="https://d3js.org/d3-scale.v1.min.js"></script>
 </head>
 
-
-<div id="content-wrapper">
-    <div class="inner clearfix">
-
-        <div id="threecontainer">
-        </div>
-
-        <section id="main-content">
-            <section id="visualsection" style="{border: red;}">
+<body>
+    <div id="content-wrapper">
+        <div class="inner clearfix">
+            <div id="threecontainer"></div>
+            <section id="main-content">
+                <section id="visualsection"></section>
+                <p>
+                    <button onclick="renderComputed()">Render Computed Simplex Chain</button>
+                </p>
             </section>
-
-            <p>
-                <button onclick="renderComputed()">Render Computed Simplex Chain</button>
-            </p>
-
-
-            <section id="textsection" style="{border: red;}">
-                <h1 id="message_banner">
-                    Untwisting the Tetrahelix </h1>
+            <section id="textsection">
+                <h1 id="message_banner">Untwisting the Tetrahelix </h1>
                 <h2> This is an interactive 3D simulation. To change the view, place your mouse in the view area, and
                     hold and "drag" the mouse to rotate the image.
                     The mouse wheel or a drag on your trackpad should zoom you in or out.</h2>
                 <p>
-                    A mathematical investigation of the Tetrahelix and <a href="https://en.wikipedia.org/wiki/Boerdijk%E2%80%93Coxeter_helix">Boerdijk-Coxeter
-                        helix</a>, which provides a new
+                    A mathematical investigation of the Tetrahelix and <a href="https://en.wikipedia.org/wiki/Boerdijk%E2%80%93Coxeter_helix">Boerdijk-Coxeter helix</a>, which provides a new
                     formulaic way of producing a continuum of untwisted tetrahelices.
                 </p>
                 <p>
@@ -84,5 +70,8 @@
                     computed in javascript by specifying the lengths of the new edges added to a starting triangle.
                     With enough hackery, this can become the basis of testing "generators" for complex simplex chains.
                 </p>
-
-                <script src="./js/main.js"></script>
+            </section>
+        </div>
+    <div>
+    <script src="./js/main.js"></script>
+</body>
