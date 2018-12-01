@@ -1143,15 +1143,69 @@ test_find_fourth_point_given_three_points_and_three_distance();
 
 (function () {
 
+    // CONSTANTS
+    
+    var INTERVAL = 25; // milliseconds between steps.
+    
+    // GLOBAL VARIABLES
+    
+    var generatorFn;
+    
+    // PAGE ELEMENTS
+    
+    var executeButton;
+    var funcStatus;
+    
+    // MAIN FUNCTION
+    
     $(function () { main(); });
-
     function main() {
-        var executeButton = document.getElementById('execute-button');
+        executeButton = document.getElementById('execute-button');
+        funcStatus = document.getElementById('function-status');
+        
         executeButton.addEventListener('click', onExecute);
+
+        var renderButton = document.getElementById('render-button');
+        renderButton.addEventListener('click', renderComputed);
     }
 
+    // STEP FUNCTION
+    
+    function step(fn, i) {
+        generatorFn(i);
+        executeButton.disabled = false;
+    }
+    
+    // EVENT HANDLERS
+    
     function onExecute() {
-        alert("Execute pressed!");
+        executeButton.disabled = true;
+        var generatorSource = document.getElementById('user-defined-generator').value;
+        generatorFn = compileGenerator(generatorSource);
+        if (!generatorFn) { 
+            executeButton.disabled = false;
+            return;
+        }
+        setTimeout(step, INTERVAL, generatorFn, 0);
     }
 
+    // HELPER FUNCTIONS
+    
+    function compileGenerator(src) {
+        var fn;
+        try { fn = eval(src); }
+        catch(err) {
+            funcStatus.innerHTML = err.message;
+            return undefined;
+        }
+        var fnType = typeof fn;
+        if (fnType != 'function') {
+            funcStatus.innerHTML = "Generator needs to be a function, not " + fnType;
+            return undefined;
+        }
+        funcStatus.innerHTML = "";
+        return fn;
+    }
+    
 })();
+
