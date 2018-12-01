@@ -19,6 +19,7 @@
 
 \newtheorem{exercise}{Exercise}
 \newtheorem{problem}{Problem}
+\newtheorem{eproblem}{Emergent Problem}
 
 \SetWatermarkText{DRAFT}
 \SetWatermarkScale{6}
@@ -194,6 +195,20 @@ generators.
 \begin{problem}[GEN-BEAM]
   (Easy 1) Can you create a generator which creates a beam?
 \end{problem}
+
+\begin{eproblem}[SIZE-N-HEXAGON]
+  Define a generator that makes triangle whose ``hole'' has $n$ edges, starting at zero.
+\end{eproblem}
+\begin{eproblem}[SIZE-N-RECURRENCE]
+  Create a recurrence relation that counts the number of trinagles in the SIZE-N-HEXAGON problem.
+\end{eproblem}
+\begin{eproblem}[HEXAGON-COMBINATION]
+  Define a generator that uses SIZE-N-HEXAGON and SIZE-N-RECURRENCE to draw a completely filled hexagon of any size.
+\end{eproblem}
+\begin{eproblem}[TILE-WITH-HEXES]
+  Define a generator that uses HEXAGON-COMBINATION to solve TILE-THE-PLANE.
+\end{eproblem}
+
 \begin{problem}[GEN-PLANE]
 (Easy 2) Can you create a generator which fills the plane?  
 \end{problem}
