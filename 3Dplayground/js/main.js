@@ -156,7 +156,7 @@ function add_vertex(am, d, i, params) {
     var darkgreen = d3.color("#008000");
     var dcolor = [null, darkgreen, d3.color("purple")];
 
-    var base = get_base();
+    var base = get_base(params.init_pos);
     var vertices = params.vertices;
     var indices = params.indices;
     var prev = params.prev;
@@ -295,8 +295,17 @@ cs[1] = new THREE.Vector3(1, 0, 0);
 cs[2] = new THREE.Vector3(.5, Math.sqrt(3) / 2, 0);
 
 // v [a, b, c], vc[a, b, c], ec[ab, bc, ac]
-function get_base() {
-    return { v: cs, vc: [colors[3], colors[3], colors[3]], ec: [colors[4], colors[4], colors[4]] };
+function get_base(init_pos) {
+    var csx = [];
+    // Cloning to avoid disrupting global variable.
+    csx[0] = cs[0].clone();
+    csx[1] = cs[1].clone();
+    csx[2] = cs[2].clone();
+    csx[0].add(init_pos);
+    csx[1].add(init_pos);
+    csx[2].add(init_pos);    
+    return { v: csx,
+             vc: [colors[3], colors[3], colors[3]], ec: [colors[4], colors[4], colors[4]] };
 }
 
 var AM = function () {
@@ -349,7 +358,6 @@ var AM = function () {
     this.INITIAL_EDGE_LENGTH = TET_DISTANCE;
     this.INITIAL_EDGE_WIDTH = this.INITIAL_EDGE_LENGTH / 40;
     this.INITIAL_HEIGHT = 3 * this.INITIAL_EDGE_LENGTH / 2;
-
     this.NUMBER_OF_TETRAHEDRA = 70;
     //       this.NUMBER_OF_TETRAHEDRA = 5;
 
@@ -812,6 +820,7 @@ function draw_helix(pvec, rail, hparams, factor, color, fudge, lw) {
 
 
 function renderComputed() {
+    alert("renderComputed");
     var pvec = new THREE.Vector3(0, 1, 0);
     am.helices.push(
         {
@@ -823,6 +832,7 @@ function renderComputed() {
     var tets = 2;
     load_NTetHelixAux(am, am.helices[0], tets, pvec, cs);
 }
+
 
 
 // for testing, we need to know when somethigns is "closeto a target"
@@ -966,7 +976,7 @@ function compute_transform_to_axes2(pa, pb, pc) {
     // now b1 should be on the x axis..
     if (debug) console.log("b1", b1);
     var m1 = new THREE.Matrix4();
-    m1.setRotationFromQuaternion(q);
+    m1.makeRotationFromQuaternion(q);
 
     var m2 = new THREE.Matrix4();
 
@@ -1162,8 +1172,10 @@ function clearAm() {
     am.helix_params = [];
 }
 
-function initialParameters() { 
-    var params = { vertices: [], indices: [], prev: [], helix: {helix_joints: [], helix_members: []}};
+function initialParameters(init_pos) { 
+    var params = { vertices: [], indices: [], prev: [], helix: {helix_joints: [], helix_members: [],
+                                                               },
+                 init_pos: init_pos};
     for (var i = 0; i < 3; i++) {
         add_vertex(am, 0, i, params);
     }
@@ -1219,6 +1231,11 @@ function drawTetrahedron(dir, i, other_params) {
         // TEMPORARY: Render button is placeholder until example generators are working.
         var renderButton = document.getElementById('render-button');
         renderButton.addEventListener('click', renderComputed);
+
+        var renderTestGeneratorsButton = document.getElementById('render-test-generators');
+        console.log("AAAA",renderTestGeneratorsButton);
+        renderTestGeneratorsButton.addEventListener('click', renderTestGenerators);
+
         
         // Fill the generators selector
         for (var key in EXAMPLE_GENERATORS) {
@@ -1235,7 +1252,8 @@ function drawTetrahedron(dir, i, other_params) {
     function step(fn, i, other_params) {
         var dir;
         try {
-            dir = generatorFn(i);
+            dir = fn(i);
+//            dir = generatorFn(i);
         } catch (err) {
            funcStatus.innerHTML = "Step " + i + ": " + err.message;
            dir = -1;
@@ -1246,7 +1264,7 @@ function drawTetrahedron(dir, i, other_params) {
             dir = -1;    
         }
         
-        console.log('Step ' + i + ' direction ' + dir);
+//        console.log('Step ' + i + ' direction ' + dir);
         if (dir != -1) {
             other_params = drawTetrahedron(dir, i, other_params);
             setTimeout(step, INTERVAL, fn, i+1, other_params);
@@ -1265,10 +1283,39 @@ function drawTetrahedron(dir, i, other_params) {
             return;
         }
         clearAm();
-        var other_params = initialParameters();
+        var other_params = initialParameters(new THREE.Vector3(0,0,0));
         setTimeout(step, INTERVAL, generatorFn, 0, other_params);
     }
 
+    function renderTestGenerators() {
+        executeButton.disabled = true;
+        var test_gen = [];
+        for(var i = 0; i < 4; i++) {
+            //            test_gen[i] = "(i) => { const K = "+i+";\n return i<200 ? ((\n(i % K) == 7) ||  ((K % 24) == 8)\n ? 1 : 2 ): -1; }";
+            test_gen[i] = "(i) => { const K = "+(i+20)+";\n return i<200 ? ((((i % K) == K-1) || ((i % K) == K-2) )? 1 : 2 ): -1; }";            
+        }
+        clearAm();
+        test_gen.forEach( (x,i) => 
+                          {
+                              console.log("XXXX",x,i);
+                              generatorFn = compileGenerator(x);
+                              if (!generatorFn) { 
+                                  executeButton.disabled = false;
+                                  return;
+                              }
+                              // clearAm();
+                              console.log("AAA");
+                              const square = 3;
+                              var y = Math.floor(i / square);
+                              var x = i % square;
+                              const space = 10;
+                              var other_params = initialParameters(new THREE.Vector3(x*space -(space/2),5,y*space - (space/2)));
+
+                              setTimeout(step, INTERVAL, generatorFn, 0, other_params);
+                          });
+    }
+    
+        
     function onGeneratorChanged() {
         funcStatus.innerHTML = '';
         generatorText.value = EXAMPLE_GENERATORS[generatorsSelector.value].src || '';
