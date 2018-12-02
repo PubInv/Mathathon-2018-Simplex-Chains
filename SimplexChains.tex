@@ -230,7 +230,7 @@ Note: at 10:00 am Central, GEN-PLANE was solved by Nathan, Sanchi, Neil, and Rob
 \end{verbatim}
 
 \begin{eproblem}[NO-CORNERS]
-  Prove that no 2D figure created by a generator can have a sharp point (that is, an exteranl 60-degree edge.
+  Prove that no 2D figure created by a generator can have a sharp point (that is, an external 60-degree edge.
   \end{eproblem}
 
 
@@ -277,7 +277,7 @@ return (j % (2 * h + 1) % 2 == 0) ? "L" : "R"; }
 \end{verbatim}
 
 Note: Setting G=4 creates a set of non-continuous gaps, which remind one of the vascular structure of a plant stem. In theory,
-one could build a ``drinking straw'' in this way that would have think vacuoles.
+one could build a ``drinking straw'' in this way that would have thick vacuoles.
 
 \begin{figure}
      \centering
@@ -323,7 +323,7 @@ Finally, here is a problem of some practical value to mechanical engineers:
 
 Any Regular 2D Simplex Chain, although it may be thought of as points in $\mathbb{R}^2$, may also be thought of as simply
 selecting a set of triangles in an abstract space, which we call the {\em Triangle Space}, which is $\mathbb{Z}^2$. By convention,
-we begin numbering the Triangle Space at a equilateral triangle point upward, whose apex is at the origin.  Then any triangle can be
+we begin numbering the Triangle Space at an equilateral triangle pointing upward, whose apex is at the origin.  Then any triangle can be
 named by $(x,y)$, where $y=0$ on is the horizontal row of triangles below the $x$-axis. A triangle at position $x$ has an apex
 pointing either upward or downward at position $x/2$.
 
@@ -337,42 +337,6 @@ pointing either upward or downward at position $x/2$.
 \footnote{ Amit proposes a different numbering scheme for regular triangles:
   \url{http://www-cs-students.stanford.edu/~amitp/game-programming/grids/})
 }
-
-\subsection{On the reachability of points}
-
-Although too simple for a professional mathematician in two dimensions, let us consider the problem of {\em reaching} certain regions
-or points with a simplex chain from a starting point.
-
-Let us for the time being consider {\em regular} simplex chains.  In the Cartesian plane, it is pretty clear that any point can {\em reached},
-that is, intersected, by a simplex chain of finite length. Developing an algorithm to produce such a chain from the coordinates of a point
-is an easy problem. We could then pose questions about the shortest such chain, or the number of such chains.
-
-Now consider the problem of reaching a point in 3D with a simplex chain formed only of regular tetrahedra.
-\begin{problem}[REGULAR REACHABILITY]
-  (Hard 9)  Given a a point in 3-space, produce a regular simplex chain of tetrahedra starting at the origin.
-  Give the shortest simplex chain which intersects the point.
-\end{problem}
-This is a much harder problem.
-
-It seems likely that any point can be intersected, except perhaps points very close to the starting point. Producing an algorithm to do so
-is more of a challenge. This is a very interesting problem to mechanical engineers, robotocists, and possibly molecular scientists.
-
-Now if instead of merely {\em intersecting} a point with the body of simplex we instead seek to move the {\em apex} of a tetrahedra close
-to the point, we have a real challenge.
-\begin{problem}[SHORTEST REGULAR WITH d]
-  (Hard 9) Given a point in 3-space and a distance $d$, produce a shortest regular simplex chain starting at the origin whose apex
-  is within $d$ of the point.
-\end{problem}
-
-\begin{problem}[ARBITRARY APPROACH]
-(Hard 9) Can we come arbitrarily close to a point with arbitrary length chains?
-\end{problem}
-
-\subsection{A diversion}
-An interesting, if somewhat wild idea, is to build a coordinate system around points based on reaching them with simplex chains. In this model
-we do not start with the Cartesian plane; rather we ``name'' points by the simplex chain we reaches them. What is the nature of a space
-of such points? 
-
 
 
 \section{Relaxations of Regularity}
@@ -451,12 +415,50 @@ First, we will number the nodes in the order in which they are added. The the st
 node will definitely attach to node $3$ (the highest-numbered node). The question is, to which of the other nodes should it attach,
 and how should we name it?
 
-I propsoe that we name the faces connected to a vertex numberd $N$ high, medium, and low, as per:
+I propose that we name the faces connected to a vertex numbered $N$ high, medium, and low, as per:
 \begin{enumerate}
 \item {\em high} when the face has vertices ${N, N-1, N-2}$,
 \item {\em medium} when the face has vertices ${N, N-1, N-3}$,
   \item {\em low} when the face has vertices ${N, N-2, N-3}$,    
 \end{enumerate}
+
+\subsection{On the reachability of points}
+
+Although too simple for a professional mathematician in two dimensions, let us consider the problem of {\em reaching} certain regions
+or points with a simplex chain from a starting point.
+
+Let us for the time being consider {\em regular} simplex chains.  In the Cartesian plane, it is pretty clear that any point can {\em reached},
+that is, intersected, by a simplex chain of finite length. Developing an algorithm to produce such a chain from the coordinates of a point
+is an easy problem. We could then pose questions about the shortest such chain, or the number of such chains.
+
+Now consider the problem of reaching a point in 3D with a simplex chain formed only of regular tetrahedra.
+\begin{problem}[REGULAR REACHABILITY]
+  (Hard 9)  Given a a point in 3-space, produce a regular simplex chain of tetrahedra starting at the origin.
+  Give the shortest simplex chain which intersects the point.
+\end{problem}
+This is a much harder problem.
+
+It seems likely that any point can be intersected, except perhaps points very close to the starting point. Producing an algorithm to do so
+is more of a challenge. This is a very interesting problem to mechanical engineers, robotocists, and possibly molecular scientists.
+
+Now if instead of merely {\em intersecting} a point with the body of simplex we instead seek to move the {\em apex} of a tetrahedra close
+to the point, we have a real challenge.
+\begin{problem}[SHORTEST REGULAR WITH d]
+  (Hard 9) Given a point in 3-space and a distance $d$, produce a shortest regular simplex chain starting at the origin whose apex
+  is within $d$ of the point.
+\end{problem}
+
+\begin{problem}[ARBITRARY APPROACH]
+(Hard 9) Can we come arbitrarily close to a point with arbitrary length chains?
+\end{problem}
+
+\subsection{A diversion}
+An interesting, if somewhat wild idea, is to build a coordinate system around points based on reaching them with simplex chains. In this model
+we do not start with the Cartesian plane; rather we ``name'' points by the simplex chain we reaches them. What is the nature of a space
+of such points? 
+
+
+\subsection{Problems}
 
 In this way a {\em generator} could be a function from the naturals to the set ${H,M,L,S}$ (high, medium, low, stop). If this is to be
 a generator for irregular tetrahedron, it is a function from the naturals to the 4-tuple,$[f,l_0,l_1,l_2]$, where the $l_x$ is a positive length.
@@ -478,6 +480,11 @@ never come back to precisely the same point.
 Note: Every example that we have tested exhibits this property. We believe it is a property of any repeated structure, not related to simplices.
 However, we do not yet know the name of this theorem or principle. We conjecture that every stack of repeated truncated prisms
 forms a helical aperigon, which is hinted at but not stated in the Wikipedia article\url{https://en.wikipedia.org/wiki/Skew_apeirogon}.
+
+Note: Rob believes a proof that any periodic structure fits within a cylinder is possible, and that it should be possible to give a formulaic bound
+on the diameter of this cylinder (under some assumptions.) The key to the proof is to use symmetry and focus on the the center of three
+such objects, observing that the other two must necessarily bend towards or away from each other in a way describable by two angles.
+A formula for the cylinder as a function of these angles would convincingly complete the proof.
 
 These problems were discovered during the Mathathon:
 \begin{eproblem}[PARAMETRIC-CURVE-3D] (Medium 6)
@@ -557,7 +564,7 @@ Note: Nathan suggests that we can fill a slab using our plane tiling algorithm a
 \end{problem}
 
 \begin{problem}[RULE FOR $k$-BOUNDED INSIDE HELIX]
-\item (Hard 7) Can we define a rule that createsa $k$-bounded tetrahelix that follows a helix (that is, that stays close to a helix, as if we took a cylinder and bent it into a helical shape, like a thick wire of
+\item (Hard 7) Can we define a rule that creates a $k$-bounded tetrahelix that follows a helix (that is, that stays close to a helix, as if we took a cylinder and bent it into a helical shape, like a thick wire of
 steel coiled into a spring? Ideally, this would be a simple algebraic expression. If no such expression is possible, show why.
 \end{problem}
 
@@ -570,9 +577,6 @@ Note: We use the term ``equitetrabeam'' to refer to an irregular tetrahelix that
   \label{fig:equitetrabeam}
 \end{figure}
 
-In order to investigate irregular simplex chains, a software platform for tetrahedral chains similar to the 2D website we have build would be
-extremely useful.
-
 \begin{problem}[SOFTWARE FOR REGULAR/IRREGULAR TETRAHEDRAL CHAINS]
 (Hard 8) Can we create a browser-based software toolkit that allows us to with regular or irregular tetrahedral simplex chains.  
 \end{problem}
@@ -580,14 +584,16 @@ extremely useful.
 Note: By Saturday, this problem was largely solved by Rob, Nathan and David, in that they build a generator for Regular 3D stuff. This allowed us to define a number of emergent problems:
 
 \begin{eproblem}[PERIODIC-REGULAR-GENERATORS]
-  In playing with periodic regular tenerators, we found toriodal (self-intersecting) shapes and shapes that were linear (with twists like the Boerdijk-Coxeter helix.
+  In playing with periodic regular generators, we found toroidal (self-intersecting) shapes and shapes that were linear (with twists like the Boerdijk-Coxeter helix.
   When does a periodic generator produce linear (fitting inside a cylinder structures)?
   When does a periodic generator produce ring-like stuctures?
 \end{eproblem}
 
 \begin{eproblem}[NON-CYLINDRICAL EXISTENCE]
-  Is there a simple generator for regular tetrahedral changes which generates a shape which cannot be containe within any cylinder?  That is, is unbounded in more than one dimension.
+  Is there a simple generator for regular tetrahedral changes which generates a shape which cannot be contained within any cylinder?  (That is, is unbounded in more than one dimension.) What is the simplest such generator?
 \end{eproblem}
+
+Note: Yes, you can create such generators, but they are non-periodic. The eaisest way is to use ever-lengthing runs of $0$ or $2$.
 
 
 \begin{itemize}
@@ -625,7 +631,6 @@ The 2D website that we have made for testing 2d-regular generators is a valuable
 It would be nice to have such a website that supports irregular triangles as well.
 
 Although more challenging, we could also produce software to test 3D simplex chains.
-If someone would do this as early in the Mathathon as possible, this would obviouosly be extremely valuable.
 
 The author is familiar with computer science techniques. Mentioning mathematical techniques useful in addressing these problems would be
 very appreciated.
@@ -695,10 +700,11 @@ awards file in the GitHub file. Judging will be performed by a committee of the 
 \section{Key Personnel and Contributors}
 
 \begin{itemize}
-\item Robert L. Read, PhD  <read.robert@gmail.com>
+\item Robert L. Read, PhD  \textless read.robert@gmail.com\textgreater
 \item David Jeschke
 \item Stephanie Liu
-\item Sanchi Vaishnavi email: <vaishnavi.sanchi@gmail.com>
+\item Sanchi Vaishnavi email: \textless vaishnavi.sanchi@gmail.com\textgreater
+  \item Nathan Gilbert email: \textless tahgtahv@gmail.com\textgreater
 \end{itemize}
 
 
