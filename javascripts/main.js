@@ -451,7 +451,7 @@ function nextParametricTriangle(lpt, tc) {
 function parametricCircle(i) {
     if (i>=360) { return false; }
     var theta = i/360*2*Math.PI;
-    var radius = MAX_X * 0.75;
+    var radius = (MAX_X * 0.75) + 0.001;
     var x = radius * Math.cos(theta);
     var y = radius * Math.sin(theta);
     return [x,y];
