@@ -256,6 +256,33 @@ This discussion led me to think of the problem emergent problem
 \begin{problem}[GEN-SPIRAL]
   (Medium 4) Can you create a generator which creates golden spiral?
 \end{problem}
+
+Note: On Sunday night at 4:30 AM CST, Sanchi produced a soltuion to a spiral which is a different form of spiral,
+which counts as a full solution. The value $G=2$ creates gap of width ``one triangle'', the values $G=3$ creates a gap width of ``two triangles''.
+
+
+\begin{verbatim}
+# hexagonal spiral 
+(n) => { if (n > 94) return "S"; 
+const G = 3;
+var k = n + 1; 
+var h = Math.floor(Math.sqrt(k/G)); 
+var j = k - h * h * G; 
+if (j == 0) return "R"; 
+else if (j == 1) return "L"; 
+return (j % (2 * h + 1) % 2 == 0) ? "L" : "R"; }
+\end{verbatim}
+
+Note: Setting G=4 creates a set of non-continuous gaps, which remind one of the vascular structure of a plant stem. In theory,
+one could build a ``drinking straw'' in this way that would have think vacuoles.
+
+\begin{figure}
+     \centering
+     \includegraphics[width=0.65\textwidth]{figures/SpiralWithClosedGaps.png}
+     \caption{A Spiral with Closed Gaps}
+  \label{fig:equitetrabeam}
+\end{figure}
+
 \begin{problem}[GEN-SINWAVE]
   (Medium 4) Can you create a generator which completely and minimal covers a sinusoidal wave?
 \end{problem}
@@ -442,6 +469,13 @@ clockwise or counterclockwise tetrahelix, respectively, and the we can go on for
 It is curious that the rotation about the center of the cylinder is an irrational fraction of circle, so we will
 never come back to precisely the same point.
 
+\begin{eproblem}[PROVE HELICITY]
+  Prove or disprove that {\em every} periodic 3D Generator generates a figure contained within a cylinder of unbounded length but bounded diameter.
+\end{eproblem}
+Note: Every example that we have tested exhibits this property. We believe it is a property of any repeated structure, not related to simplices.
+However, we do not yet know the name of this theorem or principle. We conjecture that every stack of repeated truncated prisms
+forms a helical aperigon, which is hinted at but not stated in the Wikipedia article\url{https://en.wikipedia.org/wiki/Skew_apeirogon}.
+
 These problems were discovered during the Mathathon:
 \begin{eproblem}[PARAMETRIC-CURVE-3D] (Medium 6)
   Supoose we have a parametric curve in 3d that gives coordinates as a function of $t$ $(x,y,z)(t)$.
@@ -456,9 +490,21 @@ led me define the following emergent problem
 \begin{eproblem}[GENERATE-TETRAHELIX]
 (Medium 4)  Now that we have a 3D generator page, is there a simple generator that defines the famous Boerdijk-Coxeter Tetrahelix?
 \end{eproblem}
+
+Saturday mornging Nathan solved this problem. The solution is just to use either face number $0$ or face $2$ as a constant.
+
 \begin{problem}[IS THERE A CLOSED REGULAR FIGURE]
 (Hard 9) Can we define ANY rule using only regular tetrahedra that forms a closed loop with no gaps? If not, can we prove that we cannot?  
 \end{problem}
+
+Note: A good approximation to a torus was found in a 25 tet simplex chain:
+\begin{verbatim}
+(i) => { const K = 4;
+ return i<25 ? 
+(((i % K) == K-1) 
+? 1 : 2 ):
+ -1; }
+\end{verbatim}
 
 
 \begin{problem}[MAXIMUM FRACTION OF VOLUME]
@@ -469,12 +515,34 @@ led me define the following emergent problem
 (Medium 6 R3D-01) Can we produce more interesting shapes by adopting more complex rules?  
 \end{problem}
 
+Note: This was partially solved my Nathan by the following extraordinary generator:
+\begin{verbatim}
+(i) => { (i) => { const K = 22;);
+return i<500 ? ((
+(i % K) == -1) ||  ((i % K) == K-2) 
+ ? 1 : 2 ): 
+-1; }
+\end{verbatim}
+which self-intersects, but only a little, and produces a nearly ``closed'' squarish cylinder. That is, it produces a slightly twisting large square
+cavity with no large gaps in the walls of the ``container''.
+
+An even tighter work is:
+\begin{verbatim}
+(i) => { const K = 11;
+return i<500 ? ((
+(i % K) == 7) ||  ((i % K) == 8) 
+ ? 1 : 2 ): 
+-1; }
+\end{verbatim}
+
 To be able to discuss the generation of irregular chains of tetrahedra, we would have to amend our generator rules to include a specification
 of three new lengths with the addition of each new tetrahedron.
 
 \begin{problem}[FILL SPACE WITH IRREGULAR TETRAHEDRA]
 (Hard 9) Produce a generator rule for irregular tetrahedra that fills all space.
 \end{problem}
+
+Note: Nathan suggests that we can fill a slab using our plane tiling algorithm and irregular tetrahedra with equilateral faces in the planes.
 
 \begin{problem}[IRREGULAR APEX]
   (Hard 9) If we forbid self-collisions, can we define an algorithm for irregular tetrahedral simplex chains that places the apex
