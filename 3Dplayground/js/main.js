@@ -154,7 +154,6 @@ function load_NTetHelix(am, helix, tets, pvec, hparams) {
     return load_NTetHelixAux(am, helix, tets, pvec, coords);
 }
 
-
 function add_vertex(am, d, i, params) {
     var colors = [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Blue")];
     var darkgreen = d3.color("#008000");
@@ -171,9 +170,9 @@ function add_vertex(am, d, i, params) {
         if (i < 3) {
             v = base.v[i];
             switch (i) {
-                case 0: th = [0, 0, 0, i]; c = [0, 0, 0, base.vc[i]]; break;
-                case 1: th = [0, 0, 0, i]; c = [base.ec[0], 0, 0, base.vc[i]]; break;
-                case 2: th = [1, 0, 0, i]; c = [base.ec[1], base.ec[2], 0, base.vc[i]]; break;
+                case 0: th = [0, 0, 0, i]; c = [base.ec[0], base.ec[0], base.ec[0], base.vc[i]]; break;
+                case 1: th = [0, 0, 0, i]; c = [base.ec[0], base.ec[0], base.ec[0], base.vc[i]]; break;
+                case 2: th = [1, 0, 0, i]; c = [base.ec[1], base.ec[0], base.ec[0], base.vc[i]]; break;
             }
             vertices.push(v);
             indices.push(th);
@@ -198,6 +197,7 @@ function add_vertex(am, d, i, params) {
             indices.push(th);
             c = get_colors(i, vertices, indices);
         }
+        if (params.wireframe == true) {
         //        v = v.add(pvec);                
         var pos = new THREE.Vector3();
         pos.set(v.x, v.y, v.z);
@@ -215,14 +215,7 @@ function add_vertex(am, d, i, params) {
         am.push_body_mesh_pair(body, mesh);
 
         for (var k = 0; k < Math.min(3, i); k++) {
-            //            var h = i-(k+1);
-
-            // Sadly, increasing the mass of the members seems to be
-            // necessary to keep the edges from passing through the obstacles.
-            // This is a very unfortunate tuning...I suspect it is a weakness
-            // in the solver of physics engine.
             var pos = new THREE.Vector3();
-            var quat = new THREE.Quaternion();
 
             var b_z = helix.helix_joints[i];
             var b_a = helix.helix_joints[indices[i][k]];
@@ -238,7 +231,6 @@ function add_vertex(am, d, i, params) {
             v_avg.multiplyScalar(0.5);
 
             pos.set(v_avg.x, v_avg.y, v_avg.z);
-            quat.set(0, 0, 0, 1);
 
             var tcolor = new THREE.Color(c[k].hex());
             var cmat = memo_color_mat(tcolor);
@@ -265,9 +257,32 @@ function add_vertex(am, d, i, params) {
             helix.helix_members.push(link);
             am.push_body_mesh_pair(memBody, mesh);
         }
+        }
+        else {
+            var geometry = new THREE.Geometry();
+            geometry.vertices.push(vertices[th[0]],vertices[th[1]],vertices[th[2]],vertices[th[3]]);
+            if (params.blendcolor == true) {
+                geometry.faces.push(
+                    new THREE.Face3(2, 3, 0, undefined, [cto3(c[2]),cto3(c[3]),cto3(c[0])]),
+                    new THREE.Face3(3, 2, 1, undefined, [cto3(c[3]),cto3(c[2]),cto3(c[1])]),
+                    new THREE.Face3(1, 0, 3, undefined, [cto3(c[1]),cto3(c[0]),cto3(c[3])]));
+            }
+            else {
+                geometry.faces.push(
+                    new THREE.Face3(2, 3, 0, undefined, cto3(c[1])),
+                    new THREE.Face3(3, 2, 1, undefined, cto3(c[0])),
+                    new THREE.Face3(1, 0, 3, undefined, cto3(c[2])));
+            }
+            var material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, side: THREE.BackSide});
+            var mesh = new THREE.Mesh(geometry, material);
+            am.scene.add(mesh);
+        }
         params.prev = th;
 }
 
+function cto3(c) {
+     return new THREE.Color(c.hex());
+}
 function get_random_int(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
@@ -298,7 +313,7 @@ function get_colors(n, v, i) {
 var cs = [];
 cs[0] = new THREE.Vector3(0, 0, 0);
 cs[1] = new THREE.Vector3(1, 0, 0);
-cs[2] = new THREE.Vector3(.5, Math.sqrt(3) / 2, 0);
+cs[2] = new THREE.Vector3(.5, 0, - Math.sqrt(3) / 2);
 
 // v [a, b, c], vc[a, b, c], ec[ab, bc, ac]
 function get_base(init_pos) {
@@ -1182,10 +1197,13 @@ function initialParameters(init_pos) {
     var params = { vertices: [], indices: [], prev: [], helix: {helix_joints: [], helix_members: [],
                                                                },
                  init_pos: init_pos};
-    for (var i = 0; i < 3; i++) {
+    return params;
+}
+
+function generator_init(params) {
+        for (var i = 0; i < 3; i++) {
         add_vertex(am, 0, i, params);
     }
-    return params;
 }
 
 function drawTetrahedron(dir, i, other_params) {
@@ -1294,6 +1312,9 @@ function drawTetrahedron(dir, i, other_params) {
         }
         clearAm();
         var other_params = initialParameters(new THREE.Vector3(0,0,0));
+        other_params.wireframe = document.getElementById('wireframe').checked;
+        other_params.blendcolor = document.getElementById('blendcolor').checked;
+        generator_init(other_params);
         setTimeout(step, INTERVAL, generatorFn, 0, other_params);
     }
 
