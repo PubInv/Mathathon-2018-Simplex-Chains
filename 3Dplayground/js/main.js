@@ -22,6 +22,10 @@ const CHIRALITY_CCW = 1;
 const CHIRALITY_CW = 0;
 var TET_DISTANCE = 0.5;
 
+const MAX_PARAMETRIC_STEPS = 1000;
+const PARAMETRIC_BISECTION_LIMIT = 50;
+
+
 // Detects webgl
 if (!Detector.webgl) {
     Detector.addGetWebGLMessage();
@@ -178,7 +182,9 @@ function add_vertex(am, d, i, params) {
             if (i == 3)
                 th = [0, 1, 2, 3];
             else {
-//                var d = get_direction(i - 3, vertices, indices);
+                //                var d = get_direction(i - 3, vertices, indices);
+                // I don't think the 3 case should exist here!!
+                if (d == 3) console.log("HHHHHHHHHHHH");
                 switch (d) {
                     case -1: return;
                     case 0: th = [prev[1], prev[2], prev[3], i]; break;
@@ -1235,6 +1241,10 @@ function drawTetrahedron(dir, i, other_params) {
         var renderTestGeneratorsButton = document.getElementById('render-test-generators');
         console.log("AAAA",renderTestGeneratorsButton);
         renderTestGeneratorsButton.addEventListener('click', renderTestGenerators);
+        // Add the Parametric Curve functionality
+        document.getElementById("circle-button").addEventListener("click", function(){ followParametricCurve(parametricCircle, false); });
+        document.getElementById("sine-button").addEventListener("click", function(){ followParametricCurve(parametricSineWave, true); });
+        document.getElementById("spiral-button").addEventListener("click", function(){ followParametricCurve(parametricGoldenSpiral, true); });
 
         
         // Fill the generators selector
@@ -1338,6 +1348,402 @@ function drawTetrahedron(dir, i, other_params) {
         funcStatus.innerHTML = "";
         return fn;
     }
+
+    // return true iff lpt is inside the tetrahedron formed
+    // by a,b,c,d
+    // https://stackoverflow.com/questions/25179693/how-to-check-whether-the-point-is-in-the-tetrahedron-or-not
+    function SameSide(v1, v2, v3, v4, p)
+    {
+        var v21 = v2.clone();
+        v21.sub(v1);
+        var v31 = v3.clone();
+        v31.sub(v1);
+        var normal = new THREE.Vector3();
+        normal.crossVectors(v21,v31);
+        //        var normal = cross(v2 - v1, v3 - v1);
+        var v41 = v4.clone();
+        v41.sub(v1);
+        
+        var dotV4 = normal.dot(v41);
+        var p_v1 = p.clone();
+        p_v1.sub(v1);
+        var dotP = normal.dot(p_v1);
+
+        var r = (Math.sign(dotV4) == Math.sign(dotP));
+        return r;
+    }
+    function test_SameSide() {
+        var c = [];
+        c[0] = new THREE.Vector3(0, 0, 0);
+        c[1] = new THREE.Vector3(1, 0, 0);
+        c[2] = new THREE.Vector3(0, 1, 0);
+        c[3] = new THREE.Vector3(0, 0, 1);
+        var psam = new THREE.Vector3(2, 2, 2);
+        var pnsam = new THREE.Vector3(2, 2, -2);        
+        console.assert(SameSide(c[0],c[1],c[2],c[3],psam));
+        console.assert(!SameSide(c[0],c[1],c[2],c[3],pnsam));
+        var small = new THREE.Vector3(2, 2, 2);
+        console.assert(SameSide(c[0],c[1],c[2],c[3],small));        
+    }
+    test_SameSide();
     
+    
+    function pointIsInsideTetPnts(p, v1,v2,v3,v4) {
+        var A =  SameSide(v1, v2, v3, v4, p);
+        var B = SameSide(v2, v3, v4, v1, p);
+        var C = SameSide(v3, v4, v1, v2, p);
+        var D = SameSide(v4, v1, v2, v3, p);
+        return A && B && C && D;
+
+    }
+
+    function test_pointIsInsideTet() {
+        var c = [];
+        c[0] = new THREE.Vector3(0, 0, 0);
+        c[1] = new THREE.Vector3(1, 0, 0);
+        c[2] = new THREE.Vector3(0, 1, 0);
+        c[3] = new THREE.Vector3(0, 0, 1);
+        var pin = new THREE.Vector3(0.1, .1, 0.1);
+        var pout = new THREE.Vector3(2,2,2);        
+        
+        console.assert(pointIsInsideTetPnts(pin,c[0],c[1],c[2],c[3]));
+        
+        console.assert(!pointIsInsideTetPnts(pout,c[0],c[1],c[2],c[3]));        
+    }
+
+    function addDebugSphere(am,pos,color) {
+        if (!color) {
+            color = "yellow";
+        }
+        var mesh = createSphere(am.JOINT_RADIUS/5, pos, color);
+        mesh.castShadow = false;
+        mesh.receiveShadow = false;
+        mesh.debugObject = true;
+        am.scene.add(mesh);
+    }
+    function pointIsInsideTet(lpt, tc, params) {
+        var N = params.vertices.length - 1;
+        var prev = params.prev;
+        var vs = [];
+        vs[0] = params.vertices[prev[0]];
+        vs[1] = params.vertices[prev[1]];
+        vs[2] = params.vertices[prev[2]];
+        // This is the most recently added point.
+        vs[3] = params.vertices[prev[3]];
+        return pointIsInsideTetPnts(lpt,vs[0],vs[1],vs[2],vs[3]);
+    }
+    test_pointIsInsideTet();
+
+    // PARAMETRIC CURVE FUNCTIONALITY
+
+    // lpt is a Vector3. tc is the index
+    // return value if very weird here, since we have cases.
+    function nextParametricTet(lpt, tc,params) {
+        if (pointIsInsideTet(lpt, tc,params)) { return "INSIDECURRENT"; }
+
+        var prev = params.prev;
+        var vs = [];
+        vs[0] = params.vertices[prev[0]];
+        vs[1] = params.vertices[prev[1]];
+        vs[2] = params.vertices[prev[2]];
+        // This is the most recently added point.
+        vs[3] = params.vertices[prev[3]];
+
+        // Face and direction 0 are OPPOSITE vertex 0.
+        // Face and direction 3 are GOING BACKWARD.
+
+        var te = 1.0;
+        var valid = { v: true };        
+        var v0 = find_fourth_point_given_three_points_and_three_distances(
+            CHIRALITY_CCW,
+            vs[1], vs[2], vs[3],
+            te, te, te,
+            valid);
+        console.assert(valid.v);
+
+        addDebugSphere(am,v0,"green");
+        
+        if (pointIsInsideTetPnts(lpt,v0,vs[1],vs[2],vs[3]))
+            return 0;
+        
+        var v1 = find_fourth_point_given_three_points_and_three_distances(
+            CHIRALITY_CCW,
+            vs[0], vs[2], vs[3],            
+            te, te, te,
+            valid);
+        console.assert(valid.v);
+        addDebugSphere(am,v1,"blue");        
+        
+        if (pointIsInsideTetPnts(lpt,vs[0],v1,vs[2],vs[3]))
+            return 1;
+        
+        var v2 = find_fourth_point_given_three_points_and_three_distances(
+            CHIRALITY_CCW,
+            vs[0], vs[1], vs[3],
+            te, te, te,
+            valid);
+        console.assert(valid.v);
+        
+        if (pointIsInsideTetPnts(lpt,vs[0],vs[1],v2,vs[3]))
+            return 2;
+
+        addDebugSphere(am,v2,"red");                
+
+        var v3 = find_fourth_point_given_three_points_and_three_distances(
+            CHIRALITY_CCW,
+            vs[0], vs[1], vs[2],            
+            te, te, te,
+            valid);
+        console.assert(valid.v);
+
+        addDebugSphere(am,v3,"white");
+        
+        if (pointIsInsideTetPnts(lpt,vs[0],vs[1],vs[2],v3)) {
+            console.log("CURVE WENT BACKWARD!");
+            return 3;
+        }
+        
+        // otherwise we can't reach it in one...
+        return "NOREACH";
+        
+        // var tcLeft = [ tc[0]-1, tc[1] ];
+        // if (pointIsInsideTriangle(lpt, tcLeft)) { return tcLeft; }
+        // else {
+        //     var tcRight = [ tc[0]+1, tc[1] ];
+        //     if (pointIsInsideTriangle(lpt, tcRight)) { return tcRight; }
+        //     else {
+        //         var tcAboveOrBelow = triangleIsUp(tc[0], tc[1]) ? [ tc[0], tc[1]-1 ] : [ tc[0], tc[1]+1 ];
+        //         if (pointIsInsideTriangle(lpt, tcAboveOrBelow)) { return tcAboveOrBelow; }
+        //         else {
+        //             funcStatus.innerHTML = "Parametric curve point is unreachable.";
+        //             return false;
+        //         }
+        //     }
+        // }
+    }
+
+
+    function test_nextParametricTet() {
+        var initialPt = new THREE.Vector3(0,0,0);
+        var offset = new THREE.Vector3(initialPt.x-0.5,
+                                       initialPt.y-(Math.sqrt(3) / 2)/2,
+                                       initialPt.z-0.2);
+        var params = initialParameters(offset);
+        add_vertex(am,0,3,params);
+        var prev = params.prev;
+        var vs = [];
+        console.log(prev);
+        vs[0] = params.vertices[prev[0]];
+        vs[1] = params.vertices[prev[1]];
+        vs[2] = params.vertices[prev[2]];
+        // This is the most recently added point.
+        vs[3] = params.vertices[prev[3]];
+
+        // A should be the midpoint of 2 and 3
+        var A = new THREE.Vector3(0,0,0);
+        A.add(vs[1]);
+        A.add(vs[2]);
+        A.multiplyScalar(0.5);
+        A.x += 0.0;
+        A.y += 0.1;
+        A.z += 0.2;                
+
+        addDebugSphere(am,A,"red");
+        console.log("vs[1],vs[2]",vs[1],vs[2]);
+        console.log("A",A);
+        var nt = nextParametricTet(A, 3 ,params);
+        console.log("nt",nt);
+        console.assert(0 == nt );        
+        // var B = new THREE.Vector3(0,0,0);
+        // console.assert(nextParametricTet(B, 3 ,params) );                 var C = new THREE.Vector3(0,0,0);
+        // console.assert(nextParametricTet(C, 3 ,params) );         
+        
+    }
+    test_nextParametricTet();
+
+
+    // These are hard-wired test functions, not fully parametrized.
+    // They were taken from the 2D case, but planar figures
+    // are of great interest in the 3D world.
+    // At present, I will place all of these at Z = 0.
+    // I will probably change the format to have a definite end
+    // point and a definite start point and move the point along
+    // the unit interval later.
+    var MAX_X = 10.0; // These have a different meaning here in 3space
+    var MAX_Y = 10.0; // These have a different meaning here in 3space
+    function polarToXY(r, theta) {
+        return [ r*Math.cos(theta), r*Math.sin(theta) ];
+    }
+    function parametricCircle(i) {
+        if (i>=360) { return false; }
+        var theta = i/360*2*Math.PI;
+        var radius = (MAX_X * 0.75) + 0.001;
+        var x = radius * Math.cos(theta);
+        var y = radius * Math.sin(theta);
+        return new THREE.Vector3(x,y,0);
+//        return [x,y];
+    }
+
+    // Takes integer i parameter 0,1,2,..., returns [x,y] curve coordinate.
+    function parametricGoldenSpiral(i) {
+        const phi = (1 + Math.sqrt(5))/2.0;
+        const contraction = 2;
+        var theta = i*0.05;
+        var r = Math.pow(phi, theta*2/Math.PI)/contraction;
+        var lpt = polarToXY(r, theta);
+        return new THREE.Vector3(lpt[0],lpt[1],0);        
+//        return [ lpt[0]+3, lpt[1]+2 ]; // Shift up and right to see more spiral
+    }
+
+    // Takes integer i parameter 0,1,2,..., returns [x,y] curve coordinate.
+    function parametricSineWave(i) {
+        if (i>360) { return false; }
+        var frac = i/360; // fraction between 0-1.
+        var x = -0.75 * MAX_X + frac * 1.5 * MAX_X + 0.1;
+        var y = Math.sin(frac * 2*Math.PI) * MAX_Y * 0.75;
+        return new THREE.Vector3(x,y,0);                
+//        return [x,y];
+    }
+
+    // This is much tricker in 3D than in two.
+    // THREE.js has sophsticated splines and curvepath
+    // objects that could be used to both represent and
+    // render our relatively primite parametric curves.
+    // It unclear to me if using them is better than
+    // using a polyline or a collection of dots.
+    function renderParametricCurve(am,curveFn, open) {
+        var onCanvas = true;
+//        var points = [];
+        var points3D = new THREE.Geometry();
+
+        
+        for (var i=0; i<MAX_PARAMETRIC_STEPS && onCanvas; i++) {
+            const lpt = curveFn(i);
+            // drawSpot(lpt[0], lpt[1], 'black', 1);
+            if (lpt) {
+//                points.push(lpt);
+                points3D.vertices.push(lpt);
+            }
+        }
+        // for now, test with fake data...
+        // points3D.vertices.push(        
+        //     new THREE.Vector3(0, 0, 0.5),
+        //     new THREE.Vector3(2, 0, 1),
+        //     new THREE.Vector3(2, 2, 2),
+        //     new THREE.Vector3(0, 2, 3),
+        //     new THREE.Vector3(0, 0, 0.5) // there is no autoClose function here, thus we need the fifth point
+        // );
+        var line2 = new THREE.Line(points3D, new THREE.LineBasicMaterial({color: "red"}));
+        am.scene.add(line2);
+
+    }
+
+    // This is an attempt to follow David Jeschke's code
+    // from the 2D solution.
+    function followParametricCurve(curveFn, open) {
+//    two.clear();
+        //    drawEmptyGrid();
+        clearAm();
+
+    var i = 0;
+    var initialPt = curveFn(i);
+    // if (!initialPt || !logicalPointIsVisible(initialPt)) {
+    //     funcStatus.innerHTML = "Initial point of parametric curve is not visible.";
+    //     return;
+    // }
+    if (!initialPt) {
+         return;
+    }
+
+
+        // Although debatable, we will basically create the
+        // first tet centered on initialPot
+        // We will move this over a little to get it in the center.
+        var offset = new THREE.Vector3(initialPt.x-0.5,
+                                       initialPt.y-(Math.sqrt(3) / 2)/2,
+                                       initialPt.z-0.5);
+    var params = initialParameters(offset);
+    
+//    var tc = triangleCoordsFromLogicalPt(initialPt); // current triangle coordinates.
+//    ;;    drawTriangle(tc[0], tc[1], RED);
+    
+    // We will have to use "vertices" for this.
+//    const occupiedTets = [ tc ];
+
+    // This is the index in params of the highest-numbered vertex
+    // in the tet we are producing
+    // intialParameters adds an initial triangle, we will
+    // go ahead and add a value here to have tet to start with.
+    add_vertex(am,0,3,params);
+    var tci = 3;
+
+    for ( ; true; i+=1) {
+
+        var lpt = curveFn(i);
+        if (!lpt) { /* we are done! */ break; }
+
+        //        tcNext = nextParametricTriangle(lpt, tc);
+        
+        // We will mark a tet by it's highest number vertex.
+        var tetNext = nextParametricTet(lpt,tci,params);
+        if (tetNext == "INSIDECURRENT") {
+            continue;
+        }
+
+
+        var last_i = i-1;
+        var next_i = i;
+        var j = 0;
+        for ( ; (tetNext == "NOREACH") && next_i > last_i && j<PARAMETRIC_BISECTION_LIMIT; j++) {
+
+            // var tc2 = triangleCoordsFromLogicalPt(lpt); // For debugging output only.
+            // console.log("Bisect r" + j + "(" + lpt[0] + ", " + lpt[1] + "), T(" + tc[0] + ", " + tc[1] + ") (" + tc2[0] + ", " + tc2[1] + ")");
+
+            i = (next_i+last_i)/2;
+            lpt = curveFn(i);
+            if (!lpt) {
+                break;
+            }
+            tetNext = nextParametricTet(lpt, tci,params);
+            if (tetNext == "INSIDECURRENT") {
+                console.log("Bisecting at " + i + "[" + (next_i-last_i) + "]. Same triangle.");
+                last_i = i; tetNext = "NOREACH";
+            }
+            else if (tetNext == "NOREACH") {
+                console.log("Bisecting at " + i + "[" + (next_i-last_i) + "/" + next_i + "]. Not adjacent.");
+                next_i = i
+            }
+        }
+        if (tetNext == "NOREACH") {
+            if (j>=PARAMETRIC_BISECTION_LIMIT) {
+                funcStatus.innerHTML = "Parametric bisection algorithm reached limit.";
+            } else {
+                funcStatus.innerHTML = "Parametric bisection algorithm failed.";
+            }
+            break;
+        }
+
+        // TODO: Handle case where self collision happens because we returned to the starting point
+        // in a closed curve. I am going to comment out.
+        // if (triangleIsOccupied(occupiedTriangles, tcNext[0], tcNext[1])) {
+        //     funcStatus.innerHTML = "Self-collision at p(" + i + ") = (" + lpt[0] + ", " + lpt[1] + ") / (" + tcNext[0] + ", " + tcNext[1] + ")";
+        //     break;
+        // }
+
+        
+//        tc = tetNext;
+
+        add_vertex(am, tetNext, tci, params);
+        
+        tci++;
+        
+        // const color = RAINBOW_COLORS[occupiedTriangles.length%RAINBOW_COLORS.length];
+        // drawTriangle(tc[0], tc[1], color);
+        // occupiedTriangles.push(tc);
+    }
+
+        
+        renderParametricCurve(am,curveFn,open);
+    }
 })();
 
