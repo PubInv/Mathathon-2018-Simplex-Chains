@@ -34,6 +34,7 @@ var MAX_X = 10.0; // Visible logical x coordinates are -MAX_X to MAX_X.
 var MAX_Y = 10.0; // Visible logical y coordinates are -MAX_Y to MAX_Y.
 
 const MAX_PARAMETRIC_STEPS = 1000;
+const PARAMETRIC_BISECTION_LIMIT = 50;
 
 var RED = "#ff0000";
 var ORANGE = "#ff7f00";
@@ -111,10 +112,9 @@ function main() {
     // Attach our event handlers
     executeButton.addEventListener("click", onExecute);
 
-    document.getElementById("circle-button").addEventListener("click", function(){ renderParametricCurve(parametricCircle, false); });
-    document.getElementById("sine-button").addEventListener("click", function(){ renderParametricCurve(parametricSineWave, true); });
-    document.getElementById("spiral-button").addEventListener("click", function(){ renderParametricCurve(parametricGoldenSpiral, true); });
-    document.getElementById("fpc-button").addEventListener("click", function(){ followParametricCurve(parametricCircle); });
+    document.getElementById("circle-button").addEventListener("click", function(){ followParametricCurve(parametricCircle, false); });
+    document.getElementById("sine-button").addEventListener("click", function(){ followParametricCurve(parametricSineWave, true); });
+    document.getElementById("spiral-button").addEventListener("click", function(){ followParametricCurve(parametricGoldenSpiral, true); });
     startX.addEventListener("input", onStartXChange);
     startY.addEventListener("input", onStartYChange);
 
@@ -192,18 +192,6 @@ function onGridSizeChanged(e) {
     MAX_Y = gsize.h;
     drawEmptyGrid();
     renderStartTri();
-}
-
-// Need to make sure DIRECTION is valid....
-function ensure_valid_direction() {
-    var c = getStartingCoordinates();
-    var up = triangleIsUp(c.x, c.y);
-    if (up && ((DIRECTION == 30) || (DIRECTION == 270) || (DIRECTION == 150))) {
-        DIRECTION = ((DIRECTION + 120) % 360);
-    }
-    if (!up && ((DIRECTION == 90) || (DIRECTION == 330) || (DIRECTION == 210))) {
-        DIRECTION = ((DIRECTION + 60) % 360);
-    }
 }
 
 function onStartXChange(x) {
@@ -332,10 +320,23 @@ function drawTriangle(x, y, c) {
     two.add(path);
 }
 
-function followParametricCurve(curveFn) {
-    console.log("Following parametric curve");
+function ensure_valid_direction() {
+    var c = getStartingCoordinates();
+    var up = triangleIsUp(c.x, c.y);
+    if (up && ((DIRECTION == 30) || (DIRECTION == 270) || (DIRECTION == 150))) {
+        DIRECTION = ((DIRECTION + 120) % 360);
+    }
+    if (!up && ((DIRECTION == 90) || (DIRECTION == 330) || (DIRECTION == 210))) {
+        DIRECTION = ((DIRECTION + 60) % 360);
+    }
+}
 
-    var i = 0
+function followParametricCurve(curveFn, open) {
+
+    two.clear();
+    drawEmptyGrid();
+
+    var i = 0;
     var initialPt = curveFn(i);
     if (!initialPt || !logicalPointIsVisible(initialPt)) {
         funcStatus.innerHTML = "Initial point of parametric curve is not visible.";
@@ -343,50 +344,71 @@ function followParametricCurve(curveFn) {
     }
 
     var tc = triangleCoordsFromLogicalPt(initialPt); // current triangle coordinates.
-    console.log("Initial (" + initialPt[0] + ", " + initialPt[1] + "), Triangle(" + tc[0] + ", " + tc[1] + ")");
     drawTriangle(tc[0], tc[1], RED);
     const occupiedTriangles = [ tc ];
 
-    for (var i=1; true; i += 1) {
+    for ( ; true; i+=1) {
+
         var lpt = curveFn(i);
         if (!lpt || !logicalPointIsVisible(lpt)) { /* we are done! */ break; }
 
-        // If we have not yet left the current triangle, then go on to check the next point on the curve.
-        if (pointIsInsideTriangle(lpt, tc)) { continue; }
+        tcNext = nextParametricTriangle(lpt, tc);
+        if (tcNext == tc) {
+            // Parametric function hasn't left current triangle. Skip to next step.
+            continue;
+        }
 
-        // FOR DEBUGGING ONLY:
-        var tc2 = triangleCoordsFromLogicalPt(lpt);
-        console.log("Next (" + lpt[0] + ", " + lpt[1] + "), Triangle(" + tc2[0] + ", " + tc2[1] + ")");
+        // If we didn't find an adjacent triangle.
+        if (!tcNext) {
+        }
 
-        /* TEMPORARY: */ tc = tc2;
-        // var tcLeft = [ tc[0]-1, tc[1] ];
-        // if (pointIsInsideTriangle(lpt, tcLeft)) { tc = tcLeft; }
-        // else {
-        //     var tcRight = [ tc[0]+1, tc[1] ];
-        //     if (pointIsInsideTriangle(lpt, tcRight)) { tc = tcRight; }
-        //     else {
-        //         var tcAboveOrBelow = triangleIsUp(tc) ? [ tc[0], tc[1]-1 ] : [ tc[0], tc[1]+1 ];
-        //         if (pointIsInsideTriangle(lpt, tcAboveOrBelow)) { tc = tcAboveOrBelow; }
-        //         else {
-        //             funcStatus.innerHTML = "Parametric curve point is unreachable.";
-        //             break;
-        //         }
-        //     }
-        // }
+        var last_i = i-1;
+        var next_i = i;
+        var j = 0;
+        for ( ; !tcNext && next_i > last_i && j<PARAMETRIC_BISECTION_LIMIT; j++) {
 
-        // TODO: Should handle case where self collision happens because we returned to the starting point
-        // in a closed curve.
-        if (triangleIsOccupied(occupiedTriangles, tc[0], tc[1])) {
-            funcStatus.innerHTML = "Self-collision at (" + tc[0] + ", " + tc[1] + ")";
+            var tc2 = triangleCoordsFromLogicalPt(lpt); // For debugging output only.
+            console.log("Bisect r" + j + "(" + lpt[0] + ", " + lpt[1] + "), T(" + tc[0] + ", " + tc[1] + ") (" + tc2[0] + ", " + tc2[1] + ")");
+
+            i = (next_i+last_i)/2;
+            lpt = curveFn(i);
+            if (!lpt || !logicalPointIsVisible(lpt)) {
+                break;
+            }
+            tcNext = nextParametricTriangle(lpt, tc);
+            if (tcNext == tc) {
+                console.log("Bisecting at " + i + "[" + (next_i-last_i) + "]. Same triangle.");
+                last_i = i; tcNext = false;
+            }
+            else if (!tcNext) {
+                console.log("Bisecting at " + i + "[" + (next_i-last_i) + "/" + next_i + "]. Not adjacent.");
+                next_i = i
+            }
+        }
+        if (!tcNext) {
+            if (j>=PARAMETRIC_BISECTION_LIMIT) {
+                funcStatus.innerHTML = "Parametric bisection algorithm reached limit.";
+            } else {
+                funcStatus.innerHTML = "Parametric bisection algorithm failed.";
+            }
             break;
         }
 
-        const color = RAINBOW_COLORS[i%RAINBOW_COLORS.length];
+        // TODO: Handle case where self collision happens because we returned to the starting point
+        // in a closed curve.
+        if (triangleIsOccupied(occupiedTriangles, tcNext[0], tcNext[1])) {
+            funcStatus.innerHTML = "Self-collision at p(" + i + ") = (" + lpt[0] + ", " + lpt[1] + ") / (" + tcNext[0] + ", " + tcNext[1] + ")";
+            break;
+        }
+
+        tc = tcNext;
+        const color = RAINBOW_COLORS[occupiedTriangles.length%RAINBOW_COLORS.length];
         drawTriangle(tc[0], tc[1], color);
         occupiedTriangles.push(tc);
     }
 
-    two.update();
+    renderParametricCurve(curveFn, open);
+    // two.update();
 }
 
 function getCoordinateFromInput(inputBox) {
@@ -408,6 +430,24 @@ function logicalPointIsVisible(pnt) {
     return x >= -MAX_X && x <= MAX_X && y >= -MAX_Y && y<= MAX_Y;
 }
 
+function nextParametricTriangle(lpt, tc) {
+    if (pointIsInsideTriangle(lpt, tc)) { return tc; }
+    var tcLeft = [ tc[0]-1, tc[1] ];
+    if (pointIsInsideTriangle(lpt, tcLeft)) { return tcLeft; }
+    else {
+        var tcRight = [ tc[0]+1, tc[1] ];
+        if (pointIsInsideTriangle(lpt, tcRight)) { return tcRight; }
+        else {
+            var tcAboveOrBelow = triangleIsUp(tc[0], tc[1]) ? [ tc[0], tc[1]-1 ] : [ tc[0], tc[1]+1 ];
+            if (pointIsInsideTriangle(lpt, tcAboveOrBelow)) { return tcAboveOrBelow; }
+            else {
+                funcStatus.innerHTML = "Parametric curve point is unreachable.";
+                return false;
+            }
+        }
+    }
+}
+
 function parametricCircle(i) {
     if (i>=360) { return false; }
     var theta = i/360*2*Math.PI;
@@ -423,13 +463,15 @@ function parametricGoldenSpiral(i) {
     const contraction = 2;
     var theta = i*0.05;
     var r = Math.pow(phi, theta*2/Math.PI)/contraction;
-    return polarToXY(r, theta);
+    var lpt = polarToXY(r, theta);
+    return [ lpt[0]+3, lpt[1]+2 ]; // Shift up and right to see more spiral
 }
 
 // Takes integer i parameter 0,1,2,..., returns [x,y] curve coordinate.
 function parametricSineWave(i) {
+    if (i>360) { return false; }
     var frac = i/360; // fraction between 0-1.
-    var x = -MAX_X + frac * 2 * MAX_X;
+    var x = -0.75 * MAX_X + frac * 1.5 * MAX_X + 0.1;
     var y = Math.sin(frac * 2*Math.PI) * MAX_Y * 0.75;
     return [x,y];
 }
