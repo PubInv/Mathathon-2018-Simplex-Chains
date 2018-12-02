@@ -20,6 +20,8 @@
 var INTERVAL = 25; // Milliseconds between steps
 // var MAX_STEPS = 300;
 var CANVAS_WIDTH, CANVAS_HEIGHT; // Initialized in main and updated in onResizeBody.
+
+var TRIANGLE_WIDTH = 1;
 var TRIANGLE_HEIGHT = Math.sqrt(3)/2;
 
 var GRID_CONFIGS = { "S": { name: "S", w: 10.0, h: 10.0},
@@ -84,11 +86,11 @@ var gridSizeButtons = document.getElementById("gridsize-buttons");
 var startDir = document.getElementById("start-dir");
 var SDoptions = [
     document.getElementById("start-dir-n"),
-    document.getElementById("start-dir-ne"),        
+    document.getElementById("start-dir-ne"),
     document.getElementById("start-dir-se"),
-    document.getElementById("start-dir-s"),        
+    document.getElementById("start-dir-s"),
     document.getElementById("start-dir-sw"),
-    document.getElementById("start-dir-nw")        
+    document.getElementById("start-dir-nw")
     ]
 var startX = document.getElementById("start-x");
 var startY = document.getElementById("start-y");
@@ -108,11 +110,11 @@ function main() {
 
     // Attach our event handlers
     executeButton.addEventListener("click", onExecute);
-    
-    document.getElementById("circle-button").addEventListener("click", function(){ drawParametricCurve(parametricCircle, false); });
-    document.getElementById("sine-button").addEventListener("click", function(){ drawParametricCurve(parametricSineWave, true); });
-    document.getElementById("spiral-button").addEventListener("click", function(){ drawParametricCurve(parametricGoldenSpiral, true); });
 
+    document.getElementById("circle-button").addEventListener("click", function(){ renderParametricCurve(parametricCircle, false); });
+    document.getElementById("sine-button").addEventListener("click", function(){ renderParametricCurve(parametricSineWave, true); });
+    document.getElementById("spiral-button").addEventListener("click", function(){ renderParametricCurve(parametricGoldenSpiral, true); });
+    document.getElementById("fpc-button").addEventListener("click", function(){ followParametricCurve(parametricCircle); });
     startX.addEventListener("input", onStartXChange);
     startY.addEventListener("input", onStartYChange);
 
@@ -145,19 +147,19 @@ function main() {
             break;
         case "NE":
             DIRECTION = 30;
-            break;            
+            break;
         case "SE":
             DIRECTION = 330;
-            break;            
+            break;
         case "S":
             DIRECTION = 270;
-            break;            
+            break;
         case "SW":
             DIRECTION = 210;
-            break;            
+            break;
         case "NW":
             DIRECTION = 150;
-            break;            
+            break;
         };
     });
 
@@ -166,12 +168,12 @@ function main() {
         // TODO: insert whatever you want to do with $(this) here
         console.log(this);
     });
-    
+
 }
 
 // Event Handlers
 function onResizeBody() {
-    var vs= document.getElementById('visualsection'); 
+    var vs= document.getElementById('visualsection');
     var w = vs.offsetWidth;
     vs.removeChild(vs.childNodes[0]);
     CANVAS_WIDTH = w;
@@ -181,7 +183,7 @@ function onResizeBody() {
     two = new Two({ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }).appendTo(visualSection);
     drawEmptyGrid();
     renderStartTri();
- }
+}
 
 function onGridSizeChanged(e) {
     var v = e.originalEvent.target.innerText;
@@ -191,6 +193,7 @@ function onGridSizeChanged(e) {
     drawEmptyGrid();
     renderStartTri();
 }
+
 // Need to make sure DIRECTION is valid....
 function ensure_valid_direction() {
     var c = getStartingCoordinates();
@@ -202,13 +205,14 @@ function ensure_valid_direction() {
         DIRECTION = ((DIRECTION + 60) % 360);
     }
 }
+
 function onStartXChange(x) {
     ensure_valid_direction();
     renderStartTri();
 }
 
 function onStartYChange(y) {
-    ensure_valid_direction();    
+    ensure_valid_direction();
     renderStartTri();
 }
 
@@ -218,7 +222,7 @@ function onExecute() {
     generatorFn = compileGenerator(generatorText.value);
     if (!generatorFn) {
         executeButton.disabled = false;
-//        gridSizeSelector.disabled = false;        
+//        gridSizeSelector.disabled = false;
         return;
     }
 
@@ -253,10 +257,6 @@ function onStop() {
 
 // Helper Functions
 
-function accContains(acc, x, y) {
-    return acc.filter( tri => (tri[0] == x) && (tri[1] == y)).length > 0;
-}
-
 // Returns the compiled function, or undefined if the function cannot be compiled.
 // As a side effect, this will put an error message in funcStatus.
 function compileGenerator(src) {
@@ -274,7 +274,6 @@ function compileGenerator(src) {
     funcStatus.innerHTML = "";
     return fn;
 }
-
 
 function createGrid(s) {
     var size = s || 30;
@@ -309,25 +308,84 @@ function createGrid(s) {
 
 function drawEmptyGrid() {
     createGrid(4*MAX_X);
-    renderSpot(0.0, 0.0, 'red',2);
+    drawSpot(0.0, 0.0, 'red',2);
     two.update();
 }
 
-function drawParametricCurve(curveFn, open) {
-    var onCanvas = true;
-    var points = [];
-    for (var i=0; i<MAX_PARAMETRIC_STEPS && onCanvas; i++) {
-        const pnt = curveFn(i);
-        onCanvas = pnt && pointIsVisible(pnt);
-        if (onCanvas) {
-            const canvasPnt = transformToViewport(pnt[0], pnt[1]);
-            const point = new Two.Anchor(canvasPnt[0], canvasPnt[1]);
-            points.push(point);
-        }
+function drawSpot(x, y, color, lineWidth) {
+    var pnt = transformToViewport(x, y);
+    var circle = two.makeCircle(pnt[0], pnt[1], 3);
+    circle.fill = color;
+    circle.stroke = color; // Accepts all valid css color
+    circle.linewidth = lineWidth;
+}
+
+function drawTriangle(x, y, c) {
+    var v = verticesOfTriangle(x, y);
+    var vpa = transformToViewport(v[0], v[1]);
+    var vpb = transformToViewport(v[2], v[3]);
+    var vpc = transformToViewport(v[4], v[5]);
+    var path = two.makePath(vpa[0], vpa[1], vpb[0], vpb[1], vpc[0], vpc[1], false);
+    path.linewidth = 1;
+    path.stroke = "#000000";
+    path.fill = c;
+    two.add(path);
+}
+
+function followParametricCurve(curveFn) {
+    console.log("Following parametric curve");
+
+    var i = 0
+    var initialPt = curveFn(i);
+    if (!initialPt || !logicalPointIsVisible(initialPt)) {
+        funcStatus.innerHTML = "Initial point of parametric curve is not visible.";
+        return;
     }
-    const path = two.makeCurve(points, open);
-    path.stroke = 'black';
-    path.noFill();
+
+    var tc = triangleCoordsFromLogicalPt(initialPt); // current triangle coordinates.
+    console.log("Initial (" + initialPt[0] + ", " + initialPt[1] + "), Triangle(" + tc[0] + ", " + tc[1] + ")");
+    drawTriangle(tc[0], tc[1], RED);
+    const occupiedTriangles = [ tc ];
+
+    for (var i=1; true; i += 1) {
+        var lpt = curveFn(i);
+        if (!lpt || !logicalPointIsVisible(lpt)) { /* we are done! */ break; }
+
+        // If we have not yet left the current triangle, then go on to check the next point on the curve.
+        if (pointIsInsideTriangle(lpt, tc)) { continue; }
+
+        // FOR DEBUGGING ONLY:
+        var tc2 = triangleCoordsFromLogicalPt(lpt);
+        console.log("Next (" + lpt[0] + ", " + lpt[1] + "), Triangle(" + tc2[0] + ", " + tc2[1] + ")");
+
+        /* TEMPORARY: */ tc = tc2;
+        // var tcLeft = [ tc[0]-1, tc[1] ];
+        // if (pointIsInsideTriangle(lpt, tcLeft)) { tc = tcLeft; }
+        // else {
+        //     var tcRight = [ tc[0]+1, tc[1] ];
+        //     if (pointIsInsideTriangle(lpt, tcRight)) { tc = tcRight; }
+        //     else {
+        //         var tcAboveOrBelow = triangleIsUp(tc) ? [ tc[0], tc[1]-1 ] : [ tc[0], tc[1]+1 ];
+        //         if (pointIsInsideTriangle(lpt, tcAboveOrBelow)) { tc = tcAboveOrBelow; }
+        //         else {
+        //             funcStatus.innerHTML = "Parametric curve point is unreachable.";
+        //             break;
+        //         }
+        //     }
+        // }
+
+        // TODO: Should handle case where self collision happens because we returned to the starting point
+        // in a closed curve.
+        if (triangleIsOccupied(occupiedTriangles, tc[0], tc[1])) {
+            funcStatus.innerHTML = "Self-collision at (" + tc[0] + ", " + tc[1] + ")";
+            break;
+        }
+
+        const color = RAINBOW_COLORS[i%RAINBOW_COLORS.length];
+        drawTriangle(tc[0], tc[1], color);
+        occupiedTriangles.push(tc);
+    }
+
     two.update();
 }
 
@@ -342,6 +400,12 @@ function getStartingCoordinates() {
         y: getCoordinateFromInput(startY),
         d: DIRECTION
     };
+}
+
+function logicalPointIsVisible(pnt) {
+    var x = pnt[0];
+    var y = pnt[1];
+    return x >= -MAX_X && x <= MAX_X && y >= -MAX_Y && y<= MAX_Y;
 }
 
 function parametricCircle(i) {
@@ -370,22 +434,32 @@ function parametricSineWave(i) {
     return [x,y];
 }
 
-function pointIsVisible(pnt) {
-    var x = pnt[0];
-    var y = pnt[1];
-    return x >= -MAX_X && x <= MAX_X && y >= -MAX_Y && y<= MAX_Y;
+function pointIsInsideTriangle(lpt, tc) {
+    const tc2 = triangleCoordsFromLogicalPt(lpt);
+    return tc[0] == tc2[0] && tc[1] == tc2[1];
 }
 
 function polarToXY(r, theta) {
     return [ r*Math.cos(theta), r*Math.sin(theta) ];
 }
 
-function renderSpot(x, y, color, lineWidth) {
-    var pnt = transformToViewport(x, y);
-    var circle = two.makeCircle(pnt[0], pnt[1], 3);
-    circle.fill = color;
-    circle.stroke = color; // Accepts all valid css color
-    circle.linewidth = lineWidth;
+function renderParametricCurve(curveFn, open) {
+    var onCanvas = true;
+    var points = [];
+    for (var i=0; i<MAX_PARAMETRIC_STEPS && onCanvas; i++) {
+        const lpt = curveFn(i);
+        // drawSpot(lpt[0], lpt[1], 'black', 1);
+        onCanvas = lpt && logicalPointIsVisible(lpt);
+        if (onCanvas) {
+            const canvasPnt = transformToViewport(lpt[0], lpt[1]);
+            const point = new Two.Anchor(canvasPnt[0], canvasPnt[1]);
+            points.push(point);
+        }
+    }
+    const path = two.makeCurve(points, open);
+    path.stroke = 'black';
+    path.noFill();
+    two.update();
 }
 
 function renderStartTri() {
@@ -396,7 +470,7 @@ function renderStartTri() {
 
     var up = triangleIsUp(c.x, c.y);
     console.log(up,DIRECTION);
-    
+
 //    var options = startDir.options;
     SDoptions[0].disabled = !up;
     SDoptions[1].disabled = up;
@@ -408,15 +482,7 @@ function renderStartTri() {
 }
 
 function renderTriangle(x, y, c) {
-    var v = verticesOfTriangle(x, y);
-    var vpa = transformToViewport(v[0], v[1]);
-    var vpb = transformToViewport(v[2], v[3]);
-    var vpc = transformToViewport(v[4], v[5]);
-    var path = two.makePath(vpa[0], vpa[1], vpb[0], vpb[1], vpc[0], vpc[1], false);
-    path.linewidth = 1;
-    path.stroke = "#000000";
-    path.fill = c;
-    two.add(path);
+    drawTriangle(x,y,c);
     two.update();
 }
 
@@ -463,7 +529,7 @@ function step(tx, ty, dir, f, n, acc) {
         // Draw the triangle at the new (tx, ty) coordinates.
         // If tx,ty has occurred in the accumulator, render as black.
 
-        var collision = accContains(acc,tx,ty);
+        var collision = triangleIsOccupied(acc,tx,ty);
         // console.log(`${n}: ${action} (${tx},${ty}) dir ${dir}`);
         if (collision) {
             renderTriangle(tx, ty, "#000000");
@@ -505,6 +571,30 @@ function transformToViewport(x,y) {
     return [x, y];
 }
 
+function triangleCoordsFromLogicalPt(lpt) {
+    const x = lpt[0]; const y = lpt[1];
+    const ty = Math.ceil(y/TRIANGLE_HEIGHT);
+    const evenRow = (ty%2==0);
+    const dy = y - (ty-1) * TRIANGLE_HEIGHT;
+    var tx = 2*Math.ceil(x-0.5);
+    const dx = x - (tx/2 - 0.5);
+    if (evenRow) {
+        if (dx < 0.5 && dy > dx * TRIANGLE_SLOPE) { tx--; }
+        else if (dx > 0.5 && dy > TRIANGLE_HEIGHT - (dx-0.5) * TRIANGLE_SLOPE) { tx++; }
+    } else {
+        if (dx < 0.5 && dy < TRIANGLE_HEIGHT - dx * TRIANGLE_SLOPE) { tx--; }
+        else if (dx > 0.5 && dy < (dx-0.5) * TRIANGLE_SLOPE) { tx++; }
+    }
+    // console.log("Logical (" + x + ", " + y + "), Triangle(" + tx + ", " + ty + "), D(" + dx + ", " + dy + ")");
+    return [tx, ty];
+}
+
+function triangleIsOccupied(acc, x, y) {
+    return acc.filter( tri => (tri[0] == x) && (tri[1] == y)).length > 0;
+}
+
+const TRIANGLE_SLOPE = 2*TRIANGLE_HEIGHT/TRIANGLE_WIDTH;
+
 function triangleIsUp(x, y) { return (x+y)%2 == 0; }
 
 // compute the 3 vertices (in cartesian cooreds) of Triangle x, y
@@ -522,7 +612,7 @@ function verticesOfTriangle(x, y) {
         bx = ax - 0.5;
         by = (y - 1.0) * TRIANGLE_HEIGHT;
         cx = ax + 0.5;
-        cy = (y - 1.0) * TRIANGLE_HEIGHT;
+        cy = by;
     } else {
         // this is down
         ax = (x/2.0);
@@ -530,7 +620,7 @@ function verticesOfTriangle(x, y) {
         bx = ax + 0.5;
         by = y * TRIANGLE_HEIGHT;
         cx = ax - 0.5;
-        cy = y * TRIANGLE_HEIGHT;
+        cy = by;
     }
     return [ax, ay, bx, by, cx, cy];
 }
