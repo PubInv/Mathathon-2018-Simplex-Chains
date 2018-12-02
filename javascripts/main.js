@@ -50,31 +50,31 @@ var RAINBOW_COLORS = [RED, ORANGE, YELLOW, GREEN, BLUE, VIOLET];
 var EXAMPLE_GENERATORS = {
     beam: {
         name: "Beam",
-        src: '(n) => { return ((n < 12) ? (((n % 2) == 0) ? "L" : "R" ): "S"); }'
+        src: '(n) => { return ((n > 12) ? "S" : (((n % 2) == 0) ? "L" : "R" )); }'
     },
     hex: {
         name: "Small Hexagon",
-        src: '(n) => { return ((n < 5) ?  "L" : "S"); }'
+        src: '(n) => { return ((n > 6) ?  "S" : "L"); }'
     },
     rand: {
         name: "Random Walk",
-        src: '(n) => { return ((n < 10) ? ((Math.random() < 0.5) ? "L" : "R" ) : "S"); }'
+        src: '(n) => { return ((n > 10) ? "S" : ((Math.random() < 0.5) ? "L" : "R" )); }'
     },
     triangle: {
         name: "Triangle",
-        src: '(n) => {   return (n > 34) ? "S" :  ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
+        src: '(n) => {   return (n > 36) ? "S" :  ((n % 12) == 0) ? "R" : (((n % 2) == 0 ) ? "L" : "R"); }'
     },
     hexagon: {
         name: "Large Hexagon",
-        src: '(n) => {  return (n > 40) ? "S" :  ((n % 7) == 0) ? "L" : ((((n + Math.round(n / 7) )% 2) == 0 ) ? "L" : "R"); }'
+        src: '(n) => {  return (n > 42) ? "S" :  ((n % 7) == 0) ? "L" : ((((n + Math.round(n / 7) )% 2) == 0 ) ? "L" : "R"); }'
     },
     trefoil: {
         name: "Trefoil",
-        src: '(n) => {  return (n > 70) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
+        src: '(n) => {  return (n > 72) ? "S" :  ((n % 12) == 0) ? "L" : ((((n + Math.round(n / 12) )% 2) == 0 ) ? "L" : "R"); }'
     },
     tile: {
         name: "Tile",
-        src: '(n) => { if (n > Math.pow(8,2)*6-2) return "S"; var k = n + 1; var h = Math.floor(Math.sqrt(k/6)); var j = k - h * h * 6; if (j == 0) return "R"; else if (j == 1) return "L"; return (j % (2 * h + 1) % 2 == 0) ? "L" : "R"; }'
+        src: '(n) => { if (n > Math.pow(8,2)*6) return "S"; var k = n - 1; var h = Math.floor(Math.sqrt(k/6)); var j = k - h * h * 6; if (j == 0) return "R"; else if (j == 1) return "L"; return (j % (2 * h + 1) % 2 == 0) ? "L" : "R"; }'
     }
 };
 
@@ -541,7 +541,7 @@ function step(tx, ty, dir, f, n, acc) {
     // If we have reached the maximum number of steps, then assume 'S'.
     var action;
     try {
-        action = f(n);
+        action = f(n + 2);
     } catch(err) {
         funcStatus.innerHTML = "Step " + n + ": " + err.message;
         action = 'S';
