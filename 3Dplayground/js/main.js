@@ -154,6 +154,7 @@ function load_NTetHelix(am, helix, tets, pvec, hparams) {
     return load_NTetHelixAux(am, helix, tets, pvec, coords);
 }
 
+
 function add_vertex(am, d, i, params) {
     var colors = [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Blue")];
     var darkgreen = d3.color("#008000");
@@ -170,9 +171,9 @@ function add_vertex(am, d, i, params) {
         if (i < 3) {
             v = base.v[i];
             switch (i) {
-                case 0: th = [0, 0, 0, i]; c = [base.ec[0], base.ec[0], base.ec[0], base.vc[i]]; break;
-                case 1: th = [0, 0, 0, i]; c = [base.ec[0], base.ec[0], base.ec[0], base.vc[i]]; break;
-                case 2: th = [1, 0, 0, i]; c = [base.ec[1], base.ec[0], base.ec[0], base.vc[i]]; break;
+                case 0: th = [0, 0, 0, i]; c = [0, 0, 0, base.vc[i]]; break;
+                case 1: th = [0, 0, 0, i]; c = [base.ec[0], 0, 0, base.vc[i]]; break;
+                case 2: th = [1, 0, 0, i]; c = [base.ec[1], base.ec[2], 0, base.vc[i]]; break;
             }
             vertices.push(v);
             indices.push(th);
@@ -197,7 +198,6 @@ function add_vertex(am, d, i, params) {
             indices.push(th);
             c = get_colors(i, vertices, indices);
         }
-        if (params.wireframe == true) {
         //        v = v.add(pvec);                
         var pos = new THREE.Vector3();
         pos.set(v.x, v.y, v.z);
@@ -215,7 +215,14 @@ function add_vertex(am, d, i, params) {
         am.push_body_mesh_pair(body, mesh);
 
         for (var k = 0; k < Math.min(3, i); k++) {
+            //            var h = i-(k+1);
+
+            // Sadly, increasing the mass of the members seems to be
+            // necessary to keep the edges from passing through the obstacles.
+            // This is a very unfortunate tuning...I suspect it is a weakness
+            // in the solver of physics engine.
             var pos = new THREE.Vector3();
+            var quat = new THREE.Quaternion();
 
             var b_z = helix.helix_joints[i];
             var b_a = helix.helix_joints[indices[i][k]];
@@ -231,6 +238,7 @@ function add_vertex(am, d, i, params) {
             v_avg.multiplyScalar(0.5);
 
             pos.set(v_avg.x, v_avg.y, v_avg.z);
+            quat.set(0, 0, 0, 1);
 
             var tcolor = new THREE.Color(c[k].hex());
             var cmat = memo_color_mat(tcolor);
@@ -257,32 +265,9 @@ function add_vertex(am, d, i, params) {
             helix.helix_members.push(link);
             am.push_body_mesh_pair(memBody, mesh);
         }
-        }
-        else {
-            var geometry = new THREE.Geometry();
-            geometry.vertices.push(vertices[th[0]],vertices[th[1]],vertices[th[2]],vertices[th[3]]);
-            if (params.blendcolor == true) {
-                geometry.faces.push(
-                    new THREE.Face3(2, 3, 0, undefined, [cto3(c[2]),cto3(c[3]),cto3(c[0])]),
-                    new THREE.Face3(3, 2, 1, undefined, [cto3(c[3]),cto3(c[2]),cto3(c[1])]),
-                    new THREE.Face3(1, 0, 3, undefined, [cto3(c[1]),cto3(c[0]),cto3(c[3])]));
-            }
-            else {
-                geometry.faces.push(
-                    new THREE.Face3(2, 3, 0, undefined, cto3(c[1])),
-                    new THREE.Face3(3, 2, 1, undefined, cto3(c[0])),
-                    new THREE.Face3(1, 0, 3, undefined, cto3(c[2])));
-            }
-            var material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, side: THREE.BackSide});
-            var mesh = new THREE.Mesh(geometry, material);
-            am.scene.add(mesh);
-        }
         params.prev = th;
 }
 
-function cto3(c) {
-     return new THREE.Color(c.hex());
-}
 function get_random_int(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
@@ -313,7 +298,7 @@ function get_colors(n, v, i) {
 var cs = [];
 cs[0] = new THREE.Vector3(0, 0, 0);
 cs[1] = new THREE.Vector3(1, 0, 0);
-cs[2] = new THREE.Vector3(.5, 0, - Math.sqrt(3) / 2);
+cs[2] = new THREE.Vector3(.5, Math.sqrt(3) / 2, 0);
 
 // v [a, b, c], vc[a, b, c], ec[ab, bc, ac]
 function get_base(init_pos) {
@@ -1197,13 +1182,10 @@ function initialParameters(init_pos) {
     var params = { vertices: [], indices: [], prev: [], helix: {helix_joints: [], helix_members: [],
                                                                },
                  init_pos: init_pos};
-    return params;
-}
-
-function generator_init(params) {
-        for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 3; i++) {
         add_vertex(am, 0, i, params);
     }
+    return params;
 }
 
 function drawTetrahedron(dir, i, other_params) {
@@ -1263,6 +1245,7 @@ function drawTetrahedron(dir, i, other_params) {
         document.getElementById("circle-button").addEventListener("click", function(){ followParametricCurve(parametricCircle, false); });
         document.getElementById("sine-button").addEventListener("click", function(){ followParametricCurve(parametricSineWave, true); });
         document.getElementById("spiral-button").addEventListener("click", function(){ followParametricCurve(parametricGoldenSpiral, true); });
+        document.getElementById("helix-button").addEventListener("click", function(){ followParametricCurve(parametricHelix, true); });
 
         
         // Fill the generators selector
@@ -1312,9 +1295,6 @@ function drawTetrahedron(dir, i, other_params) {
         }
         clearAm();
         var other_params = initialParameters(new THREE.Vector3(0,0,0));
-        other_params.wireframe = document.getElementById('wireframe').checked;
-        other_params.blendcolor = document.getElementById('blendcolor').checked;
-        generator_init(other_params);
         setTimeout(step, INTERVAL, generatorFn, 0, other_params);
     }
 
@@ -1461,7 +1441,8 @@ function drawTetrahedron(dir, i, other_params) {
     // return value if very weird here, since we have cases.
     function nextParametricTet(lpt, tc,params) {
         if (pointIsInsideTet(lpt, tc,params)) { return "INSIDECURRENT"; }
-
+        var debug = false;
+        if (debug) addDebugSphere(am,lpt,"white");
         var prev = params.prev;
         var vs = [];
         vs[0] = params.vertices[prev[0]];
@@ -1482,21 +1463,26 @@ function drawTetrahedron(dir, i, other_params) {
             valid);
         console.assert(valid.v);
 
-        addDebugSphere(am,v0,"green");
+        if (debug) addDebugSphere(am,v0,"green");
         
-        if (pointIsInsideTetPnts(lpt,v0,vs[1],vs[2],vs[3]))
+        if (pointIsInsideTetPnts(lpt,v0,vs[1],vs[2],vs[3])) {
+            console.log("return",lpt,0);
             return 0;
-        
+        }
+
+        // I don't know why I need this chirality change, but I do.
         var v1 = find_fourth_point_given_three_points_and_three_distances(
             CHIRALITY_CCW,
-            vs[0], vs[2], vs[3],            
+             vs[2],vs[0], vs[3],            
             te, te, te,
             valid);
         console.assert(valid.v);
-        addDebugSphere(am,v1,"blue");        
+        if (debug) addDebugSphere(am,v1,"blue");        
         
-        if (pointIsInsideTetPnts(lpt,vs[0],v1,vs[2],vs[3]))
+        if (pointIsInsideTetPnts(lpt,vs[0],v1,vs[2],vs[3])) {
+            console.log("return",lpt,1);            
             return 1;
+        }
         
         var v2 = find_fourth_point_given_three_points_and_three_distances(
             CHIRALITY_CCW,
@@ -1505,10 +1491,12 @@ function drawTetrahedron(dir, i, other_params) {
             valid);
         console.assert(valid.v);
         
-        if (pointIsInsideTetPnts(lpt,vs[0],vs[1],v2,vs[3]))
+        if (pointIsInsideTetPnts(lpt,vs[0],vs[1],v2,vs[3])) {
+            console.log("return",lpt,2);                        
             return 2;
+        }
 
-        addDebugSphere(am,v2,"red");                
+        if (debug) addDebugSphere(am,v2,"red");                
 
         var v3 = find_fourth_point_given_three_points_and_three_distances(
             CHIRALITY_CCW,
@@ -1517,13 +1505,13 @@ function drawTetrahedron(dir, i, other_params) {
             valid);
         console.assert(valid.v);
 
-        addDebugSphere(am,v3,"white");
+        addDebugSphere(am,v3,"gray");
         
         if (pointIsInsideTetPnts(lpt,vs[0],vs[1],vs[2],v3)) {
             console.log("CURVE WENT BACKWARD!");
             return 3;
         }
-        
+        console.log("NORREACH",lpt);
         // otherwise we can't reach it in one...
         return "NOREACH";
         
@@ -1577,8 +1565,8 @@ function drawTetrahedron(dir, i, other_params) {
         console.assert(0 == nt );        
         // var B = new THREE.Vector3(0,0,0);
         // console.assert(nextParametricTet(B, 3 ,params) );                 var C = new THREE.Vector3(0,0,0);
-        // console.assert(nextParametricTet(C, 3 ,params) );         
-        
+        // console.assert(nextParametricTet(C, 3 ,params) );
+        clearAm();        
     }
     test_nextParametricTet();
 
@@ -1603,6 +1591,26 @@ function drawTetrahedron(dir, i, other_params) {
         var y = radius * Math.sin(theta);
         return new THREE.Vector3(x,y,0);
 //        return [x,y];
+    }
+    function parametricHelixPure(i) {
+        if (i>=720) { return false; }
+        var j = i * 10;
+        var theta = j/360*2*Math.PI;
+        var radius = 2;
+        var x = radius * Math.cos(theta);
+        var y = radius * Math.sin(theta);
+        var z = j/320;
+        return new THREE.Vector3(x,y,z);
+    }
+    function parametricHelix(i) {
+        if (i>=360) { return false; }
+        var j = i * 10;
+        var theta = j/360*2*Math.PI;
+        var radius = 1 + (i/120);
+        var x = radius * Math.cos(theta);
+        var y = radius * Math.sin(theta);
+        var z = j/319;
+        return new THREE.Vector3(x,y,z);
     }
 
     // Takes integer i parameter 0,1,2,..., returns [x,y] curve coordinate.
@@ -1752,9 +1760,11 @@ function drawTetrahedron(dir, i, other_params) {
         // }
 
         
-//        tc = tetNext;
+        //        tc = tetNext;
 
-        add_vertex(am, tetNext, tci, params);
+        console.log("calling ADDVERTEX",tetNext,tci+1);
+
+        add_vertex(am, tetNext, tci+1, params);
         
         tci++;
         
