@@ -156,6 +156,7 @@ function load_NTetHelix(am, helix, tets, pvec, hparams) {
 
 
 function add_vertex(am, d, i, params) {
+    console.log("ADDDDDDDD",i);
     var colors = [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Blue")];
     var darkgreen = d3.color("#008000");
     var dcolor = [null, darkgreen, d3.color("purple")];
@@ -165,39 +166,42 @@ function add_vertex(am, d, i, params) {
     var indices = params.indices;
     var prev = params.prev;
     var helix = params.helix;
-        var v;
-        var c;
-        var th;
-        if (i < 3) {
-            v = base.v[i];
-            switch (i) {
-                case 0: th = [0, 0, 0, i]; c = [0, 0, 0, base.vc[i]]; break;
-                case 1: th = [0, 0, 0, i]; c = [base.ec[0], 0, 0, base.vc[i]]; break;
-                case 2: th = [1, 0, 0, i]; c = [base.ec[1], base.ec[2], 0, base.vc[i]]; break;
-            }
-            vertices.push(v);
-            indices.push(th);
+    var v;
+    var c;
+    var th;
+    if (i < 3) {
+        v = base.v[i];
+        switch (i) {
+        case 0: th = [0, 0, 0, i]; c = [base.ec[0], base.ec[0], base.ec[0], base.vc[i]]; break;
+        case 1: th = [0, 0, 0, i]; c = [base.ec[0], base.ec[0], base.ec[0], base.vc[i]]; break;
+        case 2: th = [1, 0, 0, i]; c = [base.ec[1], base.ec[0], base.ec[0], base.vc[i]]; break;
+            
+            // case 0: th = [0, 0, 0, i]; c = [0, 0, 0, base.vc[i]]; break;
+            // case 1: th = [0, 0, 0, i]; c = [base.ec[0], 0, 0, base.vc[i]]; break;
+            // case 2: th = [1, 0, 0, i]; c = [base.ec[1], base.ec[2], 0, base.vc[i]]; break;
         }
+        vertices.push(v);
+        indices.push(th);
+    } else {
+        if (i == 3)
+            th = [0, 1, 2, 3];
         else {
-            if (i == 3)
-                th = [0, 1, 2, 3];
-            else {
-                //                var d = get_direction(i - 3, vertices, indices);
-                // I don't think the 3 case should exist here!!
-                if (d == 3) console.log("HHHHHHHHHHHH");
-                switch (d) {
-                    case -1: return;
-                    case 0: th = [prev[1], prev[2], prev[3], i]; break;
-                    case 1: th = [prev[0], prev[3], prev[2], i]; break;
-                    case 2: th = [prev[3], prev[0], prev[1], i]; break;
-                    case 3: th = [prev[2], prev[1], prev[0], i]; break;
-                }
+            //                var d = get_direction(i - 3, vertices, indices);
+            switch (d) {
+            case -1: return;
+            case 0: th = [prev[1], prev[2], prev[3], i]; break;
+            case 1: th = [prev[0], prev[3], prev[2], i]; break;
+            case 2: th = [prev[3], prev[0], prev[1], i]; break;
+            case 3: th = [prev[2], prev[1], prev[0], i]; break;
             }
-            v = get_vertex(i, vertices, indices, vertices[th[0]], vertices[th[1]], vertices[th[2]]);
-            vertices.push(v);
-            indices.push(th);
-            c = get_colors(i, vertices, indices);
         }
+        v = get_vertex(i, vertices, indices, vertices[th[0]], vertices[th[1]], vertices[th[2]]);
+        vertices.push(v);
+        indices.push(th);
+        c = get_colors(i, vertices, indices);
+    }
+    console.log("PARAMS wireframe",params.wireframe);
+    if (params.wireframe == true) {
         //        v = v.add(pvec);                
         var pos = new THREE.Vector3();
         pos.set(v.x, v.y, v.z);
@@ -213,16 +217,9 @@ function add_vertex(am, d, i, params) {
         body.mesh = mesh;
         helix.helix_joints.push(body);
         am.push_body_mesh_pair(body, mesh);
-
+        console.log("HELIX",helix.helix_joints,i);
         for (var k = 0; k < Math.min(3, i); k++) {
-            //            var h = i-(k+1);
-
-            // Sadly, increasing the mass of the members seems to be
-            // necessary to keep the edges from passing through the obstacles.
-            // This is a very unfortunate tuning...I suspect it is a weakness
-            // in the solver of physics engine.
             var pos = new THREE.Vector3();
-            var quat = new THREE.Quaternion();
 
             var b_z = helix.helix_joints[i];
             var b_a = helix.helix_joints[indices[i][k]];
@@ -238,7 +235,6 @@ function add_vertex(am, d, i, params) {
             v_avg.multiplyScalar(0.5);
 
             pos.set(v_avg.x, v_avg.y, v_avg.z);
-            quat.set(0, 0, 0, 1);
 
             var tcolor = new THREE.Color(c[k].hex());
             var cmat = memo_color_mat(tcolor);
@@ -265,7 +261,30 @@ function add_vertex(am, d, i, params) {
             helix.helix_members.push(link);
             am.push_body_mesh_pair(memBody, mesh);
         }
-        params.prev = th;
+    }
+    else {
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push(vertices[th[0]],vertices[th[1]],vertices[th[2]],vertices[th[3]]);
+        if (params.blendcolor == true) {
+            geometry.faces.push(
+                new THREE.Face3(2, 3, 0, undefined, [cto3(c[2]),cto3(c[3]),cto3(c[0])]),
+                new THREE.Face3(3, 2, 1, undefined, [cto3(c[3]),cto3(c[2]),cto3(c[1])]),
+                new THREE.Face3(1, 0, 3, undefined, [cto3(c[1]),cto3(c[0]),cto3(c[3])]));
+        }
+        else {
+            geometry.faces.push(
+                new THREE.Face3(2, 3, 0, undefined, cto3(c[1])),
+                new THREE.Face3(3, 2, 1, undefined, cto3(c[0])),
+                new THREE.Face3(1, 0, 3, undefined, cto3(c[2])));
+        }
+        var material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, side: THREE.BackSide});
+        var mesh = new THREE.Mesh(geometry, material);
+        am.scene.add(mesh);
+    }
+    params.prev = th;
+}
+function cto3(c) {
+     return new THREE.Color(c.hex());
 }
 
 function get_random_int(max) {
@@ -1178,10 +1197,16 @@ function clearAm() {
     am.helix_params = [];
 }
 
-function initialParameters(init_pos) { 
+function initialParameters(init_pos,wf,bc) { 
     var params = { vertices: [], indices: [], prev: [], helix: {helix_joints: [], helix_members: [],
                                                                },
                  init_pos: init_pos};
+    if (wf === undefined)
+        wf = true;
+    if (bc === undefined)
+        bc = true;
+    params.wireframe = wf;
+    params.blendcolor = bc;
     for (var i = 0; i < 3; i++) {
         add_vertex(am, 0, i, params);
     }
@@ -1285,7 +1310,14 @@ function drawTetrahedron(dir, i, other_params) {
     }
     
     // EVENT HANDLERS
-    
+
+    function generator_init(params) {
+        for (var i = 0; i < 3; i++) {
+            add_vertex(am, 0, i, params);            
+        }
+//        return params;
+    }
+
     function onExecute() {
         executeButton.disabled = true;
         generatorFn = compileGenerator(generatorText.value);
@@ -1294,7 +1326,10 @@ function drawTetrahedron(dir, i, other_params) {
             return;
         }
         clearAm();
-        var other_params = initialParameters(new THREE.Vector3(0,0,0));
+        var wf = document.getElementById('wireframe').checked;
+        var bc = document.getElementById('blendcolor').checked;
+        var other_params = initialParameters(new THREE.Vector3(0,0,0),wf,bc);
+//        generator_init(other_params);
         setTimeout(step, INTERVAL, generatorFn, 0, other_params);
     }
 
@@ -1306,6 +1341,8 @@ function drawTetrahedron(dir, i, other_params) {
             test_gen[i] = "(i) => { const K = "+(i+20)+";\n return i<200 ? ((((i % K) == K-1) || ((i % K) == K-2) )? 1 : 2 ): -1; }";            
         }
         clearAm();
+        var wf = document.getElementById('wireframe').checked;
+        var bc = document.getElementById('blendcolor').checked;
         test_gen.forEach( (x,i) => 
                           {
                               console.log("XXXX",x,i);
@@ -1320,7 +1357,7 @@ function drawTetrahedron(dir, i, other_params) {
                               var y = Math.floor(i / square);
                               var x = i % square;
                               const space = 10;
-                              var other_params = initialParameters(new THREE.Vector3(x*space -(space/2),5,y*space - (space/2)));
+                              var other_params = initialParameters(new THREE.Vector3(x*space -(space/2),5,y*space - (space/2)),wf,bc);
 
                               setTimeout(step, INTERVAL, generatorFn, 0, other_params);
                           });
@@ -1537,7 +1574,10 @@ function drawTetrahedron(dir, i, other_params) {
         var offset = new THREE.Vector3(initialPt.x-0.5,
                                        initialPt.y-(Math.sqrt(3) / 2)/2,
                                        initialPt.z-0.2);
-        var params = initialParameters(offset);
+        
+        var wf = document.getElementById('wireframe').checked;
+        var bc = document.getElementById('blendcolor').checked;
+        var params = initialParameters(offset,wf,bc);
         add_vertex(am,0,3,params);
         var prev = params.prev;
         var vs = [];
@@ -1691,7 +1731,10 @@ function drawTetrahedron(dir, i, other_params) {
         var offset = new THREE.Vector3(initialPt.x-0.5,
                                        initialPt.y-(Math.sqrt(3) / 2)/2,
                                        initialPt.z-0.5);
-    var params = initialParameters(offset);
+        
+        var wf = document.getElementById('wireframe').checked;
+        var bc = document.getElementById('blendcolor').checked;
+        var params = initialParameters(offset,wf,bc);
     
 //    var tc = triangleCoordsFromLogicalPt(initialPt); // current triangle coordinates.
 //    ;;    drawTriangle(tc[0], tc[1], RED);
