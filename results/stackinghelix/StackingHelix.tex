@@ -69,9 +69,16 @@ angle between the axes of $\alpha$ and a rotation of the orienation of the faces
   of $\theta$ are intersected by a helix of radius: (reduce this to a pure formula of $L,\alpha,\theta$.
 \end{theorem}
 
+\begin{figure}
+     \centering
+     \includegraphics[width=0.80\textwidth]{figures/StackedSetup.png}
+     \caption{The rotatable prism of three objects}
+  \label{fig:prismdiagram}
+\end{figure}
+
 \begin{proof}
 
-  In Figure \href{}, let $L_i$ be the $i$th instance of the length-$L$ objects. Let $\alpha$ be the
+  In Figure \href{fig:prismdiagram}, let $L_i$ be the $i$th instance of the length-$L$ objects. Let $\alpha$ be the
   change in angle in the axes at a joint (the point were axes meet) measured in the plane containing the axes of both objects.
   Let $\theta$ be the change in orientation relative axis,
   or, the half-angle formed by $L_0$ and $L_2$ when projected onto a plane normal to the axis of $L_1$.
@@ -123,7 +130,7 @@ Given these defintions about our assumptions:
 c_0 &= z \cos{\phi} \\
 c_1 &= L \sin{\phi} \\
 c_2 &= z \cos{\phi} \\
-D &= \sqrt(4w^2+x^2)
+D &= \sqrt{4w^2+x^2}
   \end{align*}
   
 
@@ -207,27 +214,27 @@ Since we know that after rotation that:
     \kappa &= \frac{L}{4 \arctan{\frac{r + \sqrt{- \frac{F^2(F+E)}{E-3F}}}{F}}}
   \end{align*}.
   Putting this all together we have:
-  %% \begin{align*}
-  %%   a = L \cos{\alpha} \\
-  %%   x = L + 2a \\
-  %%   z &= L \sin{\alpha} \\
-  %%   w &= z \sin{\theta} \\
-  %%   h &= \sqrt{z^2 - w^2} \\
-  %%   D &= \sqrt(4w^2+x^2) \\
-  %%   \phi &= \arctan{\frac{z}{L}}
-  %%   E &= (D/2) \sin{\phi + \psi} \\
-  %%   F &= \sin{\phi} \\
-  %%   r &= \frac{2F^{\frac{3}{2}}}{\sqrt{3F - E}} \\
-  %%   kappa &= \frac{L}{4 \arctan{\frac{r + \sqrt{- \frac{F^2(F+E)}{E-3F}}}{F}}}
-  %% \end{align*}
+  \begin{align*}
+    a &= L \cos{\alpha} \\
+    x &= L + 2a \\
+    z &= L \sin{\alpha} \\
+    w &= z \sin{\theta} \\
+    h &= \sqrt{z^2 - w^2} \\
+    D &= \sqrt{4w^2+x^2} \\
+    \phi &= \arctan{\frac{z}{L}} \\
+    E &= (D/2) \sin{\phi + \psi} \\
+    F &= \sin{\phi} \\
+    r &= \frac{2F^{\frac{3}{2}}}{\sqrt{3F - E}} \\
+    \kappa &= \frac{L}{4 \arctan{\frac{r + \sqrt{- \frac{F^2(F+E)}{E-3F}}}{F}}}
+  \end{align*}
   Using these values derived exclusively from the inputs $L,\alpha, and \theta$, we can
   evalute the formula for the general helix only and integral values of $n$ to
   obtian a formula for precise the joint points of this any such stack.
-%% \begin{align*}
-%%     P_x(n) &= \kappa  t0 (1 + 2n)  \\
-%%     P_y(n) &= r \cos{t0 (1 + 2n)} \\
-%%     P_z(n) &= r \sin{t0 (1 + 2n)}
-%% \end{align*}
+\begin{align*}
+    P_x(n) &= \kappa  t0 (1 + 2n)  \\
+    P_y(n) &= r \cos{t0 (1 + 2n)} \\
+    P_z(n) &= r \sin{t0 (1 + 2n)}
+\end{align*}
 
 \end{proof}
 
