@@ -56,17 +56,51 @@ During the Public Invention Mathathon of 2018, software was created to view tetr
 was noted by the participants that when the rules for which face to add the next tetrahedron to were periodic, the resulting
 chain was always a helix or a torus. A torus is a degenerate helix.
 
-More generally, any stack of objects of the same length joined at the same angles to each other repetitively form a helix.
-A specific example is face-to-face connection of objects of the same length where the angles of the two joining
-faces relative to each other control the angle and rotation of the axis at each joint.
+After some relfeciton, it became clear that any stack of objects of the same length joined at the same angles to each other repetitively form a helix. 
+A specific example is a face-to-face connection of physical objects of the same length where the angles of the two joining
+faces relative to each other control the angle and rotation of the axis at each joint. We have not yet found this simple idea articulated elsewhere. The purpose of this paper is to prove and to provide formulae for the resulting helix.
+
+\section{A Warm-up: 2Dimensions}
+
+Considering the problem in two dimensions may be a valuable introduction.
+Suppose that we consider a polygon that that as two edges, called $A$ and $B$, and that we define the length $L$ of the
+polygon as the distance between the midpoints of these edges. Suppose that we are only allowed to join these
+polygons by aligning $A$ of one polygon to $B$ of another polygon, with their midpoints coincident. Let us
+further assume that we disallow inversions of the polygon.  Let us imagine that we have a
+countable number of polygons $P_i$ indexed from $0$. Then what shapes can we make by chaining these
+polygons together?
+
+Each joint $J_i$ between polygons $P_i$ and $P_{i+1}$ will place the axes of at the same angle, $\theta$, since
+our polygons do not change shape. Let us define $\theta$ to be positive
+if we move anti-clockwise from $P_i$ to $P_{i+1}$ and negative if we move clockwise. 
+If $\theta = 0$, the joints will be collinear.
+
+\begin{figure}
+     \centering
+     \includegraphics[width=0.80\textwidth]{figures/2DPolygonStacking.png}
+     \caption{The rotatable prism of three objects}
+  \label{fig:prismdiagram}
+\end{figure}
+
+If $\theta \neq 0$, it seems they polygon joints will always lie on a circle. A proof of this
+is that each polygon has associated with it an isoceles triangle $A,B,C$, where $\angle CBA = \angle CAB = \theta/2$,
+and $\angle ACB = (\pi - \theta)$. $AC$ and $BC$ are not necessarily aligned with an edge of the polygon.
+The length $AB$ is $L$, and the lengths $AC$ and $BC$ are
+$(L/2) / \sin{(\pi - \theta)/2}$. In any chain of polygons, these triangles all meet at point $C$, and there all
+joints are on the circle centered at $C$ with radius $\frac{L}{2 \sin{\frac{\pi - \theta}{2}}$.
+
+An analogous, though far more complicated, result holds in three dimensions.
+
+\section{Three dimensions}
+
 
 Consider a slender cylinder or prism with two faces $F_0,F_1$ cut at arbitrary angles to the axis of the cylinder.
-Joining to such cylinders at the axes by placing $F_0$ angainst $F_1$ produced a joint with a difference in
+Joining two such cylinders at the axes by placing $F_0$ angainst $F_1$ produced a joint with a difference in
 angle between the axes of $\alpha$ and a rotation of the orienation of the faces about the axis of $\theta$.
 
 \begin{theorem}[Stacking Helix]
-  The joints of a sequential stack of objects of length $L$ whose joints form axis change of $\alpha$ and orientation rotation
-  of $\theta$ are intersected by a helix of radius: (reduce this to a pure formula of $L,\alpha,\theta$.
+  The joints of a sequential stack of objects of length $L$ whose joints axis change of $\alpha$ and orientation rotation
+  of $\theta$ are intersected by a helix of radius.
 \end{theorem}
 
 \begin{figure}
