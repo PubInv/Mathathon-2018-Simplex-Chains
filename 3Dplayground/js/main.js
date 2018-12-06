@@ -81,13 +81,13 @@ function get_member_color(gui, len) {
 }
 
 function create_actuator(d, b_a, b_z, pos, cmat) {
-    var len = d + -am.JOINT_RADIUS * 2;
+    var len = b_z.distanceTo(b_a) + -am.JOINT_RADIUS * 2;
     var quat = new THREE.Quaternion();
 
-    var d = new THREE.Vector3(b_z.x, b_z.y, b_z.z);
-    d.sub(b_a);
-    d.divideScalar(2);
-    d.add(pos);
+    var pos = new THREE.Vector3(b_z.x, b_z.y, b_z.z);
+    pos.add(b_a);
+    pos.divideScalar(2);
+    
     var mesh = createParalellepiped(
         am.INITIAL_EDGE_WIDTH,
         am.INITIAL_EDGE_WIDTH,
@@ -154,13 +154,19 @@ function load_NTetHelix(am, helix, tets, pvec, hparams) {
     return load_NTetHelixAux(am, helix, tets, pvec, coords);
 }
 
+function create_vertex_mesh(pos, c) {
+        var mesh = createSphere(am.JOINT_RADIUS, pos, c.hex());
+        mesh.castShadow = false;
+        mesh.receiveShadow = false;
+        am.scene.add(mesh);
+}
+
 
 function add_vertex(am, d, i, params) {
     var colors = [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Blue")];
     var darkgreen = d3.color("#008000");
     var dcolor = [null, darkgreen, d3.color("purple")];
 
-    var base = get_base(params.init_pos);
     var vertices = params.vertices;
     var indices = params.indices;
     var prev = params.prev;
@@ -168,39 +174,51 @@ function add_vertex(am, d, i, params) {
     var v;
     var c;
     var th;
-    if (i < 3) {
+    if (i < 3) return;
+    if (i == 3) {
+        var base = get_base(params.init_pos, params.l);
+        params.vertices = vertices = base.v.slice(0);
+        th = [0, 1, 2, 3];
+        indices.push(th, th, th, th); //First 3 are dummy copies to align indices and vertices
         v = base.v[i];
-        switch (i) {
-        case 0: th = [0, 0, 0, i]; c = [base.ec[0], base.ec[0], base.ec[0], base.vc[i]]; break;
-        case 1: th = [0, 0, 0, i]; c = [base.ec[0], base.ec[0], base.ec[0], base.vc[i]]; break;
-        case 2: th = [1, 0, 0, i]; c = [base.ec[1], base.ec[0], base.ec[0], base.vc[i]]; break;
-            
-            // case 0: th = [0, 0, 0, i]; c = [0, 0, 0, base.vc[i]]; break;
-            // case 1: th = [0, 0, 0, i]; c = [base.ec[0], 0, 0, base.vc[i]]; break;
-            // case 2: th = [1, 0, 0, i]; c = [base.ec[1], base.ec[2], 0, base.vc[i]]; break;
+        c = [base.ec[3], base.ec[4], base.ec[5]];
+        if (params.wireframe == true) {
+            create_vertex_mesh(base.v[0], base.ec[3]);
+            create_vertex_mesh(base.v[1], base.ec[3]);
+            create_vertex_mesh(base.v[2], base.ec[3]);
+            create_actuator(v[0].distanceTo(base.v[1]), base.v[0], base.v[1], null, base.ec[2]);
+            create_actuator(v[1].distanceTo(base.v[2]), base.v[1], base.v[2], null, base.ec[0]);
+            create_actuator(v[2].distanceTo(base.v[0]), base.v[2], base.v[0], null, base.ec[1]);
         }
-        vertices.push(v);
-        indices.push(th);
-    } else {
-        if (i == 3)
-            th = [0, 1, 2, 3];
         else {
+            var geometry = new THREE.Geometry();
+            geometry.vertices.push(vertices[0],vertices[1],vertices[2]);
+            if (params.blendcolor == true) {
+                geometry.faces.push(new THREE.Face3(0, 1, 2, undefined, [cto3(c[0]),cto3(c[1]),cto3(c[2])]));
+            }
+            else {
+                geometry.faces.push(new THREE.Face3(0, 1, 2, undefined, new THREE.Color(0)));
+            }
+            var material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
+            var mesh = new THREE.Mesh(geometry, material);
+            am.scene.add(mesh);
+        }
+    } else {
             //                var d = get_direction(i - 3, vertices, indices);
-            switch (d) {
-            case -1: return;
+        switch (d) {
             case 0: th = [prev[1], prev[2], prev[3], i]; break;
             case 1: th = [prev[0], prev[3], prev[2], i]; break;
             case 2: th = [prev[3], prev[0], prev[1], i]; break;
             case 3: th = [prev[2], prev[1], prev[0], i]; break;
-            }
         }
-        v = get_vertex(i, vertices, indices, vertices[th[0]], vertices[th[1]], vertices[th[2]]);
+        var l = params.l
+        v = get_vertex(i, vertices, indices, vertices[th[0]], vertices[th[1]], vertices[th[2]], [l[0]+l[3],l[1]+l[4],l[2]+l[5]], params.l, params.m);
         vertices.push(v);
         indices.push(th);
         c = get_colors(i, vertices, indices);
     }
     if (params.wireframe == true) {
-        //        v = v.add(pvec);                
+        //        v = v.add(pvec);
         var pos = new THREE.Vector3();
         pos.set(v.x, v.y, v.z);
         var mesh = createSphere(am.JOINT_RADIUS, pos, c[3].hex());
@@ -275,7 +293,7 @@ function add_vertex(am, d, i, params) {
                 new THREE.Face3(3, 2, 1, undefined, cto3(c[0])),
                 new THREE.Face3(1, 0, 3, undefined, cto3(c[2])));
         }
-        var material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, side: THREE.BackSide});
+        var material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
         var mesh = new THREE.Mesh(geometry, material);
         am.scene.add(mesh);
     }
@@ -295,11 +313,14 @@ function get_direction(n, v, i) {
     else return -1;
 }
 
-function get_vertex(n, v, i, pa, pb, pc) {
+function get_vertex(n, v, i, pa, pb, pc, s, l, m) {
     var valid = { v: true };
-    var ad = 1;
-    var bd = 1;
-    var cd = 1;
+    var l0 = pa.distanceTo(pb);
+    var l1 = pc.distanceTo(pa);
+    var l2 = pb.distanceTo(pc);
+    var ad = m ? s[0]-l0 : (n % 2 == 0) ? l[0] : l[3];
+    var bd = m ? s[1]-l1 : (n % 2 == 0) ? l[1] : l[4];
+    var cd = m ? s[2]-l2 : (n % 2 == 0) ? l[2] : l[5];
     var pd = find_fourth_point_given_three_points_and_three_distances(
         CHIRALITY_CCW,
         pa, pb, pc,
@@ -314,21 +335,40 @@ function get_colors(n, v, i) {
 
 var cs = [];
 cs[0] = new THREE.Vector3(0, 0, 0);
-cs[1] = new THREE.Vector3(1, 0, 0);
-cs[2] = new THREE.Vector3(.5, Math.sqrt(3) / 2, 0);
+cs[1] = new THREE.Vector3(3, 0, 0);
+cs[2] = new THREE.Vector3(.5, -Math.sqrt(3) / 2, 0);
 
-// v [a, b, c], vc[a, b, c], ec[ab, bc, ac]
-function get_base(init_pos) {
-    var csx = [];
-    // Cloning to avoid disrupting global variable.
-    csx[0] = cs[0].clone();
-    csx[1] = cs[1].clone();
-    csx[2] = cs[2].clone();
-    csx[0].add(init_pos);
-    csx[1].add(init_pos);
-    csx[2].add(init_pos);    
-    return { v: csx,
-             vc: [colors[3], colors[3], colors[3]], ec: [colors[4], colors[4], colors[4]] };
+function calculate_tetrahedron(l) {
+    var v = [new THREE.Vector3( l[1]/2,0,0),
+             new THREE.Vector3(      0,0,0),
+             new THREE.Vector3(-l[1]/2,0,0),
+             new THREE.Vector3(      0,0,0)];
+    v1 = v[1];
+    v3 = v[3];
+    s0 = l[0]*l[0];
+    s1 = l[1]*l[1];
+    s2 = l[2]*l[2];
+    s3 = l[3]*l[3];
+    s4 = l[4]*l[4];
+    s5 = l[5]*l[5];
+    var x1 = v1.x = -(s2-s0)/2/l[1];
+    var x3 = v3.x = -(s3-s5)/2/l[1];
+    var xm = (x1+x3)/2;
+    var xyz1s = (s2+s0-s1/2)/2;
+    var xyz3s = (s3+s5-s1/2)/2;
+    var zs = (xyz1s+xyz3s-s4/2)/2-xm*xm;
+    var z = Math.sqrt(zs);
+    var zd = (s4/4-xyz1s+zs)/2/z;
+    var z1 = v1.z = ((3*(s2+s0)+(s3+s5)-2*s1-2*s4)/8-x1*xm)/z;
+    v3.z = 2*z-z1;
+    v1.y = -(v3.y=Math.sqrt(xyz1s-x1*x1-z1*z1));
+    return v;
+}
+
+// v [a, b, c, d], vc[a, b, c, d], ec[cb, ac, ba, ad, bd, cd]
+function get_base(init_pos, l) {
+    return { v: calculate_tetrahedron(l),
+             vc: [colors[3], colors[3], colors[3], colors[3]], ec: [colors[4], colors[4], colors[4], colors[0], colors[1], colors[2]] };
 }
 
 var AM = function () {
@@ -940,7 +980,7 @@ function find_point_from_transformed(sense, AB, AC, AD, BC, BD, CD, v) {
     }
     A = new THREE.Vector3(0.0, 0.0, 0.0);
     B = new THREE.Vector3(qx, 0.0, 0.0);
-    D = new THREE.Vector3(sx, sy, (sense == CHIRALITY_CCW) ? sz : -sz);
+    D = new THREE.Vector3(sx, sy, (sense == CHIRALITY_CCW) ? -sz : sz);
     // We compute this only for debugging purposesn
     C = new THREE.Vector3(rx, ry, 0.0);
 
@@ -1195,7 +1235,7 @@ function clearAm() {
     am.helix_params = [];
 }
 
-function initialParameters(init_pos,wf,bc) { 
+function initialParameters(init_pos,wf,bc,l,a) { 
     var params = { vertices: [], indices: [], prev: [], helix: {helix_joints: [], helix_members: [],
                                                                },
                  init_pos: init_pos};
@@ -1205,9 +1245,12 @@ function initialParameters(init_pos,wf,bc) {
         bc = true;
     params.wireframe = wf;
     params.blendcolor = bc;
-    for (var i = 0; i < 3; i++) {
-        add_vertex(am, 0, i, params);
-    }
+    params.l = l;
+    params.m = !a;
+//    for (var i = 0; i < 3; i++) {
+//        add_vertex(am, 0, i, params);
+//    }
+    add_vertex(am, 0, 3, params);
     return params;
 }
 
@@ -1273,7 +1316,6 @@ function drawTetrahedron(dir, i, other_params) {
         document.getElementById("cone-button").addEventListener("click", function(){ followParametricCurve(parametricCone, true); });
         document.getElementById("helix-button").addEventListener("click", function(){ followParametricCurve(parametricHelix, true); });
 
-        
         // Fill the generators selector
         for (var key in EXAMPLE_GENERATORS) {
             if (EXAMPLE_GENERATORS.hasOwnProperty(key)) {
@@ -1306,6 +1348,11 @@ function drawTetrahedron(dir, i, other_params) {
             other_params = drawTetrahedron(dir, i, other_params);
             setTimeout(step, INTERVAL, fn, i+1, other_params);
         } else {
+                var vertices = other_params.vertices;
+                var indices = other_params.indices;
+                var th = indices.slice(-1)[0];
+                console.log(vertices[th[0]], vertices[th[1]], vertices[th[2]], vertices[th[3]]);
+
             executeButton.disabled = false;
         }
     }
@@ -1313,9 +1360,9 @@ function drawTetrahedron(dir, i, other_params) {
     // EVENT HANDLERS
 
     function generator_init(params) {
-        for (var i = 0; i < 3; i++) {
-            add_vertex(am, 0, i, params);            
-        }
+//        for (var i = 0; i < 3; i++) {
+//            add_vertex(am, 0, i, params);            
+//        }
 //        return params;
     }
 
@@ -1329,9 +1376,19 @@ function drawTetrahedron(dir, i, other_params) {
         clearAm();
         var wf = document.getElementById('wireframe').checked;
         var bc = document.getElementById('blendcolor').checked;
-        var other_params = initialParameters(new THREE.Vector3(0,0,0),wf,bc);
+        var a = document.getElementById('alternate').checked;
+        var l = [];
+        for(var i = 0; i < 6; i++) {
+            l[i] = +document.getElementById('l'+i).value || 1;
+            console.log(l[i]);
+        }
+        create_vertex_mesh(new THREE.Vector3(0,0,0),d3.color("white"));
+        create_vertex_mesh(new THREE.Vector3(1,0,0),d3.color("red"));
+        create_vertex_mesh(new THREE.Vector3(0,1,0),d3.color("green"));
+        create_vertex_mesh(new THREE.Vector3(0,0,1),d3.color("blue"));
+        var other_params = initialParameters(new THREE.Vector3(0,0,0),wf,bc,l,a);
 //        generator_init(other_params);
-        setTimeout(step, INTERVAL, generatorFn, 0, other_params);
+        setTimeout(step, INTERVAL, generatorFn, 1, other_params);
     }
 
     function renderTestGenerators() {
@@ -1361,23 +1418,28 @@ function drawTetrahedron(dir, i, other_params) {
         var wf = document.getElementById('wireframe').checked;
         var bc = document.getElementById('blendcolor').checked;
         test_gen.forEach( (x,i) => 
-                          {
-                              console.log("XXXX",x,i);
-                              generatorFn = compileGenerator(x);
-                              if (!generatorFn) { 
-                                  executeButton.disabled = false;
-                                  return;
-                              }
-                              // clearAm();
-                              console.log("AAA");
-                              const square = 3;
-                              var y = Math.floor(i / square);
-                              var x = i % square;
-                              const space = 10;
-                              var other_params = initialParameters(new THREE.Vector3(x*space -(space/2),5,y*space - (space/2)),wf,bc);
+                            {
+                                console.log("XXXX",x,i);
+                                generatorFn = compileGenerator(x);
+                                if (!generatorFn) { 
+                                    executeButton.disabled = false;
+                                    return;
+                                }
+                                // clearAm();
+                                console.log("AAA");
+                                const square = 3;
+                                var y = Math.floor(i / square);
+                                var x = i % square;
+                                const space = 10;
+                                var l = [];
+                                for(var i = 0; i < 6; i++) {
+                                    l[i] = document.getElementById('l'+i).value || 1;
+                                }
 
-                              setTimeout(step, INTERVAL, generatorFn, 0, other_params);
-                          });
+                                var other_params = initialParameters(new THREE.Vector3(x*space -(space/2),5,y*space - (space/2)),wf,bc,l);
+
+                                setTimeout(step, INTERVAL, generatorFn, 0, other_params);
+                            });
     }
     
         
@@ -1594,11 +1656,18 @@ function drawTetrahedron(dir, i, other_params) {
         
         var wf = document.getElementById('wireframe').checked;
         var bc = document.getElementById('blendcolor').checked;
-        var params = initialParameters(offset,wf,bc);
+        var l = [];
+        for(var i = 0; i < 6; i++) {
+            l[i] = document.getElementById('l'+i).value || 1;
+        }
+
+        var params = initialParameters(offset,wf,bc,l);
         add_vertex(am,0,3,params);
         var prev = params.prev;
         var vs = [];
         console.log(prev);
+        console.log(params);
+        console.log(params.vertices);
         vs[0] = params.vertices[prev[0]];
         vs[1] = params.vertices[prev[1]];
         vs[2] = params.vertices[prev[2]];
@@ -1755,7 +1824,11 @@ function drawTetrahedron(dir, i, other_params) {
         
         var wf = document.getElementById('wireframe').checked;
         var bc = document.getElementById('blendcolor').checked;
-        var params = initialParameters(offset,wf,bc);
+        var l = [];
+        for(var i = 0; i < 6; i++) {
+            l[i] = document.getElementById('l'+i).value || 1;
+        }
+        var params = initialParameters(offset,wf,bc,l);
     
 //    var tc = triangleCoordsFromLogicalPt(initialPt); // current triangle coordinates.
 //    ;;    drawTriangle(tc[0], tc[1], RED);
