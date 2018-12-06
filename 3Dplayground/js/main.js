@@ -279,11 +279,14 @@ var colors = [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Indigo"), d
 function get_colors(n, v, i) {
     return [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Indigo"), d3.color("purple")];
 }
-
-var cs = [];
-cs[0] = new THREE.Vector3(0, 0, 0);
-cs[1] = new THREE.Vector3(3, 0, 0);
-cs[2] = new THREE.Vector3(.5, -Math.sqrt(3) / 2, 0);
+// I believe all of these must in principle be locatable by initial position
+// if we are to allow parametric curves to start in different positions.
+// I believe we should hold invariant that "init_pos" passed into
+// initialParameters below is always respected.
+// var cs = [];
+// cs[0] = new THREE.Vector3(0, 0, 0);
+// cs[1] = new THREE.Vector3(3, 0, 0);
+// cs[2] = new THREE.Vector3(.5, -Math.sqrt(3) / 2, 0);
 
 function calculate_tetrahedron(l) {
     var v = [new THREE.Vector3( l[1]/2,0,0),
@@ -314,7 +317,10 @@ function calculate_tetrahedron(l) {
 
 // v [a, b, c, d], vc[a, b, c, d], ec[cb, ac, ba, ad, bd, cd]
 function get_base(init_pos, l) {
-    return { v: calculate_tetrahedron(l),
+    var v = calculate_tetrahedron(l);
+    // now shift this dtetrhedron by the init_pos...
+    v.forEach(vec => vec.add(init_pos));
+    return { v: v,
              vc: [colors[3], colors[3], colors[3], colors[3]], ec: [colors[4], colors[4], colors[4], colors[0], colors[1], colors[2]] };
 }
 
@@ -1252,7 +1258,6 @@ function drawTetrahedron(dir, i, other_params) {
         renderButton.addEventListener('click', renderComputed);
 
         var renderTestGeneratorsButton = document.getElementById('render-test-generators');
-        console.log("AAAA",renderTestGeneratorsButton);
         renderTestGeneratorsButton.addEventListener('click', renderTestGenerators);
 
         var sht = document.getElementById("stacking-helix-table");
@@ -1261,7 +1266,7 @@ function drawTetrahedron(dir, i, other_params) {
         // Add the Parametric Curve functionality
         document.getElementById("circle-button").addEventListener("click", function(){ followParametricCurve(parametricCircle, false); });
         document.getElementById("sine-button").addEventListener("click", function(){ followParametricCurve(parametricSineWave, true); });
-//        document.getElementById("cone-button").addEventListener("click", function(){ followParametricCurve(parametricCone, true); });
+        document.getElementById("cone-button").addEventListener("click", function(){ followParametricCurve(parametricCone, true); });
         document.getElementById("helix-button").addEventListener("click", function(){ followParametricCurve(parametricHelix, true); });
 
         // Fill the generators selector
@@ -1657,6 +1662,10 @@ function drawTetrahedron(dir, i, other_params) {
     function polarToXY(r, theta) {
         return [ r*Math.cos(theta), r*Math.sin(theta) ];
     }
+    // These are some initial displacements to keep us from starting right on an edge...
+    var D_X = 0;
+    var D_Y = 0;
+    var D_Z = 0;        
     function parametricCircle_rad(i,r) {        
         if (i>=360) { return false; }
         var theta = i/360*2*Math.PI;
@@ -1678,7 +1687,7 @@ function drawTetrahedron(dir, i, other_params) {
         var x = radius * Math.cos(theta);
         var y = radius * Math.sin(theta);
         var z = j/320;
-        return new THREE.Vector3(x,y,z);
+        return new THREE.Vector3(x+D_X,y+D_Y,z+D_Z);
     }
     function parametricCone(i) {
         if (i>=360) { return false; }
@@ -1761,22 +1770,28 @@ function drawTetrahedron(dir, i, other_params) {
     if (!initialPt) {
          return;
     }
-
+        console.log("initialPt",initialPt);
 
         // Although debatable, we will basically create the
         // first tet centered on initialPot
         // We will move this over a little to get it in the center.
-        var offset = new THREE.Vector3(initialPt.x-0.5,
-                                       initialPt.y-(Math.sqrt(3) / 2)/2,
-                                       initialPt.z-0.5);
+        // var offset = new THREE.Vector3(initialPt.x-0.5,
+        //                                initialPt.y-(Math.sqrt(3) / 2)/2,
+        //                                initialPt.z-0.5);
+        var offset = new THREE.Vector3(initialPt.x,
+                                        initialPt.y,
+                                        initialPt.z+-0.5);
         
         var wf = document.getElementById('wireframe').checked;
         var bc = document.getElementById('blendcolor').checked;
         var l = [];
-        for(var i = 0; i < 6; i++) {
-            l[i] = document.getElementById('l'+i).value || 1;
+        { // This variable is a different "i" then we are using in the loop below
+            for(var i = 0; i < 6; i++) {
+                l[i] = document.getElementById('l'+i).value || 1;
+            }
         }
         var params = initialParameters(offset,wf,bc,l);
+        console.log("params",params);
     
 //    var tc = triangleCoordsFromLogicalPt(initialPt); // current triangle coordinates.
 //    ;;    drawTriangle(tc[0], tc[1], RED);
@@ -1788,9 +1803,9 @@ function drawTetrahedron(dir, i, other_params) {
     // in the tet we are producing
     // intialParameters adds an initial triangle, we will
     // go ahead and add a value here to have tet to start with.
-    add_vertex(am,0,3,params);
+        //    add_vertex(am,0,3,params);
     var tci = 3;
-
+    i = 0;
     for ( ; true; i+=1) {
 
         var lpt = curveFn(i);
