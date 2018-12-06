@@ -63,14 +63,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <button id="execute-button">GO!</button>
         <button id="render-button">Render Computed Simplex Chain</button>
         <button id="render-test-generators">Test Multiple Generators</button>
-        <label><input type="checkbox" id="wireframe" value="true">Wireframe</label>
-        <label><input type="checkbox" id="blendcolor" value="true"">Blend Vertex Color</label>
+        <div id=stack>
+        <label><input type="checkbox" id="wireframe" value="true" />Wireframe</label><br />
+        <label><input type="checkbox" id="blendcolor" value="true" />Blend Vertex Color</label><br />
+        <label><input type="checkbox" id="alternate" value="true" />Alternate a/b</label><br />
+        </div>
+        <div id=stack>
+        <label><input id="l0" /> 0a </label><label><input id="l3" /> 0b</label><br />
+        <label><input id="l1" /> 1a </label><label><input id="l4" /> 1b</label><br />
+        <label><input id="l2" /> 2a </label><label><input id="l5" /> 2b</label><br />
+        </div>
         <div id="function-status"></div>
             <div class="panel-body" id="curve-buttons">
                 <div class="btn-group" role="group" aria-label="Curves">
                   <button type="button" id="circle-button" class="btn btn-default">Circle</button>
                   <button type="button" id="sine-button" class="btn btn-default">Sine</button>
-                  <button type="button" id="cone-button" class="btn btn-default">Cone</button>
+                  <button type="button" id="spiral-button" class="btn btn-default">Spiral</button>
                   <button type="button" id="helix-button" class="btn btn-default">Helix</button>
                 </div>
             </div>
