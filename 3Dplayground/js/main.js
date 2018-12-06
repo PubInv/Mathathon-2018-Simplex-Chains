@@ -156,7 +156,6 @@ function load_NTetHelix(am, helix, tets, pvec, hparams) {
 
 
 function add_vertex(am, d, i, params) {
-    console.log("ADDDDDDDD",i);
     var colors = [d3.color("DarkRed"), d3.color("DarkOrange"), d3.color("Blue")];
     var darkgreen = d3.color("#008000");
     var dcolor = [null, darkgreen, d3.color("purple")];
@@ -200,7 +199,6 @@ function add_vertex(am, d, i, params) {
         indices.push(th);
         c = get_colors(i, vertices, indices);
     }
-    console.log("PARAMS wireframe",params.wireframe);
     if (params.wireframe == true) {
         //        v = v.add(pvec);                
         var pos = new THREE.Vector3();
@@ -1266,10 +1264,13 @@ function drawTetrahedron(dir, i, other_params) {
         var renderTestGeneratorsButton = document.getElementById('render-test-generators');
         console.log("AAAA",renderTestGeneratorsButton);
         renderTestGeneratorsButton.addEventListener('click', renderTestGenerators);
+
+        document.getElementById("stacking-helix-table").addEventListener("click", function(){ stackingHelixTable(); });
+        
         // Add the Parametric Curve functionality
         document.getElementById("circle-button").addEventListener("click", function(){ followParametricCurve(parametricCircle, false); });
         document.getElementById("sine-button").addEventListener("click", function(){ followParametricCurve(parametricSineWave, true); });
-        document.getElementById("spiral-button").addEventListener("click", function(){ followParametricCurve(parametricGoldenSpiral, true); });
+        document.getElementById("cone-button").addEventListener("click", function(){ followParametricCurve(parametricCone, true); });
         document.getElementById("helix-button").addEventListener("click", function(){ followParametricCurve(parametricHelix, true); });
 
         
@@ -1334,6 +1335,22 @@ function drawTetrahedron(dir, i, other_params) {
     }
 
     function renderTestGenerators() {
+        executeButton.disabled = true;
+        var test_gen = [];
+        for(var i = 0; i < 4; i++) {
+            //            test_gen[i] = "(i) => { const K = "+i+";\n return i<200 ? ((\n(i % K) == 7) ||  ((K % 24) == 8)\n ? 1 : 2 ): -1; }";
+            test_gen[i] = (i+0.5)*1+ 0.105;
+        }
+        clearAm();
+        
+        test_gen.forEach((x,j) => {
+            console.log("calling with x",x);
+            followParametricCurve(i => { return parametricCircle_rad(i,x);}, true);
+                                 }
+        );
+    }
+    
+    function renderTestGenerators_orig() {
         executeButton.disabled = true;
         var test_gen = [];
         for(var i = 0; i < 4; i++) {
@@ -1623,16 +1640,20 @@ function drawTetrahedron(dir, i, other_params) {
     function polarToXY(r, theta) {
         return [ r*Math.cos(theta), r*Math.sin(theta) ];
     }
-    function parametricCircle(i) {
+    function parametricCircle_rad(i,r) {        
         if (i>=360) { return false; }
         var theta = i/360*2*Math.PI;
-        var radius = (MAX_X * 0.75) + 0.001;
+        var radius = r;
         var x = radius * Math.cos(theta);
         var y = radius * Math.sin(theta);
         return new THREE.Vector3(x,y,0);
 //        return [x,y];
+        }
+    function parametricCircle(i) {
+        return parametricCircle_rad(i,(MAX_X * 0.75) + 0.001);          
     }
-    function parametricHelixPure(i) {
+                                      
+    function parametricHelix(i) {
         if (i>=720) { return false; }
         var j = i * 10;
         var theta = j/360*2*Math.PI;
@@ -1642,7 +1663,7 @@ function drawTetrahedron(dir, i, other_params) {
         var z = j/320;
         return new THREE.Vector3(x,y,z);
     }
-    function parametricHelix(i) {
+    function parametricCone(i) {
         if (i>=360) { return false; }
         var j = i * 10;
         var theta = j/360*2*Math.PI;
@@ -1805,8 +1826,6 @@ function drawTetrahedron(dir, i, other_params) {
         
         //        tc = tetNext;
 
-        console.log("calling ADDVERTEX",tetNext,tci+1);
-
         add_vertex(am, tetNext, tci+1, params);
         
         tci++;
@@ -1818,6 +1837,57 @@ function drawTetrahedron(dir, i, other_params) {
 
         
         renderParametricCurve(am,curveFn,open);
+    }
+
+    function helix_parameters(alpha, theta, L) {
+        var a = L * Math.cos(alpha);
+        var x = L + 2*a;
+        var z = L * Math.sin(alpha);
+        var w = z * Math.sin(theta);
+        var h = Math.sqrt(z*z - w*w);
+        var D = Math.sqrt(4*w*w + x*x);
+        var phi = Math.arctan(z/L);
+        var E = (D/2)*Math.sin(ph) + psi
+        var F = Math.sin(phi);
+        var r = 2*Math.pow(F,3/2)/Math.sqrt(3F-E);
+        var iv = F*F(F+E)/(E-3F);
+        var t0= -2 * Math.arctan(x)*(r+Math.sqrt(iv));
+        var k = L/(4*Math.arctan((r+Math.sqrt(iv))/F));
+        return [r,k,t0];
+    }
+
+    // MATH FOR STACKING HELIX
+    function stackingHelixTable() {
+        var tab = document.getElementById('stacking_table');
+        function addRow(table,alpha,theta,radius, kappa, t0) {
+            var row = table.insertRow(1);
+
+// Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+            var cell0 = row.insertCell(0);
+            cell0.innerHTML = alpha;
+            var cell1 = row.insertCell(1);
+            cell1.innerHTML = theta;
+            var cell2 = row.insertCell(2);
+            cell2.innerHTML = radius;            
+            var cell3 = row.insertCell(3);
+            cell3.innerHTML = kappa;            
+            var cell4 = row.insertCell(4);
+            cell4.innerHTML = t0;            
+// Add some text to the new cells:
+        }
+        var alpha = 0;
+        var theta = 0;
+        var radius = 0;
+        var kappa = 0;
+        var t0 = 0;
+        var L = 0;
+        for (var i = 0; i < 10; i++) {
+            for (var j = 0; j < 10; jk++) {
+                var res = helix_parameters(i*10*Math.PI/180,j*10*Math.PI/180,L);
+                    addRow(tab,alpha,theta,res[0],res[1],res[2]);                
+            }
+        }
+
     }
 })();
 

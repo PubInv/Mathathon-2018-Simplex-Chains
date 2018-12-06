@@ -1,0 +1,96 @@
+<!--
+Copyright (C) 2018 by
+  Robert L. Read <read.robert@gmail.com>
+  David Jeschke <djeschke@gmail.com>
+    
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Mathathon 2018: Simplex Generators</title>
+    <meta name="description" content="Mathathon 2018: Simplex Generators">
+    <meta name="author" content="Robert L. Read">
+    <link rel="stylesheet" href="./jquery-ui-1.11.4.custom/jquery-ui.min.css">
+    <!--
+    <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.structure.min.css">
+    <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.theme.min.css">
+    -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="./css/main.css">
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="./js/scijs-newton-raphson.js"></script>
+    <script src="./js/tm_bundle.js"></script>
+    <script src="./js/axes.js"></script>
+    <script src="./js/three.js"></script>
+    <script src="./js/THREE.MeshLine.js"></script>
+    <script src="./js/OrbitControls.js"></script>
+    <script src="./js/Detector.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="./js/d3-scale.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-array.v1.min.js"></script>
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-format.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+    <script src="https://d3js.org/d3-scale.v1.min.js"></script>
+</head>
+
+<body>
+    <div id="threecontainer"></div>
+    <section id="main-content">
+        <select id="generators-selector" style="display: block">
+            <option value="default" selected="selected">Select Generator...</option>
+        </select>
+        <textarea id="user-defined-generator" rows="5" cols="80"></textarea>
+        <button id="execute-button">GO!</button>
+        <button id="render-button">Render Computed Simplex Chain</button>
+        <button id="render-test-generators">Test Multiple Generators</button>
+        <label><input type="checkbox" id="wireframe" value="true">Wireframe</label>
+        <label><input type="checkbox" id="blendcolor" value="true"">Blend Vertex Color</label>
+        <div id="function-status"></div>
+            <div class="panel-body" id="curve-buttons">
+                <div class="btn-group" role="group" aria-label="Curves">
+                  <button type="button" id="circle-button" class="btn btn-default">Circle</button>
+                  <button type="button" id="sine-button" class="btn btn-default">Sine</button>
+                  <button type="button" id="cone-button" class="btn btn-default">Cone</button>
+                  <button type="button" id="helix-button" class="btn btn-default">Helix</button>
+                </div>
+            </div>
+    </section>
+    <section id="textsection">
+        <h1 id="message_banner">Untwisting the Tetrahelix </h1>
+        <h2> This is an interactive 3D simulation. To change the view, place your mouse in the view area, and
+            hold and "drag" the mouse to rotate the image.
+            The mouse wheel or a drag on your trackpad should zoom you in or out.</h2>
+        <p>A mathematical investigation of the Tetrahelix and <a href="https://en.wikipedia.org/wiki/Boerdijk%E2%80%93Coxeter_helix">Boerdijk-Coxeter helix</a>, which provides a new
+            formulaic way of producing a continuum of untwisted tetrahelices.</p>
+        <p>All of the code on this site is released under the GNU General Public License, and I hope you will
+            reuse it. </p>
+        <h1>Draft Page for the Public Invention Mathathon 2018</h1>
+        <p>This page is a very messy draft of a page meant to be a "playground" or "testbench" for playing
+            with simplex chains in 3D, specifically chains of tetrahedra joined face-to face.</p>
+        <p>We hope to expand this page into something useful. Right now, if you hit the "Render Computed
+            Simplex Chain", you will see a very simple simplex chain
+            computed in javascript by specifying the lengths of the new edges added to a starting triangle.
+            With enough hackery, this can become the basis of testing "generators" for complex simplex chains.</p>
+    </section>
+    <script src="./js/main.js"></script>
+</body>
