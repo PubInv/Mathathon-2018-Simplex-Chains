@@ -1308,12 +1308,13 @@ function drawTetrahedron(dir, i, other_params) {
         console.log("AAAA",renderTestGeneratorsButton);
         renderTestGeneratorsButton.addEventListener('click', renderTestGenerators);
 
-        document.getElementById("stacking-helix-table").addEventListener("click", function(){ stackingHelixTable(); });
+        var sht = document.getElementById("stacking-helix-table");
+        if (sht) sht.addEventListener("click", function(){ stackingHelixTable(); });
         
         // Add the Parametric Curve functionality
         document.getElementById("circle-button").addEventListener("click", function(){ followParametricCurve(parametricCircle, false); });
         document.getElementById("sine-button").addEventListener("click", function(){ followParametricCurve(parametricSineWave, true); });
-        document.getElementById("cone-button").addEventListener("click", function(){ followParametricCurve(parametricCone, true); });
+//        document.getElementById("cone-button").addEventListener("click", function(){ followParametricCurve(parametricCone, true); });
         document.getElementById("helix-button").addEventListener("click", function(){ followParametricCurve(parametricHelix, true); });
 
         // Fill the generators selector
@@ -1922,8 +1923,8 @@ function drawTetrahedron(dir, i, other_params) {
         var phi = Math.arctan(z/L);
         var E = (D/2)*Math.sin(ph) + psi
         var F = Math.sin(phi);
-        var r = 2*Math.pow(F,3/2)/Math.sqrt(3F-E);
-        var iv = F*F(F+E)/(E-3F);
+        var r = 2*Math.pow(F,3/2)/Math.sqrt(3*F-E);
+        var iv = F*F(F+E)/(E-3*F);
         var t0= -2 * Math.arctan(x)*(r+Math.sqrt(iv));
         var k = L/(4*Math.arctan((r+Math.sqrt(iv))/F));
         return [r,k,t0];
