@@ -87,10 +87,11 @@ is that each polygon has associated with it an isoceles triangle $A,B,C$, where 
 and $\angle ACB = (\pi - \theta)$. $AC$ and $BC$ are not necessarily aligned with an edge of the polygon.
 The length $AB$ is $L$, and the lengths $AC$ and $BC$ are
 $(L/2) / \sin{(\pi - \theta)/2}$. In any chain of polygons, these triangles all meet at point $C$, and there all
-joints are on the circle centered at $C$ with radius $\frac{L}{2 \sin{\frac{\pi - \theta}{2}}$.
+joints are on the circle centered at $C$ with radius $\frac{L}{2 \sin{\frac{\pi - \theta}{2}}}$.
 
 An analogous, though far more complicated, result holds in three dimensions.
 
+\label{sec:2d}
 \section{Three dimensions}
 
 
@@ -99,13 +100,14 @@ Joining two such cylinders at the axes by placing $F_0$ angainst $F_1$ produced 
 angle between the axes of $\alpha$ and a rotation of the orienation of the faces about the axis of $\theta$.
 
 \begin{theorem}[Stacking Helix]
-  The joints of a sequential stack of objects of length $L$ whose joints axis change of $\alpha$ and orientation rotation
-  of $\theta$ are intersected by a helix of radius.
+  The joints of a sequential stack of objects of length $L$ whose joints axis change by $\alpha$ and orientation rotate
+  by $\theta$ are intersected by a helix of radius and pitch easily numerically computable
+  from  $L,\alpha$, and $\theta$.
 \end{theorem}
 
 \begin{figure}
      \centering
-     \includegraphics[width=0.80\textwidth]{figures/StackedSetup.png}
+     \includegraphics[width=0.95\textwidth]{figures/StackedSetup.png}
      \caption{The rotatable prism of three objects}
   \label{fig:prismdiagram}
 \end{figure}
@@ -113,13 +115,16 @@ angle between the axes of $\alpha$ and a rotation of the orienation of the faces
 \begin{proof}
 
   In Figure \href{fig:prismdiagram}, let $L_i$ be the $i$th instance of the length-$L$ objects. Let $\alpha$ be the
-  change in angle in the axes at a joint (the point were axes meet) measured in the plane containing the axes of both objects.
-  Let $\theta$ be the change in orientation relative axis,
+  change in angle in the axes at a joint (the point were axes meet) measured in the plane containing the axes of both objects. (If these axes are parallel (and therefore coincident) define $\alpha$ to be 0.
+  Let $\theta$ be the change in orientation relative to the axis,
   or, the half-angle formed by $L_0$ and $L_2$ when projected onto a plane normal to the axis of $L_1$.
   Without loss of generality, choose the measures of these angles in radians so that
-  $0 \leq \theta \pi/2$. Take $\alpha < 0$ to mean that objects $L_0$ and $L_1$ bend away from each other,
+  $0 \leq \theta < \pi/2$ and $0 \leq \alpha < \pi$.
+  Take $\alpha < 0$ to mean that objects $L_0$ and $L_1$ bend away from each other,
   and $\alpha > 0$ to mean that the objects $L_0$ and $L_1$ bend toward each other.
-  If $\theta = 0$ and $\alpha > 0$, the stack will form a circle-like structure, where as if
+
+  If $\theta = 0$ and $\alpha > 0$, the stack will form a circle-like structure or radius 
+  $\frac{L}{2 \sin{\frac{\pi - \alpha}{2}}}$, as shown in Section \ref{sec:2d}, where as if
   $\theta = 0$ and $\alpha < 0$, then stack will form a sawtooth-like structure.
 
   Note that any angle $\alpha$ is possible, if we do not concern oursleves with the self-collision
@@ -148,42 +153,47 @@ h &= \sqrt{z^2 - w^2} \\
   \begin{itemize}
   \item The three objects are named $L_0,L_1,$ and $L_2$.
     $L_0$ has joints $P_0$ and $P_1$,
-    $L_1$ has joints $P_1 and P_2$,
-    $L_2$ has joints $P_2 and P_3$.
+    $L_1$ has joints $P_1$ and $P_2$,
+    $L_2$ has joints $P_2$ and $P_3$.
   \item  $x$ is the total length of the prism along the $x$-axis.
   \item $z$ is the length of the ``face'' of the prism, and the length
-    of the chord before any rotation about $\phi$.
+    of the chord before any rotation $\phi$ about the $y$-axis.
   \item $w$ is half of the width of the prism in the $z$-dimension.
   \item $h$ is the height of the prism in the $y$-dimension.
   \item $D$ is the length of the diagonal from $P_0$ to $P_3$.
-  \item $\psi$ is the angle of $\overline{P_3O}$.
+  \item $\psi$ is the angle of $\overline{P_0P_3}, \arctan{(w/(x/2))}$.
     \item $\phi$ is the amount we will have to rotate the prism about the $y$-axis.
     \end{itemize}
-Given these defintions about our assumptions:
-  \begin{align*}
-c_0 &= z \cos{\phi} \\
+Given these defintions about our assumptions, the cord lengths are:
+\begin{align*}
+  \psi &= \arctan{(w/(x/2))} \\
+D &= \sqrt{4w^2+x^2} \\
 c_1 &= L \sin{\phi} \\
-c_2 &= z \cos{\phi} \\
-D &= \sqrt{4w^2+x^2}
+c_2 &= \sqrt{h^2 + ((1/2)(D\sin{(\psi+\phi)}-L\sin{\phi})^2}  \\
+c_0 &= c_2 \\
   \end{align*}
   
 
   We can imagine turing our 3-object stack and simulataneously increasing the size of our intersecting
   cyliner. If we turn the stack about the $y$-axis by $\phi$ degrees and keep the cylinder intersection
   the two faces of $L_1$, then the length of the $L_1$ chord will gradually increase. At the same time,
-  the $L_0$ and $L_2$ chords will decrease. When $\phi = 0$, $c_0 = z, c_1 = 0, c_2 = z$.
+  the $L_0$ and $L_2$ chords will change their length, possibly increasing or decrasing.
+  When $\phi = 0$, $c_0 = z, c_1 = 0, c_2 = z$.
 
-  \begin{align*}
-c_0 &= z \cos{\phi} \\
-c_1 &= L \sin{\phi} \\
-c_2 &= z \cos{\phi} \\
-  \end{align*}
-Equating these quantities:
+  Equating these quantities to find when $c_2 = c_1$, we have a trigonometric equation with
+  a single unknown, $\phi$.
     \begin{align*}
-      z \cos{\phi}  &= L \sin{\phi} \\
-      \frac{z}{L} &= \tan{\phi} \\
-      \phi &= \arctan{\frac{z}{L}}  \\      
+      L \sin{\phi} &= \sqrt{h^2 + ((1/2)(D\sin{(\psi+\phi)}-L\sin{\phi})^2} \\
+      %% To put this in the language of Wolfram Alpha....
+      %% L* sin(x) = sqrt(A + ((1/2) *(D* sin(x + B) - L * sin(x)))^2)
+      %% At present, Mathemtatic does not appear able to solve this.
     \end{align*}
+
+    Although Mathematica does not appear to be able to solve this equation, it appears
+    to be a smooth equation in the variable $\phi$ and we believe from the physical
+    structure of the problem that will have only a single solution, so we can
+    solve this numerically with a Newton-Raphson solver easily.
+    
     Thus, by rotating our stack of objects $\phi$ degrees around the $y$-axis 
     all four faces of our three objects intersect a cylinder on its surface with
     equal rotational and axial distance. The axial distance between any two joints
@@ -283,10 +293,19 @@ been studied enough to have a known pitch.
 
 \section{Implications}
 
-One of the implcations of this is that it may be possible to design helixes
-of any radius and pitch by designing periodic segments. Combined with slight
+One of the implcations of having a formulaic understanding of the math
+is that it may be possible to design helixes
+of any radius and pitch by designing periodic (possibly scalene) segments. Combined with slight
 irregularites, this means that you have a basis of design molecular helices
 out of ``atoms'' which correspond to our objects.
+
+This would mean that if you wanted to build a brace of length exactly 3 meters
+with bars of exactly 1/2 meter you would be able to come as close to this
+as mathematically possible.
+
+
+
+
 
 
 \section{Applied to Periodic Regular Simplex Chains}
@@ -306,7 +325,11 @@ on the diameter of this cylinder (under some assumptions.) The key to the proof 
 such objects, observing that the other two must necessarily bend towards or away from each other in a way describable by two angles.
 A formula for the cylinder as a function of these angles would convincingly complete the proof.
 
+Note: This paper may be critical.
 
+\url{https://arxiv.org/pdf/1610.00280.pdf}
+
+\url{https://www.impan.pl/wydawnictwa/preprints_impan/p741.pdf}
 
 \bibliographystyle{unsrt}
 \bibliography{gluss}
