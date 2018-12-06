@@ -80,8 +80,8 @@ function get_member_color(gui, len) {
     }
 }
 
-function create_actuator(d, b_a, b_z, pos, cmat) {
-    var len = b_z.distanceTo(b_a) + -am.JOINT_RADIUS * 2;
+function create_actuator(b_a, b_z, pos, cmat) {
+    var len = b_z.distanceTo(b_a) + -am.JOINT_RADIUS;
     var quat = new THREE.Quaternion();
 
     var pos = new THREE.Vector3(b_z.x, b_z.y, b_z.z);
@@ -155,7 +155,7 @@ function load_NTetHelix(am, helix, tets, pvec, hparams) {
 }
 
 function create_vertex_mesh(pos, c) {
-        var mesh = createSphere(am.JOINT_RADIUS, pos, c.hex());
+        var mesh = createSphere(am.JOINT_RADIUS/2, pos, c.hex());
         mesh.castShadow = false;
         mesh.receiveShadow = false;
         am.scene.add(mesh);
@@ -181,20 +181,19 @@ function add_vertex(am, d, i, params) {
         th = [0, 1, 2, 3];
         indices.push(th, th, th, th); //First 3 are dummy copies to align indices and vertices
         v = base.v[i];
-        c = [base.ec[3], base.ec[4], base.ec[5]];
         if (params.wireframe == true) {
             create_vertex_mesh(base.v[0], base.ec[3]);
             create_vertex_mesh(base.v[1], base.ec[3]);
             create_vertex_mesh(base.v[2], base.ec[3]);
-            create_actuator(v[0].distanceTo(base.v[1]), base.v[0], base.v[1], null, base.ec[2]);
-            create_actuator(v[1].distanceTo(base.v[2]), base.v[1], base.v[2], null, base.ec[0]);
-            create_actuator(v[2].distanceTo(base.v[0]), base.v[2], base.v[0], null, base.ec[1]);
+            create_actuator(base.v[0], base.v[1], null, base.ec[2]);
+            create_actuator(base.v[1], base.v[2], null, base.ec[0]);
+            create_actuator(base.v[2], base.v[0], null, base.ec[1]);
         }
         else {
             var geometry = new THREE.Geometry();
             geometry.vertices.push(vertices[0],vertices[1],vertices[2]);
             if (params.blendcolor == true) {
-                geometry.faces.push(new THREE.Face3(0, 1, 2, undefined, [cto3(c[0]),cto3(c[1]),cto3(c[2])]));
+                geometry.faces.push(new THREE.Face3(0, 1, 2, undefined, [cto3(base.ec[0]),cto3(base.ec[1]),cto3(base.ec[2])]));
             }
             else {
                 geometry.faces.push(new THREE.Face3(0, 1, 2, undefined, new THREE.Color(0)));
@@ -215,67 +214,15 @@ function add_vertex(am, d, i, params) {
         v = get_vertex(i, vertices, indices, vertices[th[0]], vertices[th[1]], vertices[th[2]], [l[0]+l[3],l[1]+l[4],l[2]+l[5]], params.l, params.m);
         vertices.push(v);
         indices.push(th);
-        c = get_colors(i, vertices, indices);
     }
+    c = get_colors(i, vertices, indices);
     if (params.wireframe == true) {
-        //        v = v.add(pvec);
-        var pos = new THREE.Vector3();
-        pos.set(v.x, v.y, v.z);
-        var mesh = createSphere(am.JOINT_RADIUS, pos, c[3].hex());
-        mesh.castShadow = false;
-        mesh.receiveShadow = false;
-        am.scene.add(mesh);
+        create_vertex_mesh(v, c[3]);
 
-        var body = {};
-        body.rail = i % 3;
-        body.number = i / 3;
-        body.name = alphabetic_name(i);
-        body.mesh = mesh;
-        helix.helix_joints.push(body);
-        am.push_body_mesh_pair(body, mesh);
-        console.log("HELIX",helix.helix_joints,i);
         for (var k = 0; k < Math.min(3, i); k++) {
-            var pos = new THREE.Vector3();
-
-            var b_z = helix.helix_joints[i];
-            var b_a = helix.helix_joints[indices[i][k]];
-            var o_a = b_a.mesh.position;
-            var o_z = b_z.mesh.position;
-
-            var v_z = new THREE.Vector3(o_a.x, o_a.y, o_a.z);
-            var v_a = new THREE.Vector3(o_z.x, o_z.y, o_z.z);
-            var dist = v_a.distanceTo(v_z);
-
-            var v_avg = new THREE.Vector3(v_z.x, v_z.y, v_z.z);
-            v_avg.add(v_a);
-            v_avg.multiplyScalar(0.5);
-
-            pos.set(v_avg.x, v_avg.y, v_avg.z);
-
             var tcolor = new THREE.Color(c[k].hex());
             var cmat = memo_color_mat(tcolor);
-            var mesh = create_actuator(dist, v_a, v_z, pos, cmat);
-            if (b_a.name > b_z.name) {
-                var t = b_a;
-                b_a = b_z;
-                b_z = t;
-            }
-            var memBody = {};
-            memBody.name = b_a.name + " " + b_z.name;
-            memBody.link_a = b_a;
-            memBody.link_z = b_z;
-            memBody.endpoints = [];
-            memBody.endpoints[0] = b_a;
-            memBody.endpoints[1] = b_z;
-
-            for (var x = helix.helix_members.length - 1; x >= 0; x--) {
-                if (helix.helix_members[x].body.name == memBody.name) {
-                    helix.helix_members.splice(x, 1);
-                }
-            }
-            var link = { a: b_a, b: b_z, body: memBody };
-            helix.helix_members.push(link);
-            am.push_body_mesh_pair(memBody, mesh);
+            var mesh = create_actuator(vertices[th[k]], vertices[th[3]], null, cmat);
         }
     }
     else {
