@@ -182,12 +182,12 @@ function add_vertex(am, d, i, params) {
         indices.push(th, th, th, th); //First 3 are dummy copies to align indices and vertices
         v = base.v[i];
         if (params.wireframe == true) {
-            create_vertex_mesh(base.v[0], base.ec[3]);
-            create_vertex_mesh(base.v[1], base.ec[3]);
-            create_vertex_mesh(base.v[2], base.ec[3]);
-            create_actuator(base.v[0], base.v[1], null, base.ec[2]);
-            create_actuator(base.v[1], base.v[2], null, base.ec[0]);
-            create_actuator(base.v[2], base.v[0], null, base.ec[1]);
+            create_vertex_mesh(base.v[0], base.vc[0]);
+            create_vertex_mesh(base.v[1], base.vc[1]);
+            create_vertex_mesh(base.v[2], base.vc[2]);
+            create_actuator(base.v[0], base.v[1], null, memo_color_mat(cto3(base.ec[2])));
+            create_actuator(base.v[1], base.v[2], null, memo_color_mat(cto3(base.ec[0])));
+            create_actuator(base.v[2], base.v[0], null, memo_color_mat(cto3(base.ec[1])));
         }
         else {
             var geometry = new THREE.Geometry();
