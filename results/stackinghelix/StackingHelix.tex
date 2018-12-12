@@ -87,17 +87,124 @@ is that each polygon has associated with it an isoceles triangle $A,B,C$, where 
 and $\angle ACB = (\pi - \theta)$. $AC$ and $BC$ are not necessarily aligned with an edge of the polygon.
 The length $AB$ is $L$, and the lengths $AC$ and $BC$ are
 $(L/2) / \sin{(\pi - \theta)/2}$. In any chain of polygons, these triangles all meet at point $C$, and there all
-joints are on the circle centered at $C$ with radius $\frac{L}{2 \sin{\frac{\pi - \theta}{2}}}$.
+joints are on the circle centered at $C$ with radius $\frac{L}{2 \sin{\frac{\theta}{2}}}$.
 
 An analogous, though far more complicated, result holds in three dimensions.
 
 \label{sec:2d}
+\section{The Discrete Helix}
+
+In this section we consider discrete helix, or a helix evaluated only at regular points. Drawing lines between these
+points create 3D polygon.
+
+Following the Wikipedia artilce \url{https://en.wikipedia.org/wiki/Helix}, we set up a helix parametrically.
+\begin{align*}
+    P_x(t) &= r \sin{t}  \\
+    P_y(t) &= r \cos{t} \\
+   P_z(t) &= b t
+\end{align*}
+Such a helix has a radius of $r$ and slope (if $r \neq 0$) of $b/r$,. Note that a helix may be degenerate in two ways.
+If $r = 0$, these equations become a line. If $b = 0$, these equations describe a circle in the $xy$-plane.
+If $r = 0$ and $b = 0$, the figure is a point.
+
+Such helixes are continuous, but we are investigating stacks of discrete objects. We in fact wish to derive
+the parameters for a continuous helix from such discrete objects which constrain discrete points, so we wish
+to study a helix evaluated at integral points. We call such an object a {\em discrete helix} or {\em delix (DEE-lix).}.
+A discrete helix may be thought of as function that given an integer gives back a point in three space.
+\begin{align*}
+    P_x(n) &= r \sin{n \theta}  \\
+    P_y(n) &= r \cos{n \theta} \\
+   P_z(n) &= n d
+\end{align*}
+
+$d$ is the distance along the $z$-axis between adjacent points, and $\theta$ is the rotation around the $z$-axis between adjacent points. $r$ is the radius of the delix. If we think of the delix as describing a polyline in 3-space, we would like to investgiate
+the properties of that polyline.
+
+\begin{itemize}
+\item $L$ is the distance between any two adjacent points.
+\item $c$ is the length of a chord formed by the projection of the segment between two points into the $xy$-plane.
+\item $\phi$ is the angle in the plane containing two points which is perpendicular to $xy$-plane
+  (in other words the plane parallel to the $z$ axis containing two points.)
+  \end{itemize}
+These quantities are related:
+\begin{align*}
+    c = 2r\sin{\theta/2} \\
+    L^2 &= c^2+d^2  \\
+    \arctan{c/d}  &= \phi \\
+\end{align*}
+
+Now we are attempting to relate these properties to properties intrinsic to the joint or interface between
+two segments or objects in the delix. If given an object, the length between the joint points $L$ is
+easily measured. The most easily measured relationship between the segments
+is the angle $\alpha$ in the plane containing both of the segments. (If the segments are coincident and therefore
+parallel $\alpha$ will be $\pi$. If $\alpha < \pi/2$, the segment ``bends backward''.
+The final measure that is needed is the rotation about a member between the elements attached to it.
+Let us call this angle $\psi$.
+
+
+
+\begin{align*}
+    A &= P(-1)  \\
+    B &= P(0) \\
+    C &= P(1)
+\end{align*}
+
+$A,B,C$ form an isoceles triangle that contains $\overline{AB}$ and $\overline{BC}$, and therefore the angle $\alpha$ is in
+this plane. Forming the kite $ABCO$, we see that one diagonal is $r$ and the other diagonal is $2 r \sin{\theta}$, where
+$y = r \sin{\theta}$ is half of this diagonal. 
+
+\begin{align*}
+    y &= r \sin{\theta}  \\
+    z^2 &= c^2 - y^2 \\
+    z^2 &= c^2 - (r \sin{\theta})^2 \\    
+    q^2 + z^2 &= L^2 \\
+    q &= \sqrt{L^2 - z^2} \\
+    q &= \sqrt{L^2 - (c^2- (r\sin{\theta})^2)} \\
+    q &= \sqrt{L^2 + (r\sin{\theta})^2 - (2r\sin{\theta/2})^2 } \\        
+    \sin{\alpha/2} &= q/L \\
+    q &= L \sin{\alpha/2} \\
+    \alpha/2 &= \arcsin{q/L} \\
+    \alpha &= 2 \arcsin{\frac{\sqrt{L^2 + (r\sin{\theta})^2 -
+          (2r\sin{\theta/2})^2}}
+      {L}} \\ 
+\end{align*}
+
+Note $y$ is in the projected kite, $q$ is in the slanted kite.
+Rearranging these relationships in terms of known quantites $L, \alpha, \psi$, we have:
+
+\begin{align*}
+  \sin{\alpha/2} &= q/L \\
+  q &= L \sin{\alpha/2} \\    
+  z^2 &= L^2 - q^2 \\
+  %% Now we must use \psi
+  \beta &= \frac{\pi - \theta}{2} \\
+  \frac{z}{c} &= \cos{\beta} \\
+  c &= \frac{z}{\cos{\beta}} \\
+  y^2 &= c^2 - z^2 \\
+  r &= \frac{y}{\sin{\theta}} \\
+  d^2 &= L^2 - c^2 \\
+  \phi &= \arctan{c/d} \\
+\end{align*}
+
+I think we can compute $\psi$ from $\theta$ easily enough. The problem is going the other way.
+
+\subsection{An alternate approach}
+
+Rather than starting with $\alpha$ and $\psi$ as inputs, we can think of a vector $v$ that
+moves in the positive $\overline Z$ direction, $\overline Z = \overline P_1 - \overline P_0$, and
+the angle $\theta$ which $Z$ rotates about the $z$-axis at each step. If a rotation matrix $M$
+represents rotation about and $T$ represents translation along the $z$-axis, then $P_n = (M+T)^nP_n$.
+
+
 \section{Three dimensions}
+
+
 
 
 Consider a slender cylinder or prism with two faces $F_0,F_1$ cut at arbitrary angles to the axis of the cylinder.
 Joining two such cylinders at the axes by placing $F_0$ angainst $F_1$ produced a joint with a difference in
 angle between the axes of $\alpha$ and a rotation of the orienation of the faces about the axis of $\theta$.
+Note that $\alpha$ and $\theta$ are a function of the vectors normal to the faces to be joined, but are not the same as them. $\alpha$ and $\theta$ are likely combinations of the face angles.
 
 \begin{theorem}[Stacking Helix]
   The joints of a sequential stack of objects of length $L$ whose joints axis change by $\alpha$ and orientation rotate
@@ -124,7 +231,7 @@ angle between the axes of $\alpha$ and a rotation of the orienation of the faces
   and $\alpha > 0$ to mean that the objects $L_0$ and $L_1$ bend toward each other.
 
   If $\theta = 0$ and $\alpha > 0$, the stack will form a circle-like structure or radius 
-  $\frac{L}{2 \sin{\frac{\pi - \alpha}{2}}}$, as shown in Section \ref{sec:2d}, where as if
+  $\frac{L}{2 \sin{\frac{\alpha}{2}}}$, as shown in Section \ref{sec:2d}, where as if
   $\theta = 0$ and $\alpha < 0$, then stack will form a sawtooth-like structure.
 
   Note that any angle $\alpha$ is possible, if we do not concern oursleves with the self-collision
@@ -222,7 +329,7 @@ Since we know that after rotation that:
     P_{3z} &= (D/2) \sin{\phi + \psi} \\
     P_{3z} &= r\sin{3t_0} \\
     P_{2z} &= \sin{\phi} \\
-    P_{2z} &= r\sin{t}
+    P_{2z} &= r\sin{t_0}
   \end{align*}
   We can use symbolic computation to solve this system of 2 equations and 2 unkowns:
   \begin{align*}
@@ -291,6 +398,8 @@ $0$ or $\pi/2$, for example. We also have the particular non-trivial example
 of the Boerdick-Coxeter tetrahelix, formed by regular tetrahedra, which has
 been studied enough to have a known pitch.
 
+
+
 \section{Implications}
 
 One of the implcations of having a formulaic understanding of the math
@@ -331,11 +440,254 @@ Note: This paper may be critical.
 
 \url{https://www.impan.pl/wydawnictwa/preprints_impan/p741.pdf}
 
+\url{https://math.stackexchange.com/questions/878051/why-does-a-3d-line-of-segments-with-constant-angles-always-make-a-helix/878079#878079}
+
 \bibliographystyle{unsrt}
 \bibliography{gluss}
 
 
 \end{document}
 
+The following math in Mathematica may be useful.
+
+Note: Mathematica has build in Vector Angle function that can be used for alpha!!
+
+c = 2 r Sin[theta/2]
+
+Chord[r_,theta_] := 2 r Sin[theta/2]
+1 == c^2 + d^2
+DZ[r_,theta_] := Sqrt[1 - Chord[r,theta]]
+(* Note, this may be a problem --- Chord lenght can be diameter (2r), but I am treating it as 1 here *)
+(* Some radiuses are not possible for some thetas with a length of one *)
+(* Maximum radius as a function of theta *)
+Mxr[theta_] := MaxValue[1 == 2 r Sin[theta/2],{r}]
+Mxr[theta_] := 1/ (2  Sin[theta/2])
+
+
+ Note: I should go ahead and make these functions....
+
+(* P0 = {0, r, 0} *)
+(* P1 = {r Sin[theta], r Cos[theta], d} *)
+(* P2 = {r Sin[2 theta], r Cos[2 theta], 2 d} *)
+(* P3 = { r Sin[3 theta], r Cos[3 theta], 3 d} *)
+(* S0 = P0 - P1 *)
+(* S1 = P1 - P2 *)
+(* S2 = P2 - P3 *)
+P[n_,r_,theta_] := { r Sin[n theta], r Cos[n theta], n DZ[r,theta]}
+S[n_,r_,theta_] := P[n,r,theta] - P[n+1,r,theta]
+
+Alpha[r_,theta_] := VectorAngle[S[0,r,theta],S[1,r,theta]]
+
+alpha = ArcCos[S0.S1]
+Solve[alpha == ArcCos[S0.S1], alpha]
+
+f[r_, theta_] := 
+ ArcCos[-1 + (r - r Cos[theta]) (-r Cos[theta] + r Cos[2 theta]) + 
+   4 r^2 Sin[theta/2]^2 - 
+   r Sin[theta] (-r Sin[theta] + r Sin[2 theta])]
+
+Plot3D[f[r, theta]/ Degree, {r, 0, 2}, {theta, -Pi/6, Pi/6}, 
+ AxesLabel -> Automatic]
+
+
+Plot3D[Alpha[r, theta]/ Degree, {r,0,N[Mxr[Pi]]}, {theta, 0, Pi}, 
+ AxesLabel -> Automatic]
+
+
+Note: Given that we can compute $\alpha$ from $r,\theta$ in this way, one interesting thing to ask
+is simply what is the minimum or maximum r (or theta) that matches an alpha. The maximum r is the
+largest helix that matches, the minimum is the smallest. But with $\psi$ we will know more.
+
+PlaneNormal[a_, b_] := Normalize[Cross[a, b]]
+
+Psi[p0_, p1_, v_] := 
+With[{n = PlaneNormal[p0, p1]}, ArcSin[(n.v) /(Norm[v] Norm[n])]]
+
+PsiC[rx_,thetax_] := 
+With[{r = rx,theta = thetax}, Evaluate[Psi[S[0,r,theta],S[1,r,theta],S[2,r,theta]]]]
+
+Plot3D[PsiC[r, theta]/ Degree, {r, 0, N[Mxr[Pi/2]]}, {theta, 0, Pi/2}, 
+ AxesLabel -> Automatic]
+
+
+Note: A strategy for computation is: given alpha, find maximum or minimum radius.
+Then slow change radius until \psi if find.  However, Mathematic has optimization
+built in, so we may be able to use an energy function.
+
+Enrg[alpha_,psi_,r_,theta_] := (Alpha[r,theta] - alpha)^2 + (PsiC[r,theta] - psi)^2
+
+FindMinimum[Enrg[Pi/10,Pi/10,r,t],{r,t}]
+
+(* These seem to work, but they produce rules, instead of values, what up with that? *)
+
+Rx[alpha_,psi_] := r /. FindMinimum[Enrg[alpha,psi,r,t],{r,t}][[2]][[1]]
+Tx[alpha_,psi_] := t /.  FindMinimum[Enrg[alpha,psi,r,t],{r,t}][[2]][[2]]
+
+Plot3D[Rx[a,p]/Degree, {a,0,Pi/10},{p,0,Pi/10}]
+
+(* Now that we can in theory find Rx, Tx as a function of alpha and psi,
+It is important that we have a check function (or two.)
+The best check would be to use a reconstruction based on transformations
+of alpha and psi. I need to think about how this should be done with a
+RollPitchYaw Matrix, and in what order. First you by \alpha, then you rotate by \psi.
+I think we are doing ``Pitch, Roll, Yaw''. First we Pitch by \alpha, then
+we Roll into the plane of the joint, then we yaw by \psi.
+In fact what we are trying to do is to fly a little airplane in a helical course.
+``Pitch down by alpha'', ``Yaw by psi'', ``roll so that we are perpendicular
+to the the plane of the last joint''.  Maybe we never need to the roll component.
+I want intrinsic angle rotation (by the definition.) We do seem to have a mobile
+frame of reference.
+So in fact I want EulerMatrices, not RollPitchYaw matrices.
+
+Euluer[{\alpha,\beta,\gamma},{a,b,c}], where a,b,c = 1,2,3, let us specify those.
+So we need to define how our mobile frame works. We will want $y$ to always point
+``out'' of the helix, ``z'' to point along the motion'', and $x$ to be
+tangential to the helix.
+
+If we start with the intrinsic frame aligned with the extrinsic frame, repeated
+transofrmations will produce a helix, but not about the $z$ axis.
+We have so far described our mostion as ``rotate about y'' by $\alpha$, then
+rotation about $x by $\psi$. Then our $z$ axis would be pointed in the
+write direction, we would translate  by $z$, in the intrinsic frame of refrence,
+and repeat.
+
+Note, mathematica seems to have a way to render a helix, this would be very useful to me:
+ListPointPlot3D[
+Table[Table[{t, Cos[t + s Pi/2], Sin[t + s Pi/2]}, {t, 0, 
+      5 Pi, .2}], {s, 4}], BoxRatios -> Automatic]
+
+Graphics3D[
+GeometricTransformation[{Hue[#/Pi], Sphere[{5, 0, 0}, 1]}, 
+  EulerMatrix[{#, Pi/2, #}]] & /@ Range[0, 2 Pi, Pi/16]]
+
+My claim is that we can somehow combine an EulerTransformation with a translation
+to end up with a helix.
+
+We can call GeometricTransoforamtion on an Euler matrix, can we pass a vector
+as an object? Can we create an object of length L which is a vector
+and then create a transformation?
+
+Graphics3D[Arrow[{{1, 1, 1}, {1, -1, 2}}], Axes -> True, 
+  AxesLabel -> {"X", "Y", "Z"}, ImageSize -> Large]
+
+Graphics3D[
+GeometricTransformation[{Hue[#/Pi],Arrow[{{1, 1, 1}, {1, -1, 2}}] }, 
+Composition @@ {
+     TranslationTransform[{1, 1, 1}],
+      EulerMatrix[{0, Pi/2, #}]
+}] & /@ Range[0, 2 Pi, Pi/16]]
+
+
+ EulerMatrix[{Pi/15, Pi/20, 0}] [1,1,1]
+
+
+ myt = TranslationTransform[{0, 0, 1}] EulerMatrix[{Pi/15, Pi/20, 0}]
+
+
+ Graphics3D[{
+  Opacity[1]
+  , Red
+  , Arrow[{{0, 0, 0}, {1, 0, 0}}]
+  , Green
+  , Arrow[{{0, 0, 0}, {0, 1, 0}}]
+  , Blue
+  , Arrow[{{0, 0, 0}, {0, 0, 1}}]
+  , Opacity[0.2]
+  , GeometricTransformation[Cuboid[-{1, 1, 1}/4, {1, 1, 1}/4],
+   Composition @@ {
+     RotationTransform[Pi/4, {0, 0, 1}]
+     , TranslationTransform[{1, 1, 1}]
+     }
+   ]
+ }]
+ 
+ Graphics3D[{
+  Opacity[1]
+  , Red
+  , Arrow[{{0, 0, 0}, {1, 0, 0}}]
+  , Green
+  , Arrow[{{0, 0, 0}, {0, 1, 0}}]
+  , Blue
+  , Arrow[{{0, 0, 0}, {0, 0, 1}}]
+  , Opacity[0.2]
+  , GeometricTransformation[Cuboid[-{1, 1, 1}/4, {1, 1, 1}/4],
+    Composition @@ {
+       RotationTransform[Pi/15,{0,1,2}],
+     , TranslationTransform[{1, 1, 1}]
+     }
+   ]  & /@ Range[0, 5, 1]
+ }]
+
+
+ Graphics3D[
+   GeometricTransformation[{Hue[#/Pi],Arrow[{{1, 1, 1}, {1, -1, 2}}] },
+       Composition @@ {
+       RotationTransform[Pi/15,{0,1,2}],
+     , TranslationTransform[{1, 1, 1}]
+     }
+ ]]
+
+
+ Composition @@ {
+     RotationTransform[Pi/4, {0, 0, 1}]
+     , TranslationTransform[{1, 1, 1}]
+ }
+
+ Graphics3D[
+   
+  (GeometricTransformation[Cuboid[-{1, 1, 1}/4, {1, 1, 1}/4], 
+   Composition @@ {RotationTransform[Pi/4, {0, 0, #}], 
+     TranslationTransform[{1, 1, #}]}]) & Range[3]
+
+ ]
+
+double[x_] := 2 x
+ 
+Nest[double,#,4] & Range[3]
+
+(* Now, what we really want to do here, is  construct
+a transform out of \alpha, \pi, ending up with the arrows head to tail
+
+Clear[ComposeN]
+ComposeN[0] = ScalingTransform[{1,1,1}]
+ComposeN[1] = Composition @@ {
+  RotationTransform[ Pi/6, {0, 1, 0}],
+  Composition @@ {
+    TranslationTransform[{1, 1, 1}],
+    RotationTransform[ Pi/6, {0, 0, 1}]
+  }
+}
+
+ComposeN[n_] :=  Composition[ComposeN[Floor[n/2]],ComposeN[Ceiling[n/2]]]
+
+
+ myarrows = 
+ Table[
+   GeometricTransformation[{
+     Arrow[{{0, 0, 0}, {0, 0, 2}}],
+     Arrow[{{0, 0, 0}, {0,1/2, 0}}]},   
+     ComposeN[i]
+   ],{i,1,10}
+   ] 
+ 
+ Graphics3D[myarrows]
+
+
+ (* I think to do what I want, I need to do my own transformationns. *)
+ (* An object is a vector and an upvector.
+ The 0th object is a z-aligned vector starting at the origin, with a y upvector.
+ The n+1th object is:
+ A) Take the nth object (AB), find the head B of the vector.
+ B) Create a vector of length N pointing in the same direction as the nth object.
+ C) Translate it along the nth object to the head.
+ D) Relative to 
+ E) Rotate it in the AB coordinate frame in the Y direction by Alpha.
+ F) Rotate it in the X direction by Psi.
+ G) Apply these same arguments to the up Vector.
+
+ Note that Mathematica has powerful RotationMatrix functions built in to which
+ we can use the Nth vectors as input, to rotate in a plane. So in this sense
+ we may actually be able to accomplish this.
+*)
 
 
