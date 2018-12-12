@@ -1874,29 +1874,131 @@ function drawTetrahedron(dir, i, other_params) {
         
         renderParametricCurve(am,curveFn,open);
     }
+    function rhand(hsq,D,psi,L,phi) {
+        var q = ((D*Math.sin(psi+phi)) -
+                 (L*Math.sin(phi)));
+//        console.log("phi,c2",phi,Math.sqrt(hsq+(1/4)*q*q));
+        return Math.sqrt(hsq+(1/4)*q*q);
+    }
+    function lhand(L,phi) {
+//        console.log("phi,c1",phi,Math.abs(L*Math.sin(phi)));        
+        return Math.abs(L*Math.sin(phi));
+    }
+    function calc_phi(L,h,D,psi) {
+        var result =
+            newtonRaphson((phi) => lhand(L,phi) - rhand(h*h,D,psi,L,phi),0.02
+                          ,{ verbose: true, maxIter: 20});
+        return result;
+    }
 
+    function test_xxx() {
+        var h = 0.5;
+        var w = 0.5;
+        var L = 1;
+        var psi = 22.5*Math.PI/180;
+        var D =  2.613125929752753 ;
+        for(var i = 0; i < 90; i += 1) {
+            var irad = i*Math.PI/180;
+            var c1 = lhand(L,irad);
+            var c2 = rhand(h*h,D,psi,L,irad)
+            console.log("xxx c1",i,c1);
+            console.log("xxx c2",i,c2);
+            console.log("xxx c1-c2",i,c1-c2);                                    
+        }
+    }
+    test_xxx();
+
+    // alpha and theta, phi in radians.
+    // 0 <= alpha < PI
+    // 0 <= theta <= PI/2 
+    // L is the length of the object along the axis.
+    // return array [phi,radius, kappa,theta0]
     function helix_parameters(alpha, theta, L) {
+        // if theta == 0, we have a "circle", so we return special....
+        if (theta == 0) {
+            if (alpha == 0) {
+                // it would make more sense to return a symbolic "infinity"
+                // for a radius here, but your number system does not easily support that.
+                return [0,0,0];                
+            } else {
+                // This is effectively a circle.
+                return [0,L/(2*Math.sin((alpha)/2)),0,0];
+            }
+        }
+        
+        // length of 
         var a = L * Math.cos(alpha);
+        // x total length of prism
         var x = L + 2*a;
+        // z is length of "face" of the prism, and lenghth of a chord before roation 
         var z = L * Math.sin(alpha);
+        // w is the half width of the prism in the z-dimension
         var w = z * Math.sin(theta);
+        // h is the height of the prism
         var h = Math.sqrt(z*z - w*w);
+        // D is the lenth of the diagonal from P_0 to P_3
         var D = Math.sqrt(4*w*w + x*x);
-        var phi = Math.arctan(z/L);
-        var E = (D/2)*Math.sin(ph) + psi
+        // psi is the angle P_0 to P_3 witht he z-axis
+        var psi = Math.atan(w/(x/2));
+        // phi is the amount of rotation about the y-axis needed to make
+        // the chords of equal length
+        var phi = calc_phi(L,h,D,psi);
+
+        // note psi + phi CAN be greater than 90.
+        // I need to figure out what this says about the helix---is there one?
+        console.log("check",Math.sin(psi)*D,2*w)
+        console.log("a,x,z",a,x,z);
+        console.log("w,h,D",w,h,D);
+        console.log("psi,phi",psi*180/Math.PI,phi*180/Math.PI);
+        // if psi and phi are both zero, we have a collinear system.
+        // pow compute P1, P2, P3, and compute that
+        // they have the same cord lengths and
+        // the same distances.
+        p3z = D/2*Math.sin(psi+phi);
+        p3x = D/2*Math.cos(psi+phi);
+        p3y = -h;
+
+        p2z = (L/2)*Math.sin(phi);
+        p2x = (L/2)*Math.cos(phi);
+        p2y = 0;
+        
+        var p3 = new THREE.Vector3(p3x,p3y,p3z);
+        var p2 = new THREE.Vector3(p2x,p2y,p2z);
+        console.log("p2,p3",p2,p3);
+        // now check that distance p3-p2 = L
+        console.log("distance",L,p2.distanceTo(p3));
+
+        // now check chord length...
+        var c1 = 2*(p2z);
+        var c2v = p3.clone().sub(p2);
+        console.log("c2v",c2v);
+        c2v.projectOnPlane(new THREE.Vector3(1,0,0));
+        console.log("projected c2v",c2v,c2v.length());
+        console.log("projected c1",c1);        
+        
+        console.log("distance",L,p2.distanceTo(p3));        
+        
+        // We can return r = 0, k = 0, t0 = 0, I think.
+        if ((phi + psi) == 0) {
+            return [0,0,0,0];
+        }
+
+        // All of this needs to be re-checked
+        var E = (D/2)*Math.sin(phi + psi)
         var F = Math.sin(phi);
+
         var r = 2*Math.pow(F,3/2)/Math.sqrt(3*F-E);
-        var iv = F*F(F+E)/(E-3*F);
-        var t0= -2 * Math.arctan(x)*(r+Math.sqrt(iv));
-        var k = L/(4*Math.arctan((r+Math.sqrt(iv))/F));
-        return [r,k,t0];
+        var iv = F*F*(F+E)/(E-3*F);
+        var t0= -2 * Math.atan(x)*(r+Math.sqrt(iv));
+        var k = L/(4*Math.atan((r+Math.sqrt(iv))/F));
+        return [phi,r,k,t0];
     }
 
     // MATH FOR STACKING HELIX
     function stackingHelixTable() {
         var tab = document.getElementById('stacking_table');
-        function addRow(table,alpha,theta,radius, kappa, t0) {
-            var row = table.insertRow(1);
+        function addRow(table,alpha,theta,phi, radius, kappa, t0) {
+            var row = table.insertRow();
 
 // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
             var cell0 = row.insertCell(0);
@@ -1904,23 +2006,32 @@ function drawTetrahedron(dir, i, other_params) {
             var cell1 = row.insertCell(1);
             cell1.innerHTML = theta;
             var cell2 = row.insertCell(2);
-            cell2.innerHTML = radius;            
+            cell2.innerHTML = phi;            
             var cell3 = row.insertCell(3);
-            cell3.innerHTML = kappa;            
+            cell3.innerHTML = radius;            
             var cell4 = row.insertCell(4);
-            cell4.innerHTML = t0;            
+            cell4.innerHTML = kappa;            
+            var cell5 = row.insertCell(5);
+            cell5.innerHTML = t0;            
 // Add some text to the new cells:
         }
-        var alpha = 0;
-        var theta = 0;
         var radius = 0;
         var kappa = 0;
         var t0 = 0;
-        var L = 0;
-        for (var i = 0; i < 10; i++) {
-            for (var j = 0; j < 10; jk++) {
-                var res = helix_parameters(i*10*Math.PI/180,j*10*Math.PI/180,L);
-                    addRow(tab,alpha,theta,res[0],res[1],res[2]);                
+        var L = 1;
+        // We'll tree these as degrees.
+        for (var i = 0; i < 8; i++) {
+            for (var j = 0; j < 1; j++) {
+                var alpha = i*10;
+                var theta = j*60;
+                alpha= i*10;
+                theta = 170;
+                var arad = alpha*Math.PI/180;
+                var trad = theta*Math.PI/180;
+                console.log("arad",arad*180/Math.PI);
+                var res = helix_parameters(arad,trad,L);
+                console.log("alpha, theta, res",alpha,theta,res);
+                addRow(tab,alpha,theta,res[0]*180/Math.PI,res[1],res[2],res[3]);                
             }
         }
 
