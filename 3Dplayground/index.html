@@ -51,6 +51,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <script src="https://d3js.org/d3-time.v1.min.js"></script>
     <script src="https://d3js.org/d3-time-format.v2.min.js"></script>
     <script src="https://d3js.org/d3-scale.v1.min.js"></script>
+    <style>
+  codenza, code {}     /*  noop mnemonic aide that codenza mimes code tag  */
+  codenza {display:block;white-space:pre-wrap}
+</style>
 </head>
 
 <body>
@@ -85,21 +89,218 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </div>
     </section>
     <section id="textsection">
-        <h1 id="message_banner">Untwisting the Tetrahelix </h1>
+        <h1 id="message_banner">Basic Usage</h1>
         <h2> This is an interactive 3D simulation. To change the view, place your mouse in the view area, and
             hold and "drag" the mouse to rotate the image.
             The mouse wheel or a drag on your trackpad should zoom you in or out.</h2>
         <p>A mathematical investigation of the Tetrahelix and <a href="https://en.wikipedia.org/wiki/Boerdijk%E2%80%93Coxeter_helix">Boerdijk-Coxeter helix</a>, which provides a new
             formulaic way of producing a continuum of untwisted tetrahelices.</p>
         <p>All of the code on this site is released under the GNU General Public License, and I hope you will
-            reuse it. </p>
-        <h1>Draft Page for the Public Invention Mathathon 2018</h1>
-        <p>This page is a very messy draft of a page meant to be a "playground" or "testbench" for playing
-            with simplex chains in 3D, specifically chains of tetrahedra joined face-to face.</p>
-        <p>We hope to expand this page into something useful. Right now, if you hit the "Render Computed
-            Simplex Chain", you will see a very simple simplex chain
-            computed in javascript by specifying the lengths of the new edges added to a starting triangle.
-            With enough hackery, this can become the basis of testing "generators" for complex simplex chains.</p>
+          reuse it. </p>
+        <h2>Creating Objects</h2>
+        <p>
+        You can make this page render a wide variety of 3D objects.
+        Pressing the "circle", "sine", "spiral", "cone" or "helix" buttons will
+        render those objects based on an algorithm for following parametric curves.
+        </p>
+        <p>
+          To create a new parametric curve at present, you would have to hack the code
+          of this page, which we encourage you to do. 
+        </p>
+        <h2>Generated Objects</h2>
+        <p>
+          By enterring in the text area a short snippet of JavaScript defining an
+          anonymous function which takes an integer and returns either -1, 0, 1, or 2,
+          you can produce an unlimited number of shapes. Just enter such javascript and hig the "GO!" button. -1 means "stop." 0, 1 and 2 desrcibe the face to which to add the new tetrahedron.
+        </p>
+        <p>
+          Perhaps the simplest recipe is a purely periodic generator.
+          An example is:
+        </p>
+        <p>
+            <code>        
+              (i) => { return i<20 ? [ 2,1,0,1,2][i%5]: -1; }
+                                   </code>
+        </p>
+        <p>
+            Which simply cycles through an array of 5 values. You can change the numbers (always keeping them 0,1, or 2---go ahead ant try it.
+        </p>
+This is a flattened view of a tetrahedron in the 3D generator, as viewed from the outside.        
+        <img src="images/EdgeDiagram.png">
+        <ul>
+<li>The base (face 3) of each tetrahedron is placed against a face of the previous tetrahedron, as determined by a generator.</li>
+<li>Edge 1 of the base of the new tetrahedron is matched against an edge 1 of the previous. Depending on which face it’s placed against, this may be an edge along the base (faces 1 and 3), or one adjacent to the apex (faces 0 and 2).</li>
+<li>Edge 0 of each tetrahedron is matched up with edge 2 of the tetrahedron it is placed against.</li>
+<li>For a chain of direction 1, no matter what the edge lengths are, the entire chain shares a single edge 1 along the base. This causes tight turns in the resulting constructions.</li>
+</ul>
+       
+        <h1>A Menagerie of Generated Objects</h1>
+
+        Try using these generators to get interesting shapes.
+
+        <h3>Giant Square Container</h3>
+        -- found by Nathan
+            <codenza>        
+(i) => { 
+  return i<500 ? ((
+    (i % 22) == 21) ||  ((i % 22) == 20) 
+      ? 1 : 2 ): 
+  -1; }
+         </codenza>             
+
+
+<h3>Gentle Helix With Cavity</h3>
+
+            <codenza>        
+(i) => { return i<200 ? [ 1,0,0,1,0][i%5]: -1; } 
+         </codenza>             
+
+<h3> The LENGTH CLASS</h3>
+This is an class of objects created by varying the constant K.
+
+            <codenza>        
+(i) => { const K = 24;
+return i<500 ? ((
+(i % K) == 7) ||  ((K % 24) == 8) 
+ ? 1 : 2 ): 
+             -1; }
+         </codenza>                          
+             
+<p>
+  THIS IS A CLOSE APPROXIMATION TO A TORUS:
+  </p>
+            <codenza>        
+(i) => { const K = 4;
+ return i<25 ? 
+(((i % K) == K-1) 
+? 1 : 2 ):
+             -1; }
+         </codenza>                                       
+<p>
+  THIS IS A VERY NICE APPROXIMATION TO A HELIX WITH A TIGHT CAVITY
+  </p>
+            <codenza>        
+(i) => { const K = 9;
+ return i<250 ? 
+(((i % K) == K-1) 
+? 1 : 2 ):
+              -1; }
+         </codenza>                                                     
+<p>
+  THIS IS LIKE K = 9 BUT SIGNIFICANTLY MORE OPEN
+</p>
+            <codenza>        
+(i) => { const K = 10;
+ return i<250 ? 
+(((i % K) == K-1) 
+? 1 : 2 ):
+              -1; }
+              </codenza>
+<p>
+FROM K = 9 to K = 18 you produce helixes of various torsion more or less smoothly.
+</p>
+<p>
+  THIS PRODUCES A NICE BROADLY OPEN HELIX
+</p>
+            <codenza>        
+(i) => { const K = 18;
+ return i<250 ? 
+(((i % K) == K-1) 
+? 1 : 2 ):
+              -1; }
+              </codenza>              
+<p>
+  THIS ALSO PRODUCES A NICE BROADLY OPEN HELIX, EVENLARGER
+</p>
+            <codenza>        
+(i) => { const K = 27;
+ return i<250 ? 
+(((i % K) == K-1) 
+? 1 : 2 ):
+              -1; }
+              </codenza>                            
+<h3> Two very nearly planar structures</h3>
+<p>
+  “Nearly Flat Sawtooth”
+</p>
+            <codenza>        
+(i) => { const K = 30;
+ return i<250 ? 
+(((i % K) == K-1) 
+? 1 : 2 ):
+              -1; }
+              </codenza>                                          
+
+
+            <codenza>        
+(i) => { const K = 41;
+ return i<250 ? 
+(((i % K) == K-1) 
+? 1 : 2 ):
+              -1; }
+              </codenza>                                                        
+
+<h2> A means of Generating Toruses</h2>
+
+To generate perfect toruses, you have to check the "Alternate a/b" checkbox,
+and enter some specific lengths (creating irregular or scalene tetrahedra.)
+            <codenza>        
+(i) => { const K = 4;
+ return i<24 ? 
+(((i % K) == 0) 
+? 1 : 2 ):
+             -1; }
+              </codenza>                                                                   <p>  
+Alternate a/b = true;
+2b = .95
+</p>
+
+These numbers (put into the same was as above for 2b, produce different polygonal toriods.)
+<p>  Triangle: 0.29 </p>
+<p>  Square: 0.648 </p>
+<p>  Pentagon: 0.835 </p>
+<p>  Hexagon: 0.95 </p>
+<p> Setting 2b to 1.414 produces a straight "beam" different than the Equitetrabeam.</p>
+<p>In fact, this method is a basic mechanism for producing toroidal forms are any lengh, which is very useful.
+</p>  
+
+<h2>Equitetrabream</h2>
+
+This formula with no alternations produces the famous Boerdijk-Coxeter tetrahelix:
+<codenza>
+(i) => { 
+ return i<24 ? 
+2:
+-1; }
+             </codenza>
+<p>
+  Modify edge lengths thusly produces a square "box beam":
+</p>
+This setting produces the perfectly triangular "Equitetrabeam" 
+<p>
+  0b = 2a = 1.1547 (2/sqrt(3)
+  </p>
+             
+
+<h3>The Funny Square-side Helix</h3>
+
+<codenza>
+(i) => { const K = 4;
+ return i<100 ? 
+(((i % K) == 0) 
+? 1 : 2 ):
+              -1; }
+</codenza>
+<p>
+This setting produces a funny "sqare-hole helix" whose central cavity is square:              
+2a = 0b = 1.1547, alternate ab = true
+</p>
+
+<p>
+This produces a similar "octagonal helix":
+1a = 1b = 1.1547, alternate ab = true
+</p>
+
     </section>
     <script src="./js/main.js"></script>
 </body>
