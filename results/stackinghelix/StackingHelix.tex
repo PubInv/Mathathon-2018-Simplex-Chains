@@ -452,10 +452,10 @@ The following math in Mathematica may be useful.
 
 Note: Mathematica has build in Vector Angle function that can be used for alpha!!
 
-c = 2 r Sin[theta/2]
+(* c = 2 r Sin[theta/2] *)
 
 Chord[r_,theta_] := 2 r Sin[theta/2]
-1 == c^2 + d^2
+ (* 1 == c^2 + d^2 *)
 DZ[r_,theta_] := Sqrt[1 - Chord[r,theta]]
 (* Note, this may be a problem --- Chord lenght can be diameter (2r), but I am treating it as 1 here *)
 (* Some radiuses are not possible for some thetas with a length of one *)
@@ -476,9 +476,9 @@ Mxr[theta_] := 1/ (2  Sin[theta/2])
 P[n_,r_,theta_] := { r Sin[n theta], r Cos[n theta], n DZ[r,theta]}
 S[n_,r_,theta_] := P[n,r,theta] - P[n+1,r,theta]
 
-Alpha[r_,theta_] := VectorAngle[S[0,r,theta],S[1,r,theta]]
+AlphaC[r_,theta_] := VectorAngle[S[0,r,theta],S[1,r,theta]]
 
-alpha = ArcCos[S0.S1]
+(* alpha = ArcCos[S0.S1] *)
 Solve[alpha == ArcCos[S0.S1], alpha]
 
 f[r_, theta_] := 
@@ -490,13 +490,15 @@ Plot3D[f[r, theta]/ Degree, {r, 0, 2}, {theta, -Pi/6, Pi/6},
  AxesLabel -> Automatic]
 
 
-Plot3D[Alpha[r, theta]/ Degree, {r,0,N[Mxr[Pi]]}, {theta, 0, Pi}, 
+Plot3D[AlphaC[r, theta]/ Degree, {r,0,N[Mxr[Pi]]}, {theta, 0, Pi}, 
  AxesLabel -> Automatic]
 
+(*
 
 Note: Given that we can compute $\alpha$ from $r,\theta$ in this way, one interesting thing to ask
 is simply what is the minimum or maximum r (or theta) that matches an alpha. The maximum r is the
 largest helix that matches, the minimum is the smallest. But with $\psi$ we will know more.
+*)
 
 PlaneNormal[a_, b_] := Normalize[Cross[a, b]]
 
@@ -509,10 +511,11 @@ With[{r = rx,theta = thetax}, Evaluate[Psi[S[0,r,theta],S[1,r,theta],S[2,r,theta
 Plot3D[PsiC[r, theta]/ Degree, {r, 0, N[Mxr[Pi/2]]}, {theta, 0, Pi/2}, 
  AxesLabel -> Automatic]
 
-
+(*
 Note: A strategy for computation is: given alpha, find maximum or minimum radius.
 Then slow change radius until \psi if find.  However, Mathematic has optimization
 built in, so we may be able to use an energy function.
+*)
 
 Enrg[alpha_,psi_,r_,theta_] := (Alpha[r,theta] - alpha)^2 + (PsiC[r,theta] - psi)^2
 
@@ -522,6 +525,10 @@ FindMinimum[Enrg[Pi/10,Pi/10,r,t],{r,t}]
 
 Rx[alpha_,psi_] := r /. FindMinimum[Enrg[alpha,psi,r,t],{r,t}][[2]][[1]]
 Tx[alpha_,psi_] := t /.  FindMinimum[Enrg[alpha,psi,r,t],{r,t}][[2]][[2]]
+
+
+Unprotect[$PerformanceGoal]
+$PerformanceGoal = ``Speed''
 
 Plot3D[Rx[a,p]/Degree, {a,0,Pi/10},{p,0,Pi/10}]
 
@@ -552,6 +559,8 @@ write direction, we would translate  by $z$, in the intrinsic frame of refrence,
 and repeat.
 
 Note, mathematica seems to have a way to render a helix, this would be very useful to me:
+*)
+
 ListPointPlot3D[
 Table[Table[{t, Cos[t + s Pi/2], Sin[t + s Pi/2]}, {t, 0, 
       5 Pi, .2}], {s, 4}], BoxRatios -> Automatic]
@@ -560,12 +569,13 @@ Graphics3D[
 GeometricTransformation[{Hue[#/Pi], Sphere[{5, 0, 0}, 1]}, 
   EulerMatrix[{#, Pi/2, #}]] & /@ Range[0, 2 Pi, Pi/16]]
 
-My claim is that we can somehow combine an EulerTransformation with a translation
+(* My claim is that we can somehow combine an EulerTransformation with a translation
 to end up with a helix.
 
 We can call GeometricTransoforamtion on an Euler matrix, can we pass a vector
 as an object? Can we create an object of length L which is a vector
 and then create a transformation?
+*)
 
 Graphics3D[Arrow[{{1, 1, 1}, {1, -1, 2}}], Axes -> True, 
   AxesLabel -> {"X", "Y", "Z"}, ImageSize -> Large]
@@ -647,6 +657,7 @@ Nest[double,#,4] & Range[3]
 
 (* Now, what we really want to do here, is  construct
 a transform out of \alpha, \pi, ending up with the arrows head to tail
+*)
 
 Clear[ComposeN]
 ComposeN[0] = ScalingTransform[{1,1,1}]
@@ -690,4 +701,58 @@ ComposeN[n_] :=  Composition[ComposeN[Floor[n/2]],ComposeN[Ceiling[n/2]]]
  we may actually be able to accomplish this.
 *)
 
+(* I'm going to try to use F to mean the nth object. *)
+(* We will make the first to points computed from the Helix *)
+F[0,alpha_,psi_,init_] := init
 
+(* We are forced to pass the initial object in as a starting point *)
+F[n_,alpha_,psi_,init_] :=
+  With[{Prev = F[n-1,alpha,psi,init]},
+      With[{
+          A = Part[Prev,1], B = Part[Prev,2], U = Part[Prev,3]},
+        With[{BA = B-A, UA = U-A},
+        (* now we want to contruct the parts of P_n *)
+        Module[{NA,NB,NU,RA,RP,NV},
+          NA = B;
+          V = BA;
+          (* This is in theory spanned by BA, UA *)
+          RA = RotationMatrix[alpha,{BA,UA}];
+          RP = RotationMatrix[psi,BA];
+          NB = RP.RA.V;
+          NU = RP.RA.UA;
+          NB = NB + B;
+          NU = NU + B;
+          {NA,NB,NU}
+    ]
+  ]]]]
+
+  
+  (* F requires an initial object (of three points, A, B Up.) These
+  are essentially P[0],P[1], and P[0] + [0,1,0]. *)
+
+  FTest[n_,alpha_,psi_,r_,theta_] :=
+  With[{P0 = P[0,r,theta]},
+    Part[F[n,alpha,psi,{P0,P[1,r,theta],P0+{0,1,0}}
+      ],1]
+    - P[n,r,theta]]
+    
+  FTest[1,Pi/8,0,1,0]
+
+  FStratTest[k_,alpha_,psi_] :=
+  With[
+    {r = Rx[alpha,psi], t = Tx[alpha,psi], P0 = {0,0,0} },
+    With[{P0 = P[0,r,t], P1 = P[1,r,t]},
+      With[{init = {P0,P1,P0+{0,1,0}}},
+    Print["alpha, psi, r, t ",alpha,", ",psi,", ",r,", ",t Degree];    
+    For[i = 0, i < k, i++,
+      Print["point ",i];
+      Print["P ",P[i,r,t]];
+      Print["F ",Part[F[i,r,t,init],1]]
+      ]
+    ]
+  ]]
+
+  (* Pretty sure this is showing the r is way to small *)
+  FStratTest[4, 10 Degree,10 Degree]
+
+  
