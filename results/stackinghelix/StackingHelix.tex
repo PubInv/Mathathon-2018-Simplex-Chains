@@ -139,7 +139,8 @@ easily measured. The most easily measured relationship between the segments
 is the angle $\alpha$ in the plane containing both of the segments. (If the segments are coincident and therefore
 parallel $\alpha$ will be $\pi$. If $\alpha < \pi/2$, the segment ``bends backward''.
 The final measure that is needed is the rotation about a member between the elements attached to it.
-Let us call this angle $\psi$.
+Let us call this angle $\psi$. That is, if you look along the axis of an object at the line
+between the joints, the two members form an angle between 0 and $\pi /2$. 
 
 
 
@@ -198,7 +199,45 @@ represents rotation about and $T$ represents translation along the $z$-axis, the
 
 \section{Three dimensions}
 
+\subsection{New Approach}
 
+We want to compute everything from properties intrinsic to the object and the joint process.
+These are the length, the face normal vectors, and the joint twist. These are the
+inputs to our process.  From this we can compute several joints by:
+1) Placing the object joint-to-joint aligned along their axes;
+2) Computing from the face angles the rotation that makes the normal to B the
+negative of the normal to A, that is, the rotation that moves A into -B.
+3) Apply this rotation around the joint.
+4) Rotate along the axis until the up vectors match.
+
+The ``Up vectors'' are computed to be in the line between the midpoints of points
+pointed to by the face normals, and the mid point of the axis, projected to be normal
+to that axis.
+
+Using this intrinsic method, we can get as many points as we need of the stacked objects.
+
+From these points, we can easily compute a ``tilt and twist'' approach, which defines
+$\alpha$ as the tilt and $\psi$ as the twist. Those two parameters now become
+an output of this process above.  Not the ``twist'' is measured IN THE PLANE OF
+FACES.
+
+The remaining task is to find an $(r,\theta)$ helix representation that gives us
+what we need.
+
+Conjecture: the twist is the same (or at least monotone in) as $\theta$.
+
+Proof Sketch: Imagine moving so many times around the helix that
+our $(x,y)$ coordinates are similar to your starting point. The up vector
+for this object must point in approximately the same direction as the up axis
+you started with, by symmetry. If $\theta$ is anything other an integral
+factor of the twist, this would be impossible.
+
+Alternative: The up vector at the midpoint of the object must aim at the
+axis of the helix. This must always be true. Therefore, the 
+
+
+
+\subsection{Old Approach}
 
 
 Consider a slender cylinder or prism with two faces $F_0,F_1$ cut at arbitrary angles to the axis of the cylinder.
@@ -442,6 +481,14 @@ Note: This paper may be critical.
 
 \url{https://math.stackexchange.com/questions/878051/why-does-a-3d-line-of-segments-with-constant-angles-always-make-a-helix/878079#878079}
 
+\url{https://www.sciencedirect.com/science/article/pii/S0097849313001787}
+\url{https://www.win.tue.nl/~wstomv/publications/mathmitering-final.pdf}
+\url{https://www.clinbiomech.com/article/S0268-0033(98)00080-1/abstract}
+\url{http://www.close-range.com/docs/Computing_Euler_angles_from_a_rotation_matrix.pdf}
+\url{https://gist.github.com/peteristhegreat/3b76d5169d7b9fc1e333}
+
+
+
 \bibliographystyle{unsrt}
 \bibliography{gluss}
 
@@ -474,12 +521,11 @@ Mxr[theta_] := 1/ (2  Sin[theta/2])
 (* S1 = P1 - P2 *)
 (* S2 = P2 - P3 *)
 P[n_,r_,theta_] := { r Sin[n theta], r Cos[n theta], n DZ[r,theta]}
-S[n_,r_,theta_] := P[n,r,theta] - P[n+1,r,theta]
+S[n_,r_,theta_] := P[n+1,r,theta] - P[n,r,theta]
+
 
 AlphaC[r_,theta_] := VectorAngle[S[0,r,theta],S[1,r,theta]]
 
-(* alpha = ArcCos[S0.S1] *)
-Solve[alpha == ArcCos[S0.S1], alpha]
 
 f[r_, theta_] := 
  ArcCos[-1 + (r - r Cos[theta]) (-r Cos[theta] + r Cos[2 theta]) + 
@@ -501,12 +547,15 @@ largest helix that matches, the minimum is the smallest. But with $\psi$ we will
 *)
 
 PlaneNormal[a_, b_] := Normalize[Cross[a, b]]
+(* Maybe psi is just theta? *)
 
-Psi[p0_, p1_, v_] := 
-With[{n = PlaneNormal[p0, p1]}, ArcSin[(n.v) /(Norm[v] Norm[n])]]
+Psi[pv0_, pv1_, v_] := 
+With[{n = PlaneNormal[pv0, pv1]}, ArcSin[(n.v) /(Norm[v] Norm[n])]]
 
+(* This is computing the angle between planes
 PsiC[rx_,thetax_] := 
 With[{r = rx,theta = thetax}, Evaluate[Psi[S[0,r,theta],S[1,r,theta],S[2,r,theta]]]]
+
 
 Plot3D[PsiC[r, theta]/ Degree, {r, 0, N[Mxr[Pi/2]]}, {theta, 0, Pi/2}, 
  AxesLabel -> Automatic]
@@ -517,15 +566,18 @@ Then slow change radius until \psi if find.  However, Mathematic has optimizatio
 built in, so we may be able to use an energy function.
 *)
 
-Enrg[alpha_,psi_,r_,theta_] := (Alpha[r,theta] - alpha)^2 + (PsiC[r,theta] - psi)^2
+Enrg[alpha_,psi_,r_,theta_] := (AlphaC[r,theta] - alpha)^2 + (PsiC[r,theta] - psi)^2
 
-FindMinimum[Enrg[Pi/10,Pi/10,r,t],{r,t}]
 
 (* These seem to work, but they produce rules, instead of values, what up with that? *)
 
 Rx[alpha_,psi_] := r /. FindMinimum[Enrg[alpha,psi,r,t],{r,t}][[2]][[1]]
 Tx[alpha_,psi_] := t /.  FindMinimum[Enrg[alpha,psi,r,t],{r,t}][[2]][[2]]
 
+(* This should return 2! *)
+(* Is Psi the VectorAngle of the Normals of each ABC joint? *)
+Rx[AlphaC[2, Pi/20], PsiC[2, Pi/20]]
+FindMinimum[Enrg[AlphaC[2, Pi/20], PsiC[2, Pi/20],r,t],{r,t}]
 
 Unprotect[$PerformanceGoal]
 $PerformanceGoal = ``Speed''
@@ -743,7 +795,7 @@ F[n_,alpha_,psi_,init_] :=
     {r = Rx[alpha,psi], t = Tx[alpha,psi], P0 = {0,0,0} },
     With[{P0 = P[0,r,t], P1 = P[1,r,t]},
       With[{init = {P0,P1,P0+{0,1,0}}},
-    Print["alpha, psi, r, t ",alpha,", ",psi,", ",r,", ",t Degree];    
+    Print["alpha, psi, r, t ",alpha,", ",psi,", ",r,", ",t 180 / Pi];    
     For[i = 0, i < k, i++,
       Print["point ",i];
       Print["P ",P[i,r,t]];
@@ -754,5 +806,7 @@ F[n_,alpha_,psi_,init_] :=
 
   (* Pretty sure this is showing the r is way to small *)
   FStratTest[4, 10 Degree,10 Degree]
+
+
 
   
