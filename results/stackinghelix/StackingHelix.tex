@@ -117,32 +117,140 @@ A discrete helix may be thought of as function that given an integer gives back 
    P_z(n) &= n d
 \end{align*}
 
-$d$ is the distance along the $z$-axis between adjacent points, and $\theta$ is the rotation around the $z$-axis between adjacent points. $r$ is the radius of the delix. If we think of the delix as describing a polyline in 3-space, we would like to investgiate
+$d$ is the distance along the $z$-axis between adjacent joints, and $\theta$ is the rotation around the $z$-axis between adjacent points. $r$ is the radius of the delix. If we think of the delix as describing a polyline in 3-space, we would like to investgiate
 the properties of that polyline.
 
 \begin{itemize}
 \item $L$ is the distance between any two adjacent points.
 \item $c$ is the length of a chord formed by the projection of the segment between two points into the $xy$-plane.
-\item $\phi$ is the angle in the plane containing two points which is perpendicular to $xy$-plane
+\item $\phi$ is the angle in the plane containing two joints which is perpendicular to $xy$-plane
   (in other words the plane parallel to the $z$ axis containing two points.)
   \end{itemize}
 These quantities are related:
-\begin{align*}
-    c = 2r\sin{\theta/2} \\
+\begin{align}
+    c &= 2r\sin{\frac{\theta}{2}} \\
     L^2 &= c^2+d^2  \\
-    \arctan{c/d}  &= \phi \\
-\end{align*}
+    \arctan{\frac{c}{d}}  &= \phi 
+\end{align}
 
 Now we are attempting to relate these properties to properties intrinsic to the joint or interface between
 two segments or objects in the delix. If given an object, the length between the joint points $L$ is
-easily measured. The most easily measured relationship between the segments
+easily measured.
+
+\section{The Intrinsic Properties of Stacking Objects}
+
+There seem to be two different approaches to defining the stacking of objects: the point-method,
+and the angle-method.
+
+In the point method we begin with the position of up to four joints in Cartesian space, and
+seek to disover the delix which fits them.
+
+\begin{figure}
+     \centering
+     \includegraphics[width=0.80\textwidth]{figures/ObjectForStackingSetup.png}
+     \caption{The rotatable prism of three objects}
+  \label{fig:intrinsicdiagram}
+\end{figure}
+
+In the angle method, we start with intrinsic properties of an object, and additionally the
+rule for how objects are laid face-to-face. That is, knowing the length between two
+joint points and a vector normal to the faces of the two joints, we almost have
+enough to determine the unique stacking of objects. The final piece is that we must
+know the {\em twist}. That is, when face $A$ of a second objects is placed on face $B$
+of a first object so that they are flush (that is, their normals are in opposite directions),
+it remains the case that the second object can be rotated about the normals. To
+define the joining rule, we must attach an {\em up vector} to each object. Then a joining
+rule is ``place the second object against the first, joint point conincident to joint point,
+and twist it so that its up vector differs by $\tau$ degrees from the up vector of the first
+object.''
+
+It seems clear that either method gives us everything we want to know and is computable
+from the other. In the realm of comptuer graphics, obtaining four points is probably easy.
+In the real of chemistry or molecular biology, where the objects are in fact molecules,
+it might be easier to predict the intrinsic properties of the object and the joint twist
+than to actually construct a three-object stack and measure it, so we consider the angle
+method more basic.
+
+The angle method requires:
+\begin{itemize}
+\item An object with two identified faces, labeled $F_A$ and $F_b$. These faces are in
+  fact planes, with normal vectors $N_A$ and $N_B$. We assume that normals point out
+  of the object rather than in.
+\item The length $L$ of an object, measured from joint point $A$ to joint point $B$.
+\item A joint twist $\tau$ defining the change in computed up-vector between objects,
+  mesured at the joint face.
+\end{itemize}
+
+From the normals, we can compute an {\em up vector} which is intrinsic to the object.
+We could think of the up vector as a fine mark made on each face in the same direction
+(if projected onto a plane perpendicular to the axis.) When face $F_A$ of object $N+1$
+is placed against $F_B$ of object $N$, object $N+1$ is twisted until the mark on $F_A$ angles
+$\tau$ away from the mark on object $N$, measured anticlockwise looking from $A$ to $B$ on
+object $N$.
+
+To define the up vector, place the object so that joint $B$ is at the origin and the
+axis is aligned with the $z$-axis, with the point $A$ on the negative $z$-axis.
+The projection of the face normals form a minimum angle less than or equal to $\pi$
+radians. Rotate the object about the $z$-axis so that the projections of the face normals
+form equal angles with the negative $y$-axis. Then define the direction straight up
+the $y$ axis to be the up vector. If we had a physical object, we might mark the face
+normals with an arrow to mark the up vectors.
+
+If one of the face normals is aligned with object axis, the up-vector is the opposite
+of the other face normal. (If both face normals are aligned with the axis of the object,
+then delix has zero radius and $d = L$, so we need do no further math.)
+
+Mathematically, we will treat the up vector as unit-vector.
+\begin{align}
+  M &= \frac{A+B}{2} \\
+  X &= \frac{(A+F_a) + (B+F_b)}{2} \\
+  U &= \frac{M - X}{\Vert M - X \Vert}
+\end{align}
+
+The up vector is not defined when the face norms point in precisely opposite directions,
+in which case $d = L$.
+
+In the placement of the first object described above, it would
+be nice to know where the position of point $B$ on the second
+object is. This can be obtained by computing the Euler angles
+of the face normal $N_A$ at the origin, and then simply
+adding the negation of the Euler angles $N_B$, and using
+the resulting angles to compute a rotation $R(N_A,N_B)$ to be a applied to
+a vector of length $L$, and then performing the twist by $T(\tau)$. This process can be repeated at
+the point $B_1$ (though no longer at the axis) to generate
+four or more points. In fact the entire process of constructing
+the stack could be thought of a series of ``rotate then translate'' steps by the composition of the rotation matrixes $RT$ applied to a vector $\overline{AB}$ and the up vector.
+However, it is a tiny bit of work to compute this given only
+the intrinsic properties of the object and joint.
+
+TODO: Actually giving the transformation matrix here would be nice.
+How would we test? 
+
+TODO: Compute the vector angle between axes here. In this positioning, compute where
+point B of the second object will be.
+
+Note: The twist is not the same as $\theta$. When $\tau = 0$, $\theta = \alpha$,
+I think. Possible $\theta = \alpha + $ some function of $\tau$.
+
+Note: Possibly theta goes down as tau goes up.
+
+Note: Considering the pitch of the discrete helix may be useful
+in relating variables.
+
+
+\section{Computation of Discrete Helix}
+
+In this section we attempt to derive formulae for $r,d,/theta$ from
+the instrinsic properties of the object.
+
+\section{Old Work}
+
+The most easily measured relationship between the segments
 is the angle $\alpha$ in the plane containing both of the segments. (If the segments are coincident and therefore
 parallel $\alpha$ will be $\pi$. If $\alpha < \pi/2$, the segment ``bends backward''.
 The final measure that is needed is the rotation about a member between the elements attached to it.
 Let us call this angle $\psi$. That is, if you look along the axis of an object at the line
 between the joints, the two members form an angle between 0 and $\pi /2$. 
-
-
 
 \begin{align*}
     A &= P(-1)  \\
@@ -216,6 +324,9 @@ to that axis.
 
 Using this intrinsic method, we can get as many points as we need of the stacked objects.
 
+From these intrinsic property, the vector angle between axes of different objects
+is determined.
+
 From these points, we can easily compute a ``tilt and twist'' approach, which defines
 $\alpha$ as the tilt and $\psi$ as the twist. Those two parameters now become
 an output of this process above.  Not the ``twist'' is measured IN THE PLANE OF
@@ -234,6 +345,29 @@ factor of the twist, this would be impossible.
 
 Alternative: The up vector at the midpoint of the object must aim at the
 axis of the helix. This must always be true. Therefore, the 
+
+TODO: We are still fundamentally seeking $r,\theta$ from these specifications.
+A formula for that is of the utmost importance.
+
+Note: If the up vectors intersect the axis of the helix, we can find two
+points on this line using the wikipedia article: \url{https://en.wikipedia.org/wiki/Skew_lines}
+and the distance between these two points. This will allow us to find $r$, I think.
+
+Using the method from skewlines to find two nearest points, we can then solve for
+the distance between this line and $A$ or $B$ and we have $r$.
+
+So, the way to test this is to generate a helix. Use the helix to generate
+the midpoints and up vectors. Then at least check that we can back out and
+obtain our same radius and theta for the delix.  Then the problem becomes the
+computation of the points and up vectors from the intrinsic properties of the block,
+which I believe to be possible.  Which should I attack first?
+
+Let us first prove that given 3 points and two up vectors we can recover the helix.
+
+When we have a Mathematica procedure for that, then we can generate these inputs
+from the object inputs of $L,\overline{A},\overline{B}$,and twist.
+
+Is twist the same as theta? No, it is not---but they are related by $/phi$.
 
 
 
@@ -808,5 +942,53 @@ F[n_,alpha_,psi_,init_] :=
   FStratTest[4, 10 Degree,10 Degree]
 
 
+  (* now attempting to compute the transformation matrix
+  that transforms {A,B,U},{L,N_A,N_B, Tau} into the next A,B,U.
+  M = W . R . T , where W is the twist, R is the rotation,
+  and T is the translation. We can test this by using a synthetic delix to generate points and up vectors and test against that.
+  *)
+
+  (* I first need to build and test a simple Skew test.
+  I want a function that yields the closest points on two skew lines,
+  defined by vectors. *)
+
+  Skew[p1_,d1_,p2_,d2_] := (* p1(2) is a point on line with direction d1(2),
+  result is a vector containg C1 and C2, nearest points on those lines. 
+  from: https://en.wikipedia.org/wiki/Skew_lines *)
+  With[{n2 = Cross[d2,Cross[d1,d2]],
+      n1 = Cross[d1,Cross[d1,d2]]},
+    With[{C1 = p1 + (((p2-p1) . n2)/ (d1 . n2)) d1,
+          C2 = p2 + (((p1-p2) . n1)/ (d2 . n1)) d2},
+      {C1,C2}]]
+
+  TestSkew[] :=
+  With[{xp1 = {2,0,0}, xd1 = {1,0,0},
+      yp1 = {1,5,1}, yd1 = {0,2,0}},
+    Skew[xp1,xd1,yp1,yd1]]
+
+  (* Now we could try a 3-point test. We take the
+  first 3 points of our delix and then compute the mid-points,
+  and try to find r by treating these as skew lines with
+  closes intersections. *)
+
+  M[n_,r_,theta_] := (* midpoint of Pn-1, Pn+1 *)
+  (P[n-1,r,theta]+P[n+1,r,theta])/2
+
+  AngelBi[n_,r_,theta_] := (* unit angle bisector *)
+ Normalize[M[n,r,theta] - P[n,r,theta]]
+
+ (* This does not return the radius, it returns d, the travel *)
+  Test3PointTheory[k_,r_,theta_] :=
+  With[{D0 = N[AngelBi[k,r,theta]],
+      D1 = N[AngelBi[k+1,r,theta]]},
+    Print[D0]
+    Print[D1]
+    Print[357]
+    With[{CS = Skew[P[k,r,theta],D0,P[k+1,r,theta],D1]},
+      Print[CS]
+      Print[3333333333333]
+      Norm[Part[CS,1] - Part[CS,2]]
+  ]]
+  
 
   
