@@ -145,6 +145,9 @@ and the angle-method.
 In the point method we begin with the position of up to four joints in Cartesian space, and
 seek to disover the delix which fits them.
 
+By using the the basic fact that the points nearest each other on the skew lines drawn between a point and the midpoint between its two
+adjacent points intersect the axis of the helix and are easily computed, it is relatively easy to compute $r,d,\theta$ from four points.
+
 \begin{figure}
      \centering
      \includegraphics[width=0.80\textwidth]{figures/ObjectForStackingSetup.png}
@@ -223,6 +226,11 @@ the stack could be thought of a series of ``rotate then translate'' steps by the
 However, it is a tiny bit of work to compute this given only
 the intrinsic properties of the object and joint.
 
+Note: we have shown we can compute from 4 points.
+More elegant however, would be to construct a similar
+construction using the axis-intersecting lines without
+computing 4 points, perhaps from a pure geometry in some way.
+
 TODO: Actually giving the transformation matrix here would be nice.
 How would we test? 
 
@@ -236,6 +244,27 @@ Note: Possibly theta goes down as tau goes up.
 
 Note: Considering the pitch of the discrete helix may be useful
 in relating variables.
+
+Note: I now think we can think in terms of the skew lines (the
+joint lines), and I believe $\tau$ is directly the angle
+formed with the up vector, that the up-vector aims at
+the mid point of the axis between the intersection skew line
+points, and that angle bend $\alpha$ (or $(\pi - alpha)/2$)
+let's us determine the skew line as well.  So we have
+the mid point, and we have another line based purely
+on $\tau$ and $\alpha$, so that may allow $\theta$
+to be computed more simply than the skew line intersection
+construction.
+
+Todo: Try to do my 4-point solution with an Midpoint and
+upvector solution.
+
+Todo: Try to prove that $\tau$ is really either the
+angle bisector angle or twice it.
+
+Todo: Create a definition of the ``sidedness'' of delix,
+in terms of the number of sides in one pitch, and relate
+this matehmatically to the other points.
 
 
 \section{Computation of Discrete Helix}
@@ -978,6 +1007,43 @@ F[n_,alpha_,psi_,init_] :=
  Normalize[M[n,r,theta] - P[n,r,theta]]
 
  (* This does not return the radius, it returns d, the travel *)
+ (* If we made this a function of 4 points instead, then
+ this would be independent of the current defintion of our
+ test delix.*)
+
+ (* This seems to work. So if we can compute 4 points
+ by virtue of the transform, we can probably compute d (z travel).
+ However, the two points should let us go further. Since
+ they lie on the axis plane, we can compute theta by projecting
+ onto the plane normal to this line. Or just translate
+ the points along this angle and then call VectorAngle.
+
+ 
+ *)
+ ComputeAxisPointsFrom4[ps_] := (* Input is a vector of four points *)
+ With[{P0 = Part[ps,1],
+     P1 = Part[ps,2],
+     P2 = Part[ps,3],
+     P3 = Part[ps,4]},
+ With[{M1 = (P0+P2)/2,
+     M2 = (P1+P3)/2},
+   With[{B1 = Normalize[M1-P1],
+       B2 = Normalize[M2-P2]},
+     With[{Sk = Skew[P1,B1,P2,B2]},
+       With[{C1 = Part[Sk,1],
+             C2 = Part[Sk,2]},
+         Print[N[VectorAngle[P1 - C1, P2 -C2]]]
+         Sk
+     ]]]]]
+
+TestAxisPoint[k_,r_,theta_] :=
+   With[{P0 = P[k,r,theta],
+       P1 = P[k+1,r,theta],
+       P2 = P[k+2,r,theta],
+       P3 = P[k+3,r,theta]},
+     With[{CS = ComputeAxisPointsFrom4[{P0,P1,P2,P3}]},
+      Norm[Part[CS,1] - Part[CS,2]]]]       
+ 
   Test3PointTheory[k_,r_,theta_] :=
   With[{D0 = N[AngelBi[k,r,theta]],
       D1 = N[AngelBi[k+1,r,theta]]},
