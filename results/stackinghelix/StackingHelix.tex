@@ -60,6 +60,9 @@ After some relfeciton, it became clear that any stack of objects of the same len
 A specific example is a face-to-face connection of physical objects of the same length where the angles of the two joining
 faces relative to each other control the angle and rotation of the axis at each joint. We have not yet found this simple idea articulated elsewhere. The purpose of this paper is to prove and to provide formulae for the resulting helix.
 
+In engineering, sometimes the term ``special helix'' is use for helical curves on non-cylindrical surfaces. This paper use the term ``helix'' only in the sense of ``cylindrical helix''.
+\url{https://link.springer.com/chapter/10.1007/978-94-007-2169-2_95}
+
 \section{A Warm-up: 2Dimensions}
 
 Considering the problem in two dimensions may be a valuable introduction.
@@ -649,7 +652,36 @@ Note: This paper may be critical.
 \url{https://www.clinbiomech.com/article/S0268-0033(98)00080-1/abstract}
 \url{http://www.close-range.com/docs/Computing_Euler_angles_from_a_rotation_matrix.pdf}
 \url{https://gist.github.com/peteristhegreat/3b76d5169d7b9fc1e333}
+\url{https://link.springer.com/chapter/10.1007/978-94-007-2169-2_95}
+\url{https://www.sciencedirect.com/science/article/pii/S0022309303008573}
+\url{https://www.sciencedirect.com/science/article/pii/S0022309307005583}
 
+This reference is EXTREMELY IMPORTANT
+\url{https://link.springer.com/article/10.1023/A:1015863923728}
+\url{https://www.researchgate.net/publication/226976531_Helical_Structures_The_Geometry_of_Protein_Helices_and_Nanotubes}
+This reference clearly states that any repetitive unit gives rise to a helix, and gives some species: the icosahelix, for example, and gives a 96-tet ring (not quite regular, like this work.)  It gives a linear algebra way of talking about the transform. It does implies the helix is deducible from the transformation matrix, but does not appear to give any formular or method for describing it.
+
+Need to get and read this:
+\url{https://books.google.com/books?hl=en&lr=&id=1LZlSZ7ORrQC&oi=fnd&pg=PP1&ots=0hSEwJvlUB&sig=xNG9UWv_H1OXHwaOiOBJN7TW6xA#v=onepage&q&f=false}
+
+This may be worth reading:
+\url{https://link.springer.com/article/10.1007/PL00011063}
+
+This is worth getting:
+\url{https://books.google.com/books?hl=en&lr=&id=FHPlDWvz1bEC&oi=fnd&pg=PP1&ots=TsOnodavEZ&sig=HO86UUVlqRVWGqY-Tv02nb7x7NA#v=onepage&q&f=false}
+
+Some discussion of ``screw transformations''
+\url{http://dergipark.gov.tr/download/article-file/56483}
+\url{https://ieeexplore.ieee.org/document/56653}
+
+CRITICAL:
+\url{https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=56653}
+
+This mentions Rodrigues's equation (p. 7)
+\url{https://www.cc.gatech.edu/~hic/8803-Mobile-08/slides/1_draft.pdf}
+
+This is a valuable reference
+\url{http://www.12000.org/my_notes/screw_axis/index.htm}
 
 
 \bibliographystyle{unsrt}
@@ -671,6 +703,7 @@ DZ[r_,theta_] := Sqrt[1 - Chord[r,theta]]
 (* Some radiuses are not possible for some thetas with a length of one *)
 (* Maximum radius as a function of theta *)
 Mxr[theta_] := MaxValue[1 == 2 r Sin[theta/2],{r}]
+
 Mxr[theta_] := 1/ (2  Sin[theta/2])
 
 
