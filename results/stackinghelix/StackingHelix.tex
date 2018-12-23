@@ -177,6 +177,8 @@ rule is ``place the second object against the first, joint point conincident to 
 and twist it so that its up vector differs by $\tau$ degrees from the up vector of the first
 object.''
 
+
+
 It seems clear that either method gives us everything we want to know and is computable
 from the other. In the realm of comptuer graphics, obtaining four points is probably easy.
 In the real of chemistry or molecular biology, where the objects are in fact molecules,
@@ -188,7 +190,7 @@ The angle method requires:
 \begin{itemize}
 \item An object with two identified faces, labeled $F_A$ and $F_b$. These faces are in
   fact planes, with normal vectors $N_A$ and $N_B$. We assume that normals point out
-  of the object rather than in.
+  of the object rather than in. The angles in the method may be considered the angles of the face diagonals of the axis-aligned cuboid whose body digaonal is the vector normal.
 \item The length $L$ of an object, measured from joint point $A$ to joint point $B$.
 \item A joint twist $\tau$ defining the change in computed up-vector between objects,
   mesured at the joint face.
@@ -275,6 +277,20 @@ angle bisector angle or twice it.
 Todo: Create a definition of the ``sidedness'' of delix,
 in terms of the number of sides in one pitch, and relate
 this matehmatically to the other points.
+
+\subsection{New Insight}
+
+Having arranged the objects as in our diagrams and identified the ``prism'' formation,
+it becomes clear that we can operate in the projection plane ($XZ$).
+This allows considerable simplication.
+
+Our basic plan is to contruct the midpoint near $F$, $M_F$, which is
+in fact the midpoint of $E$ and $G$. The line hits the axis
+of the helix perpendicularly. The midpoint of $E$ adn $F$ also
+hits this axis line, (and is the origin of the $XZ$ plane.)
+Therefore, if we find the perpendicular distance from the the $\overline{F,M_F}$
+line to the origin, we can easily compute the distance $d$ along the axis,
+which will be slightly less than $L$. 
 
 
 \section{Computation of Discrete Helix}
@@ -1096,5 +1112,20 @@ TestAxisPoint[k_,r_,theta_] :=
       Norm[Part[CS,1] - Part[CS,2]]
   ]]
   
+  (* Now beginning simple work on face diagonals *)
 
+  Zf[w_,r_] := 1/Sqrt[1 + Tan[r]^2 + Tan[w]^2]
+  Xf[w_,r_] :=
+  With[{z = Zf[w,r]},
+    z Tan[r]]
+  Yf[w_,r_] :=
+  With[{z = Zf[w,r]},
+    z Tan[w]]
+
+  TestXYZ[w_,r_] :=
+  With[{ z = Zf[w,r], y = Yf[w,r], x = Xf[w,r]},
+    Print N[Norm[{x,y,z}]]
+    ]
+  
+  
   
