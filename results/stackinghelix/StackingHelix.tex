@@ -142,14 +142,34 @@ easily measured.
 
 \section{The Intrinsic Properties of Stacking Objects}
 
-There seem to be two different approaches to defining the stacking of objects: the point-method,
-and the angle-method.
+If we are given a physical or mathematical object that stacks,
+the faces may be specified by a normal vector or by the
+angles of the face relative to the axis. The normal vector
+is a more linear-algebraic approach; the face angles may be more
+natural to chemists and mechanical engineers. Since
+the two methods are interchangable, it is largely a matter of
+convenience. However, we seek specifically to develop a formula
+which allows helices to be designed, and the face-angle approach
+seems more suited to the carpenter grasping a hand saw or the
+molecular biologist designing a molecule.
 
-In the point method we begin with the position of up to four joints in Cartesian space, and
-seek to disover the delix which fits them.
+As shown in figures \href{fig:intrinsicdiagram} and \href{fig:jointdiagram},
+We place a joint point on each face, and call these points $A$ and $B$.
+We define the axis of the object as $\overline{AB}$. Imagine the
+object placed on the $z$ axis in a right-handed coordinate system, so that
+$A$ is in the negative $z$ direction and $B$ is at the origin. Then
+the cut of the $B$ face can be described by two angles. $\alpha$ is the
+angle in the $XZ$ plane, and $\beta$ is the angle in the $YZ$ plane.
+In other words, if a box or cuboid were drawn with three edges aligned
+with the axis and at the origin, and the vector defining the face-normal
+defined the diagonal of the box or cuboid, $\alpha$ is the angle with the $z$-axis
+of the
+face diagonal in the $XZ$ plane (or the projection of the body diagonal
+into that plane), and $\beta$ is the angle of the $z$-axis with the $YZ$-plane.
 
-By using the the basic fact that the points nearest each other on the skew lines drawn between a point and the midpoint between its two
-adjacent points intersect the axis of the helix and are easily computed, it is relatively easy to compute $r,d,\theta$ from four points.
+The face angles for $A$ are denoted $\alpha_A, \beta_A$, and likewise
+the independent face angles for $B$ are $\alpha_B, \beta_B$.
+
 
 \begin{figure}
      \centering
@@ -165,7 +185,10 @@ adjacent points intersect the axis of the helix and are easily computed, it is r
   \label{fig:jointdiagram}
 \end{figure}
 
-In the angle method, we start with intrinsic properties of an object, and additionally the
+
+
+
+In the angle method, we start with these intrinsic properties of an object, and additionally the
 rule for how objects are laid face-to-face. That is, knowing the length between two
 joint points and a vector normal to the faces of the two joints, we almost have
 enough to determine the unique stacking of objects. The final piece is that we must
@@ -177,14 +200,37 @@ rule is ``place the second object against the first, joint point conincident to 
 and twist it so that its up vector differs by $\tau$ degrees from the up vector of the first
 object.''
 
+\subsection{Relating Face Angles to Face Normal}
+
+Although intercomputable, we certainly want to be able to compute
+the coordinates or the point $B_1$ (the joint point of the second object),
+or equivalently, the axis vector of the second object.
+
+This depends not solely on one face, but on how they combine, and in
+particular how they combine via the twist $\tau$. We use $\omega$ and $\rho$
+to capture this combination.
+\begin{align}
+  \omega &= \alpha_B + \alpha_A \cos{\tau} + \beta_A \sin{\tau} \\
+  \rho &= \beta_B + \beta_A \cos{\tau}  + \alpha_A \sin{\tau}
+\end{align}
+
+Given these angles and treating them as face diagonals,
+we can find the position of point $A_1$ via:
+
+\begin{align}
+  z &= \frac{L}{\sqrt{1 + \tan{\omega} + \tan{\rho}}}  \\
+  A[1]_x &= z \tan{\rho} \\
+  A[1]_y &= z \tan{\omega} \\
+  A[1]_z &= z
+\end{align}
+
+Possibly due to my lack of imagination, these coordinates
+will become the basis of the formulae for $r,d$, and $\theta$
+in the discrete helix.
 
 
-It seems clear that either method gives us everything we want to know and is computable
-from the other. In the realm of comptuer graphics, obtaining four points is probably easy.
-In the real of chemistry or molecular biology, where the objects are in fact molecules,
-it might be easier to predict the intrinsic properties of the object and the joint twist
-than to actually construct a three-object stack and measure it, so we consider the angle
-method more basic.
+
+
 
 The angle method requires:
 \begin{itemize}
