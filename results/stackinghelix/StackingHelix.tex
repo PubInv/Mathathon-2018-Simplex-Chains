@@ -1215,8 +1215,8 @@ F[n_,alpha_,psi_,init_] :=
   Skew[p1_,d1_,p2_,d2_] := (* p1(2) is a point on line with direction d1(2),
   result is a vector containg C1 and C2, nearest points on those lines. 
   from: https://en.wikipedia.org/wiki/Skew_lines *)
-  With[{d12 = N[Cross[d1,d2]],
-      d21 = N[Cross[d2,d1]]},
+  With[{d12 = Cross[d1,d2],
+      d21 = Cross[d2,d1]},
 (*    Print[N[d1]]
     Print[N[d2]]
     Print[N[d12]]
@@ -1236,6 +1236,7 @@ F[n_,alpha_,psi_,init_] :=
 (*    Print[N[C1]]
     Print[N[C2]]
     Print[999999999999999] *)
+    (* For unknown perforance reasons, I have to force evaluation to a number here *)
       {N[C1],N[C2]}]]]
 
   TestSkew[] :=
@@ -1440,6 +1441,10 @@ RhoOmegaFromRTheta[r_,theta_] :=
 
 
  (* This routine generates 4 symmetric points on the Z axis matching the input values. *)
+ (* To test this is sensible, I really should be able to invert it---that is,
+ To find an r,theta parametrization that matches the L,rho,omega parametrization.
+ Of course, in a ense, that is what we are trying to do entirely---so why not back out with my other
+ computations? *)
  Generate4Points[L_,rho_,omega_] :=
  With[{
      B = {0,0,-L/2},
@@ -1464,19 +1469,17 @@ RhoOmegaFromRTheta[r_,theta_] :=
 
  (* In typical cases Skew is hanging below.
  I don't even know a mechanism by which that should be possible. *)
- ComputeD[A_,B_,C_,D_] :=
+ ComputeDR[A_,B_,C_,D_] :=
   With[{Bb = Bisector[A,B,C],
       Cb = Bisector[B,C,D]},
-(*    Print[N[Bb]]
-    Print[N[Cb]]
-    Print[N[B]]
-    Print[N[C]]
-    Print[888888888888888]    *)
     With[{CS = Skew[B,Bb,C,Cb]},
-(*      Print[4444444]
-      Print[N[CS]] *)
-      Norm[Part[CS,1] - Part[CS,2]]
+      {Norm[Part[CS,1] - Part[CS,2]],
+       Norm[Part[CS,1] - B]}
   ]]
+
+  ComputeD[A_,B_,C_,D_] :=
+  Part[ComputeDR[A,B,C,D],1]
+ 
 
   TestComputeD[r_,theta_] :=
   With[{
@@ -1536,4 +1539,54 @@ RhoOmegaFromRTheta[r_,theta_] :=
       },
    ComputeD[A,B,C,D]]]
 
+
+  
+  (* Full test computation: Given rho,omega, compute r, theta,
+  and see that it matches.
+  1) Starting with r, theta, generate rho, omega, L.
+  2) from rho, omega, L, generate 4 points
+  3) Compute D from this.
+  5) Use basic formulae to compute r,theta.
+  *)
+
+  (* Given the cord length, how do I compute R? *)
+  ChordFromLD[L_,D_] := Sqrt[L^2 - D^2]
+  ThetaFromRC[R_,C_] :=
+  2 ArcSin[C/(2R)]
+
+
+  (* Return basic helix params: r, theta, d, c *)
+GetHelixParams[L_,rho_,omega_] :=
+     With[{abcd = Generate4Points[L, rho, omega]},
+        With[{
+            A = Part[abcd,1],
+            B = Part[abcd,2],
+            C = Part[abcd,3],
+            D = Part[abcd,4]
+          },
+          With[{dr = ComputeDR[A,B,C,D]},
+            With[{di = Part[dr,1],
+                r = Part[dr,2]},
+              With[{
+                  c = ChordFromLD[L,di]},
+                With[{ theta2 = ThetaFromRC[r,c]},
+                  {r,theta2,di,c}
+                  ]]]]]]
+  
+  TestComputeDagainstROmega[rad_,theta_] :=
+  With[{ L = Len[rad,theta],
+      ro = RhoOmegaFromRTheta[rad,theta]},
+    On[Assert];
+    With[{
+        rho = Part[ro,1],
+        omega = Part[ro,2]},
+      With[{ hp = GetHelixParams[L,rho,omega]},
+        With[{ r = Part[hp,1],
+            theta2 = Part[hp,2]},
+          Print[theta2 180 / Pi]
+          Assert[Abs[theta2 - theta] < 0.00001];
+          Assert[Abs[r - rad] < 0.00001];          
+          Off[Assert];
+          ]]]]
+            
   
