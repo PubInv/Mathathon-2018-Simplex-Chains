@@ -1590,3 +1590,151 @@ GetHelixParams[L_,rho_,omega_] :=
           ]]]]
             
   
+  (* One way to try to solve this is to fold into
+  one function, then use symmetries and zeroes there
+  to simplify.)
+
+  (* This is an intermediate point with the bisector operations
+  unfolded *)
+  UnifiedComp0[L_,rho_,omega_] :=
+  With[{
+      B = {0,0,-L/2},
+      C = {0,0,L/2},
+      q = QFromRhoOmega[L,rho,omega]
+    },
+    With[{ x = q Tan[omega],
+        y = q Tan[rho]},
+      With[{
+          A = {-x,y,-(L/2 + q)},
+          D = {x,y,(L/2 + q)},
+          Bb = {x/2,-y/2,(q-L)/2},
+          Cb = {-x/2,-y/2,(L-q)/2}},
+        With[{CS = Skew[B,Bb,C,Cb]},
+            With[{
+            dr = {Norm[Part[CS,1] - Part[CS,2]],
+            Norm[Part[CS,1] - B]}},
+              With[{di = Part[dr,1],
+                  r = Part[dr,2]},
+                With[{
+                    c = ChordFromLD[L,di]},
+                  With[{ theta2 = ThetaFromRC[r,c]},
+                    {r,theta2,di,c}
+      ]]]]]]]]
+
+
+  (* Now I attempt to unfold the Skew *)
+  UnifiedComp1[L_,rho_,omega_] :=
+  With[{
+      B = {0,0,-L/2},
+      C = {0,0,L/2},
+      q = QFromRhoOmega[L,rho,omega]
+    },
+    With[{ x = q Tan[omega],
+        y = q Tan[rho]},
+      With[{
+          A = {-x,y,-(L/2 + q)},
+          D = {x,y,(L/2 + q)},
+          Bb = {x/2,-y/2,(q-L)/2},
+          Cb = {-x/2,-y/2,(L-q)/2}},
+        With[{BbXCb = N[Cross[Bb,Cb]],
+            CbXBb = N[Cross[Cb,Bb]]},
+          With[{n2 = N[Cross[Cb,BbXCb]],
+              n1 = N[Cross[Bb,CbXBb]],
+              Bbz = Part[Bb,3],
+              Cbz = Part[Cb,3]},            
+            (* Note: C-B exist only in z dimesion! *)
+         With[{CmBz = Part[C-B,3],
+             BmCz = Part[B-C,3],
+             n2z = Part[n2,3],
+             n1z = Part[n1,3]
+           },
+(*           Print[555555555]
+           Print[(C-B) . n2]
+           Print[(CmBz)  n2z]           
+           Print[B-C]*)
+(*          With[{CmBz = L,
+                BmCz = -L
+             },
+             *)
+            (* Note: this dot product can be replaced with a
+            z multiple, since the other terms are zero *)
+(*              With[{C1 = B + (((C-B) . n2)/ (Bb . n2)) Bb,
+                C2 = C + (((B-C) . n1)/ (Cb . n1)) Cb},*)
+              (* But that allows us to cancel out... *) 
+              With[{C1 = B + ((CmBz  n2z)/ (Bb . n2)) Bb,
+                  C2 = C + ((BmCz  n1z)/ (Cb . n1)) Cb}, 
+(*              With[{C1 = B + (L / Bbz ) Bb,
+                    C2 = C + (-L / Cbz) Cb}, *)
+(* But that can be furher simplied... *)                  
+(*               With[{C1 = B + (2 L / (q-L) ) Bb,
+                  C2 = C + (2 L / (q-L)) Cb}, *)
+                    (* And then decomposed.... *)
+ (*                   With[{S = 2 L / (q - L)},
+                      With[{C1 = B + S Bb,
+                          C2 = C + S Cb},
+                        *)
+                        With[{ CS = 
+                            {N[C1],N[C2]}},
+                          With[{
+                              dr = {Norm[Part[CS,1] - Part[CS,2]],
+                                Norm[Part[CS,1] - B]}},
+                            With[{di = Part[dr,1],
+                                r = Part[dr,2]},
+                              With[{
+                                  c = ChordFromLD[L,di]},
+                                With[{ theta2 = ThetaFromRC[r,c]},
+                                  {r,theta2,di,c}
+          ]]]]]]]]]]]]
+
+N[UnifiedComp1[1, Pi/10, Pi/30]]
+
+
+
+  UnifiedComp2[L_,rho_,omega_] :=
+  With[{
+      B = {0,0,-L/2},
+      C = {0,0,L/2},
+      q = QFromRhoOmega[L,rho,omega]
+    },
+    With[{ x = q Tan[omega],
+        y = q Tan[rho]},
+      With[{
+          A = {-x,y,-(L/2 + q)},
+          D = {x,y,(L/2 + q)},
+          Bb = {x/2,-y/2,(q-L)/2},
+          Cb = {-x/2,-y/2,(L-q)/2}},
+        With[{BbXCb = N[Cross[Bb,Cb]],
+            CbXBb = N[Cross[Cb,Bb]]},
+          With[{n2 = N[Cross[Cb,BbXCb]],
+              n1 = N[Cross[Bb,CbXBb]]
+            },            
+            With[{
+             n2z = Part[n2,3],
+             n1z = Part[n1,3]
+              },
+              Print[n2]
+              With[{C1 = B + ((L  n2z)/ (Bb . n2)) Bb,
+                  C2 = C + ((-L  n1z)/ (Cb . n1)) Cb}, 
+                        With[{ CS = 
+                            {N[C1],N[C2]}},
+                          With[{
+                              dr = {Norm[Part[CS,1] - Part[CS,2]],
+                                Norm[Part[CS,1] - B]}},
+                            With[{di = Part[dr,1],
+                                r = Part[dr,2]},
+                              With[{
+                                  c = ChordFromLD[L,di]},
+                                With[{ theta2 = ThetaFromRC[r,c]},
+                                  {r,theta2,di,c}
+          ]]]]]]]]]]]]
+
+
+
+
+
+
+
+
+
+
+  
