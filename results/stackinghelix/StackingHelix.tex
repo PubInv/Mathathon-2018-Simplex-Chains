@@ -21,6 +21,7 @@
 \newtheorem{exercise}{Exercise}
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
+\newtheorem{conjecture}{Conjecture}
 
 \SetWatermarkText{DRAFT}
 \SetWatermarkScale{6}
@@ -200,6 +201,17 @@ rule is ``place the second object against the first, joint point conincident to 
 and twist it so that its up vector differs by $\tau$ degrees from the up vector of the first
 object.''
 
+\begin{itemize}
+\item An object with two identified faces, labeled $F_A$ and $F_b$. These faces are in
+  fact planes, with $\alpha_A, \beta_A, \alpha_B, \beta_B$, specifying the
+  angular separation of the normal from the $XZ$ and $YZ$ planes. We assume that normals point out
+  of the object rather than in. The angles in the method may be considered the angles of the face diagonals of the axis-aligned cuboid whose body digaonal is the vector normal.
+\item The length $L$ of an object, measured from joint point $A$ to joint point $B$.
+\item A joint twist $\tau$ defining the change in computed up-vector between objects,
+  mesured at the joint face.
+\end{itemize}
+
+
 \subsection{Relating Face Angles to Face Normal}
 
 Although intercomputable, we certainly want to be able to compute
@@ -213,14 +225,16 @@ to capture this combination.
   \omega &= \alpha_B + \alpha_A \cos{\tau} + \beta_A \sin{\tau} \\
   \rho &= \beta_B + \beta_A \cos{\tau}  + \alpha_A \sin{\tau}
 \end{align}
+$\omega$ is the rotation about the $y$-axis,
+$\rho$ is the rotation about the $x$-axis.
 
 Given these angles and treating them as face diagonals,
 we can find the position of point $A_1$ via:
 
 \begin{align}
-  z &= \frac{L}{\sqrt{1 + \tan{\omega} + \tan{\rho}}}  \\
-  A[1]_x &= z \tan{\rho} \\
-  A[1]_y &= z \tan{\omega} \\
+  z &= \frac{L}{\sqrt{1 + \tan^2{\omega} + \tan^2{\rho}}}  \\
+  A[1]_x &= z \tan{\omega} \\
+  A[1]_y &= z \tan{\rho} \\
   A[1]_z &= z
 \end{align}
 
@@ -228,19 +242,128 @@ Possibly due to my lack of imagination, these coordinates
 will become the basis of the formulae for $r,d$, and $\theta$
 in the discrete helix.
 
+\subsection{Observations}
 
+Having related the face angles to positions of the points directly connected
+to an object on the $z$-axis with a joint at the orign, it now becomes more
+convenient to think of the object's midpoint as placed at the origin.
 
-
-
-The angle method requires:
+In the derivations below, we rely on certain facts about
+the discrete helix formed by the stack of objects:
 \begin{itemize}
-\item An object with two identified faces, labeled $F_A$ and $F_b$. These faces are in
-  fact planes, with normal vectors $N_A$ and $N_B$. We assume that normals point out
-  of the object rather than in. The angles in the method may be considered the angles of the face diagonals of the axis-aligned cuboid whose body digaonal is the vector normal.
-\item The length $L$ of an object, measured from joint point $A$ to joint point $B$.
-\item A joint twist $\tau$ defining the change in computed up-vector between objects,
-  mesured at the joint face.
+\item Without loss of generality, we may think of any member whoses faces
+  and twist generate a non-degenerate helix as being ``above'' the
+  axis of the helix. We furthermore choose to place the object in
+  this figure so that $G_y = H_y$, that is, that the members are symmetrix
+  about the $z$-axis. 
+  
+\item Every joint ($E,F,G,H$) is the same distance $r$ from the axis of the helix.
+\item Every member is in the same angular relation to the axis of the helix.
+\item Since every member cuts across a cylinder around the axis,
+  the midpoint of every memeber is the same distance from the axis
+  which is general a little a less than $r$. In particular the midpoint $M$
+  whose closest point on the helix axis $m$ is on the $y$-axis and
+  $\overline{Mm} < \overline{Ff}$.
+\item The points ($e,f,g,h$) on the axis closest to the joints ($E,F,G,H$)
+  are eqidistant about the axis and centered about the $y$-axis. In
+  particular, $\overline{fm} = \overline{gm}$
 \end{itemize}
+
+From the obeservations that $\overline{Ff} = \overline{Gg}$,
+$\overline{fm} = \overline{mg} $, and
+ we concluded that the helix axis is in a plane
+parallel to the $XZ$-plane, it intersects the $y$-axis, but in general is
+not parallel to the $z$-axis. (Note: this assertion requires a formal proof. I can't quite produce a short proof yet.)
+
+From these observations we may state a fundamental fact:
+
+\begin{conjecture}
+  The angle bisectors of each joint are in general skew and are closest
+  at the axis of helix.
+\end{conjecture}
+
+The conjecture allows us to use the standard linear algebra formula for
+computing the closest points of two skew lines to find two points on the
+axis of the helix. The distances between these points is $d$, and the
+distances between these points ad the joints is $r$.
+
+Following the \url{https://en.wikipedia.org/wiki/Skew_lines}, we calculate:
+
+\begin{align}
+  \overline{X} &= \overline{F} + \lambda(\overline{F} - \overline{M_{FH}} \\
+  \overline{Y} &= \overline{G} + \lambda(\overline{F} - \overline{M_{FH}}  
+\end{align}
+
+\begin{figure}
+     \centering
+     \includegraphics[width=0.80\textwidth]{figures/TwoAngleDiagram.png}
+     \caption{Three Members}
+  \label{fig:threemembersdiagram}
+\end{figure}
+
+Wolfram Alpha provides that:
+\begin{align}
+  \sin{\arctan{x}} &= \frac{x}{x^2 + 1}
+\end{align}
+Whe we can reasonably hope to use to produce a simplified form of
+$d$.
+
+From our previous calculations based on face angles, we can
+concluded that:
+
+\begin{align}
+  q &= \frac{L}{\sqrt{1 + \tan^2{\omega} + \tan^2{\rho}}}  \\
+  L &= \frac{\sqrt{1 + \tan^2{\omega} + \tan^2{\rho}}}{q}  \\  
+  H_x &= q \tan{\omega} \\
+  H_y &= q \tan{\rho} \\
+  H_z &= q + \frac{L}{2}
+\end{align}
+
+Combining with the simple fact that:
+\begin{align}
+  F_x &= 0 \\
+  F_y &= 0  \\
+  F_z &= - \frac{L}{2}
+\end{align}
+
+We conclude that:
+\begin{align}
+  q &= \frac{L}{\sqrt{1 + \tan^2{\omega} + \tan^2{\rho}}}  \\  
+  M^{fh} &= \frac{F + H}{2} \\
+  M^{fh}_x &= \frac{q \tan{\omega}}{2} \\
+  M^{fh}_z &= q \\
+  G_z &= L/2 \\
+\end{align}
+
+And therefore:
+
+\begin{align}
+  \chi &= \arctan{\frac{\frac{q \tan{\omega}}{2}}{L/2 - q}} \\
+  \chi &= \arctan{\frac{\frac{q \tan{\omega}}{2}}{\frac{L - 2q}{2}}} \\
+  \chi &= \arctan{\frac{q \tan{\omega}}{L - 2q}} \\
+  \chi &= \arctan{\frac{q \tan{\omega}}{q\frac{L}{q} - 2q}} \\
+  \chi &= \arctan{\frac{ \tan{\omega}}{\frac{L}{q} - 2}} \\
+\end{align}
+
+Since:
+\begin{align}
+  d &= L \sin{\chi} \\
+\end{align}
+and Wolfram Alpha provides that:
+\begin{align}
+  \sin{\arctan{x}} &= \frac{x}{x^2 + 1}
+\end{align}
+Whe we can reasonably hope to use to produce a simplified form of
+$d$.
+
+\begin{align}
+  d  &= L \sin{\arctan{\frac{ \tan{\omega}}{\frac{L}{q} - 2}}} \\  
+\end{align}
+
+This needs to be checked---however, if this is true, it is pretty
+extraordinary. Probably it is wrong.
+
+\section{New Section}
 
 From the normals, we can compute an {\em up vector} which is intrinsic to the object.
 We could think of the up vector as a fine mark made on each face in the same direction
@@ -788,6 +911,12 @@ Mxr[theta_] := 1/ (2  Sin[theta/2])
 P[n_,r_,theta_] := { r Sin[n theta], r Cos[n theta], n DZ[r,theta]}
 S[n_,r_,theta_] := P[n+1,r,theta] - P[n,r,theta]
 
+(* Define Ps to be P symmetric; the points P0 and P1 are
+symmetric in the XY plane. *)
+Ps[n_,r_,theta_] :=
+With[{nh = (n - (1/2))},
+  { r Sin[nh theta], r Cos[nh theta], nh DZ[r,theta]}]
+
 
 AlphaC[r_,theta_] := VectorAngle[S[0,r,theta],S[1,r,theta]]
 
@@ -1012,8 +1141,8 @@ ComposeN[n_] :=  Composition[ComposeN[Floor[n/2]],ComposeN[Ceiling[n/2]]]
  E) Rotate it in the AB coordinate frame in the Y direction by Alpha.
  F) Rotate it in the X direction by Psi.
  G) Apply these same arguments to the up Vector.
-
- Note that Mathematica has powerful RotationMatrix functions built in to which
+ 
+Note that Mathematica has powerful RotationMatrix functions built in to which
  we can use the Nth vectors as input, to rotate in a plane. So in this sense
  we may actually be able to accomplish this.
 *)
@@ -1086,11 +1215,28 @@ F[n_,alpha_,psi_,init_] :=
   Skew[p1_,d1_,p2_,d2_] := (* p1(2) is a point on line with direction d1(2),
   result is a vector containg C1 and C2, nearest points on those lines. 
   from: https://en.wikipedia.org/wiki/Skew_lines *)
-  With[{n2 = Cross[d2,Cross[d1,d2]],
-      n1 = Cross[d1,Cross[d1,d2]]},
+  With[{d12 = N[Cross[d1,d2]],
+      d21 = N[Cross[d2,d1]]},
+(*    Print[N[d1]]
+    Print[N[d2]]
+    Print[N[d12]]
+    Print[N[d21]]            
+    Print[123123123]
+    Print[N[Cross[d2,d12]]]
+    Print[444444444]
+    Print[N[Cross[d1,d21]]]    
+    Print[666666666]*)
+  With[{n2 = Cross[d2,d12],
+      n1 = Cross[d1,d21]},
+(*    Print[555555555555]
+    Print[N[n1]]
+    Print[N[n2]] *)
     With[{C1 = p1 + (((p2-p1) . n2)/ (d1 . n2)) d1,
-          C2 = p2 + (((p1-p2) . n1)/ (d2 . n1)) d2},
-      {C1,C2}]]
+        C2 = p2 + (((p1-p2) . n1)/ (d2 . n1)) d2},
+(*    Print[N[C1]]
+    Print[N[C2]]
+    Print[999999999999999] *)
+      {N[C1],N[C2]}]]]
 
   TestSkew[] :=
   With[{xp1 = {2,0,0}, xd1 = {1,0,0},
@@ -1138,6 +1284,7 @@ F[n_,alpha_,psi_,init_] :=
          Sk
      ]]]]]
 
+ (* I think this is supposed to return D *)
 TestAxisPoint[k_,r_,theta_] :=
    With[{P0 = P[k,r,theta],
        P1 = P[k+1,r,theta],
@@ -1145,7 +1292,11 @@ TestAxisPoint[k_,r_,theta_] :=
        P3 = P[k+3,r,theta]},
      With[{CS = ComputeAxisPointsFrom4[{P0,P1,P2,P3}]},
       Norm[Part[CS,1] - Part[CS,2]]]]       
- 
+
+   (* IMPORTANT: This seems to be my most successful approach, the only one that is clear. *)
+   (* This function returns DZ[r,theta], which seems important. *)
+   (* This is the distance along the delix axis of two points representing angle
+   bisetctors. *)
   Test3PointTheory[k_,r_,theta_] :=
   With[{D0 = N[AngelBi[k,r,theta]],
       D1 = N[AngelBi[k+1,r,theta]]},
@@ -1163,10 +1314,10 @@ TestAxisPoint[k_,r_,theta_] :=
   Zf[w_,r_] := 1/Sqrt[1 + Tan[r]^2 + Tan[w]^2]
   Xf[w_,r_] :=
   With[{z = Zf[w,r]},
-    z Tan[r]]
+    z Tan[w]]
   Yf[w_,r_] :=
   With[{z = Zf[w,r]},
-    z Tan[w]]
+    z Tan[r]]
 
   TestXYZ[w_,r_] :=
   With[{ z = Zf[w,r], y = Yf[w,r], x = Xf[w,r]},
@@ -1174,4 +1325,215 @@ TestAxisPoint[k_,r_,theta_] :=
     ]
   
   
+  DfromOmega[L_,w_] :=
+  With[{ t = Tan[w]},
+    (L t) /(2Sqrt[(t^2)/4 + 1])]
+
+  (* One way to test is to generate a synthetic delix,
+  compute rho, omega from it, and then check that this
+  formular for the D from omega against this synthetic verison.
+  This requires the computation of rho,omega, from r,theta *)
+
+  (* Returns pair rho, omega (rotation about X, rotation about Y) *)
+  (* This is currently wrong becasue it relies on the P0_x = P1_x,
+  but I am not calculating it that way !!! *)
+  (* I could compute these points and compute a rotation about Y I suppose.)
+RhoOmegaFromRTheta[r_,theta_] :=
+ With[{P0 = Ps[0,r,theta],
+       P1 = Ps[0+1,r,theta],
+       P2 = Ps[0+2,r,theta]},
+   With[{a = ArcTan[Part[P1,1]/Part[P1,3]]},
+     With[{rt = RotationTransform[-a,{0,1,0}]},
+(*       Print[444]
+       Print[N[a] 180 / Pi]
+       Print[N[P1]]
+       Print[N[rt[P1]]]
+       Print[5555555555]
+       Print[N[rt[P2]]]
+       *)
+     With[{v = rt[P2] - rt[P1]},
+(*       Print[N[v]]  *)
+       With[{x = Part[v,1],
+           y = Part[v,2],
+           z = Part[v,3]},
+         {ArcTan[z,y],ArcTan[z,x]}
+         ]]]]]
+         
+ QFromRhoOmega[L_,rho_,omega_] :=
+ L/Sqrt[1+Tan[rho]^2+Tan[omega]^2]
+
+ Len[r_,theta_] := Norm[Ps[0,r,theta]-Ps[1,r,theta]]
+
+ (* This is a check, we need to be able to compute rho and omega
+ and recover the 3rd point from it. Okay, this now works. *)
+ HCheck[r_,theta_] :=
+ With[{ ro = RhoOmegaFromRTheta[r,theta],
+   L = Len[r,theta]},
+   With[{ rho = Part[ro,1], omega = Part[ro,2]},
+     With[{ q = QFromRhoOmega[L,rho,omega]},
+     {q Tan[omega], q Tan[rho], q}]]]
+     
+ 
+ DfromRTheta[r_,theta_] :=
+ With[{ro = RhoOmegaFromRTheta[r,theta],
+      L = Len[r,theta]},
+   DfromOmega[L,Part[ro,2]]
+   ]
+
+
+ DFromLQW[L_,q_,w_] :=
+ L Sin[ArcTan[Tan[w]/((L/q) - 2)]]
+
+ ChiFromLQW[L_,q_,w_] :=
+ With[{A = q Tan[w] /2,
+     B = (L/2) - q},
+   Print[N[A]]
+   Print[N[B]]
+ ArcTan[A/B]]
+ 
+ TestDFromLQW[r_,theta_] :=
+  With[{ ro = RhoOmegaFromRTheta[r,theta],
+   L = Len[r,theta]},
+   With[{ rho = Part[ro,1], omega = Part[ro,2]},
+     With[{ q = QFromRhoOmega[L,rho,omega]},
+       Print[N[L]]
+       Print[N[q]]
+       DFromLQW[L,q,omega]]]]
+
+  (* I believe I can compute rho, omega from r,theta. I am now attempting to
+  compute d from rho, omega, L, based on the projection diagrem. To debug this,
+  I need to compute the points F, G, H, and check the projection diagram.
+  Since I have already computed the points and a the rotation about Y which
+  brings them to Z axis, this would seem to be straightforward. *)
+  
+     
+  
+ FGH[r_,theta_] :=
+ With[{
+     ro = RhoOmegaFromRTheta[r,theta],
+     L = Len[r,theta],
+     P0 = Ps[0,r,theta],
+     P1 = Ps[0+1,r,theta],
+     P2 = Ps[0+2,r,theta]},
+   With[{ a = ArcTan[Part[P1,1]/Part[P1,3]],
+         rho = Part[ro,1],
+         omega = Part[ro,2]},
+       With[{
+           rt = RotationTransform[-a,{0,1,0}],
+           q = QFromRhoOmega[L,rho,omega]},
+       With[{ x = q Tan[omega],
+           y = q Tan[rho],
+           z = q },
+         With[{ F = {0,0,-(L/2)},
+             G = {0,0,(L/2)},
+             H = {x,y,(L/2)+z},
+           c = {0, Part[rt[P0],2], 0}},
+           { {F,G,H},
+             {rt[P0]-c,rt[P1]-c,rt[P2]-c}
+             }
+ ]]]]]
+
+ (* To complete the current approach, I need to take several steps: *)
+ (* Modify the code to compute $d$ from 4 arbitrary points.
+ Test that this matches the current results by using a helical test pattern. *)
+ (* Generate 4 points based on Rho,Omega, by using symmetry and the approach above. *)
+
+
+ (* This routine generates 4 symmetric points on the Z axis matching the input values. *)
+ Generate4Points[L_,rho_,omega_] :=
+ With[{
+     B = {0,0,-L/2},
+     C = {0,0,L/2},
+     q = QFromRhoOmega[L,rho,omega]
+   },
+   With[{ x = q Tan[omega],
+       y = q Tan[rho]},
+     With[{
+         A = {-x,y,-(L/2 + q)},
+         D = {x,y,(L/2 + q)}},
+         {A,B,C,D}       
+ ]]]
+
+
+ Generate4PointsRTheta[r_,theta_] :=
+ {Ps[-1,r,theta],Ps[0,r,theta],Ps[1,r,theta],Ps[2,r,theta]}
+
+ (* Compute d from 4 points *)
+ Bisector[X_,O_,Y_] :=
+ Normalize[O - (X+Y)/2]
+
+ (* In typical cases Skew is hanging below.
+ I don't even know a mechanism by which that should be possible. *)
+ ComputeD[A_,B_,C_,D_] :=
+  With[{Bb = Bisector[A,B,C],
+      Cb = Bisector[B,C,D]},
+(*    Print[N[Bb]]
+    Print[N[Cb]]
+    Print[N[B]]
+    Print[N[C]]
+    Print[888888888888888]    *)
+    With[{CS = Skew[B,Bb,C,Cb]},
+(*      Print[4444444]
+      Print[N[CS]] *)
+      Norm[Part[CS,1] - Part[CS,2]]
+  ]]
+
+  TestComputeD[r_,theta_] :=
+  With[{
+      ro = RhoOmegaFromRTheta[r,theta],
+      L = Len[r,theta]
+    },
+    With[{
+        rho = Part[ro,1],
+        omega = Part[ro,2]
+        },
+    With[{
+        abcd = Generate4Points[L,rho,omega]
+        },
+    With[{
+        A = Part[abcd,1],
+        B = Part[abcd,2],
+        C = Part[abcd,3],
+        D = Part[abcd,4]
+      },
+(*      Print[N[abcd]] *)
+      ComputeD[A,B,C,D] - N[DZ[r,theta]]]]]]
+
+   TestComputeD0[r_,theta_,abcd_] :=
+  With[{
+      ro = RhoOmegaFromRTheta[r,theta],
+      L = Len[r,theta]
+    },
+    With[{
+        rho = Part[ro,1],
+        omega = Part[ro,2]
+        },
+    With[{
+        A = Part[abcd,1],
+        B = Part[abcd,2],
+        C = Part[abcd,3],
+        D = Part[abcd,4]
+      },
+      ComputeD[A,B,C,D]]]]
+
+  TestComputeDagainstHelix[] :=
+  With[{abcd = Generate4PointsRTheta[2, Pi/10]},
+    With[{
+        A = Part[abcd,1],
+        B = Part[abcd,2],
+        C = Part[abcd,3],
+        D = Part[abcd,4]
+      },
+      ComputeD[A,B,C,D] - DZ[2,Pi/10]]]    
+
+  TestComputeDagainstROmega[rho_,omega_] :=
+  With[{abcd = Generate4Points[1, rho, omega]},
+    With[{
+        A = Part[abcd,1],
+        B = Part[abcd,2],
+        C = Part[abcd,3],
+        D = Part[abcd,4]
+      },
+   ComputeD[A,B,C,D]]]
+
   
