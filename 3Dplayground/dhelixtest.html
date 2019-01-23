@@ -1,0 +1,99 @@
+<!--
+Copyright (C) 2018 by
+  Robert L. Read <read.robert@gmail.com>
+  David Jeschke <djeschke@gmail.com>
+    
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Mathathon 2018: Simplex Generators</title>
+    <meta name="description" content="Mathathon 2018: Simplex Generators">
+    <meta name="author" content="Robert L. Read">
+    <link rel="stylesheet" href="./jquery-ui-1.11.4.custom/jquery-ui.min.css">
+    <!--
+    <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.structure.min.css">
+    <link rel="stylesheet" href="./jquery-ui-1.12.4.custom/jquery-ui.theme.min.css">
+    -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="./css/main.css">
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="./js/scijs-newton-raphson.js"></script>
+    <script src="./js/tm_bundle.js"></script>
+    <script src="./js/axes.js"></script>
+    <script src="./js/three.js"></script>
+    <script src="./js/THREE.MeshLine.js"></script>
+    <script src="./js/OrbitControls.js"></script>
+    <script src="./js/Detector.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="./js/d3-scale.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-array.v1.min.js"></script>
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-format.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+    <script src="https://d3js.org/d3-scale.v1.min.js"></script>
+    <style>
+  codenza, code {}     /*  noop mnemonic aide that codenza mimes code tag  */
+  codenza {display:block;white-space:pre-wrap}
+</style>
+</head>
+<script>
+  var GLOBAL_DHELIX_PAGE = true;
+  </script>
+<body>
+    <div id="threecontainer"></div>
+    <section id="main-content">
+        <div id=stack>
+        <label><input type="checkbox" id="wireframe" value="true" />Wireframe</label><br />
+        <label><input type="checkbox" id="blendcolor" value="true" />Blend Vertex Color</label><br />
+        </div>
+        <div id="intrinsics">
+          <label>Rho (deg): <input id="rho" />  </label><label>Omega (deg): <input id="omega" /> </label><br />
+        </div>
+        <button id="compute-delix">GO!</button>        
+    </section>
+    <section id="textsection">
+        <h1 id="message_banner">Basic Usage -- Test Discrete Helix Math</h1>
+        <h2> This is an interactive 3D simulation. To change the view, place your mouse in the view area, and
+            hold and "drag" the mouse to rotate the image.
+            The mouse wheel or a drag on your trackpad should zoom you in or out.</h2>
+        <p>A mathematical investigation of the Tetrahelix and <a href="https://en.wikipedia.org/wiki/Boerdijk%E2%80%93Coxeter_helix">Boerdijk-Coxeter helix</a>, which provides a new
+            formulaic way of producing a continuum of untwisted tetrahelices.</p>
+        <p>All of the code on this site is released under the GNU General Public License, and I hope you will
+          reuse it. </p>
+        <h2>Creating a Helix</h2>
+        This is a test page in order to a math principle that came out of the Mathathon
+        where we publicly developed a a lot of "generators".
+
+        <p> We observed that every regular generator created a helix (though sometimes a a degenerate helix.) In fact, we now know every repeated transformation involving a
+          translation and a similar change in angle produces a discrete helix. As far as I have been able to find, this has been articulated only
+          by Eric Lord in a <a href=" https://www.researchgate.net/publication/226976531_Helical_Structures_The_Geometry_of_Protein_Helices_and_Nanotubes">paper from 2002</a>.
+</p>
+        <p> I worked an an algorithm --- it is actually a closed-form expression, but too complex to be treated as such---which computes the intrinsic properties of the discrete helix from the intrinsic properties of a stacked object.
+          </p>
+        <p> This page is my attempt to demonstrate this mathematics, and turn it into
+          a tool that can be used by anyone withough Mathematica.
+          </p>
+
+    </section>
+    <script src="./js/main.js"></script>
+</body>

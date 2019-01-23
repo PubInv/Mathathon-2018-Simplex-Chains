@@ -1183,6 +1183,9 @@ function clearAm() {
         if (obj.type == "Mesh" && obj.name != "GROUND") {
             am.scene.remove(obj);
         }
+        if (obj.name == "HELIX") {
+            am.scene.remove(obj);            
+        }
     }
     am.helices = [];
     am.helix_params = [];
@@ -1240,43 +1243,50 @@ function drawTetrahedron(dir, i, other_params) {
     var funcStatus;
     var generatorsSelector;
     var generatorText;
+
+    // This is the new experimental computation...
+    var computeDelix;
     
     // MAIN FUNCTION
     
     $(function () { main(); });
     function main() {
         executeButton = document.getElementById('execute-button');
+        computeDelix = document.getElementById('compute-delix');        
         funcStatus = document.getElementById('function-status');
         generatorsSelector = document.getElementById("generators-selector");
         generatorText = document.getElementById('user-defined-generator');
-        
-        executeButton.addEventListener('click', onExecute);
-        generatorsSelector.addEventListener("change", onGeneratorChanged);
 
-        // TEMPORARY: Render button is placeholder until example generators are working.
-        var renderButton = document.getElementById('render-button');
-        renderButton.addEventListener('click', renderComputed);
+        if (typeof GLOBAL_DHELIX_PAGE !== 'undefined') {
+            computeDelix.addEventListener('click', onComputeDelix);            
+        } else {
+            executeButton.addEventListener('click', onExecute);
+            generatorsSelector.addEventListener("change", onGeneratorChanged);
 
-        var renderTestGeneratorsButton = document.getElementById('render-test-generators');
-        renderTestGeneratorsButton.addEventListener('click', renderTestGenerators);
+            // TEMPORARY: Render button is placeholder until example generators are working.
+            var renderButton = document.getElementById('render-button');
+            renderButton.addEventListener('click', renderComputed);
 
-        var sht = document.getElementById("stacking-helix-table");
-        if (sht) sht.addEventListener("click", function(){ stackingHelixTable(); });
-        
-        // Add the Parametric Curve functionality
-        document.getElementById("circle-button").addEventListener("click", function(){ followParametricCurve(parametricCircle, false); });
-        document.getElementById("sine-button").addEventListener("click", function(){ followParametricCurve(parametricSineWave, true); });
-        document.getElementById("cone-button").addEventListener("click", function(){ followParametricCurve(parametricCone, true); });
-        document.getElementById("helix-button").addEventListener("click", function(){ followParametricCurve(parametricHelix, true); });
+            var renderTestGeneratorsButton = document.getElementById('render-test-generators');
+            renderTestGeneratorsButton.addEventListener('click', renderTestGenerators);
 
-        // Fill the generators selector
-        for (var key in EXAMPLE_GENERATORS) {
-            if (EXAMPLE_GENERATORS.hasOwnProperty(key)) {
-                var entry = EXAMPLE_GENERATORS[key];
-                generatorsSelector.options[generatorsSelector.options.length] = new Option(entry.name, key);
+            var sht = document.getElementById("stacking-helix-table");
+            if (sht) sht.addEventListener("click", function(){ stackingHelixTable(); });
+            
+            // Add the Parametric Curve functionality
+            document.getElementById("circle-button").addEventListener("click", function(){ followParametricCurve(parametricCircle, false); });
+            document.getElementById("sine-button").addEventListener("click", function(){ followParametricCurve(parametricSineWave, true); });
+            document.getElementById("cone-button").addEventListener("click", function(){ followParametricCurve(parametricCone, true); });
+            document.getElementById("helix-button").addEventListener("click", function(){ followParametricCurve(parametricHelix, true); });
+
+            // Fill the generators selector
+            for (var key in EXAMPLE_GENERATORS) {
+                if (EXAMPLE_GENERATORS.hasOwnProperty(key)) {
+                    var entry = EXAMPLE_GENERATORS[key];
+                    generatorsSelector.options[generatorsSelector.options.length] = new Option(entry.name, key);
+                }
             }
         }
-
     }
 
     // STEP FUNCTION
@@ -1317,6 +1327,116 @@ function drawTetrahedron(dir, i, other_params) {
 //            add_vertex(am, 0, i, params);            
 //        }
 //        return params;
+    }
+
+    // Render a Helix of radius r, with theta, v is the vector
+    // The helix is parallel to the vector v.
+    // The helix is centered on the y axis, and the two points
+    // at n = -1, n = 0, or centered on the z axis.
+    function RenderHelix(l,r,d,theta,v,phi) {
+        const MAX_POINTS = 100;
+        // One way to effect this is to compute a z-axis aligned helix,
+        // Then rotate it parallel to v, then translate it on the
+        // z axis so that the certain points on the on the z-axis.
+        // In fact the rotation is purely about the y-axis.
+        var points3D = new THREE.Geometry();        
+        for (var i=0; i<MAX_POINTS; i++) {
+            var n = i - (MAX_POINTS/2) + 0.5;
+            var y = r * Math.cos(n*theta);
+            var x = r * Math.sin(n*theta);            
+            var z = n *d;
+            points3D.vertices.push(new THREE.Vector3(x,y,z));
+        }
+        var line2 = new THREE.Line(points3D, new THREE.LineBasicMaterial({color: "red"}));
+        line2.rotation.y = phi;
+        line2.name = "HELIX";
+        am.scene.add(line2);
+    }
+
+    function QFromRhoOmega(L,rho,omega) {
+        return L/(Math.sqrt(1 + Math.tan(rho) ** 2 + Math.tan(omega) ** 2));
+    }
+    function ChordFromLD(L,di) {
+        return Math.sqrt(L ** 2 - di**2);
+    }
+    function ThetaFromRC(r,c) {
+        return Math.abs(2 * Math.asin(c/(2*r)));
+    }
+    
+    // return r,theta,d,c,phi    
+    function UnifiedComp(L,rho,omega) {
+        const B = new THREE.Vector3(0,0,-L/2);
+        const C = new THREE.Vector3(0,0,L/2);            
+        const q = QFromRhoOmega(L,rho,omega);
+        const x = q * Math.tan(omega);
+        const y = q * Math.tan(rho);
+        const u = q - L;
+        const L2q = (L/2) + q; 
+        const A = new THREE.Vector3(-x,y,-L2q);
+        const D = new THREE.Vector3(x,y,L2q);
+        const Bb = new THREE.Vector3(x,-y,u);
+        const Cb = new THREE.Vector3(-x,-y,-u);
+        const BbXCb = new THREE.Vector3().crossVectors(Bb,Cb);
+        const n2 = new THREE.Vector3().crossVectors(Cb,BbXCb);
+        const BbN2inner = Bb.dot(n2);
+        const n2z = n2.z;            
+        const Bn2 = n2z / (BbN2inner);
+        const LBn2 = L * Bn2;
+        const C1 = new THREE.Vector3(Bb.x,Bb.y,Bb.z).multiplyScalar(LBn2);
+        C1.add(B);
+        // now, if we haven't messed up, phi can be computed from C1...
+        const phi = Math.atan2(Math.abs(C1.x),Math.abs(C1.z));
+        const di = 2 * Math.sqrt(C1.x ** 2 + C1.z ** 2);
+        // Have to be careful, multiplyScalar changes its value.
+        const r = Bb.multiplyScalar(LBn2).length();
+        const c = ChordFromLD(L,di);
+        const theta2 = ThetaFromRC(r,c);
+        return [r,theta2,di,c,phi];
+    }
+
+    function test_UnifiedComp() {
+        const res = UnifiedComp(1,Math.PI/10,Math.PI/30);
+        console.log(res);
+        console.log(res[4] * 180 / Math.PI);
+        console.assert(near(res[0],0.688145,1e-4));
+        console.assert(near(res[1],0.704444,1e-4));        
+              }
+    test_UnifiedComp();
+    
+
+    // Here I will attempt to do several things:
+    // First, to compute the 4 points corresponding to rho and omega.
+    // Secondly, I will compute the intrinsic parameters as I have done
+    // in Mathematica.
+    // However, the point here is to render something.
+    // I suppose at first I can render lines.
+    function onComputeDelix() {
+        clearAm();
+        var wf = document.getElementById('wireframe').checked;
+        var bc = document.getElementById('blendcolor').checked;
+
+        const rho_deg = document.getElementById('rho').value;
+        const omega_deg = document.getElementById('omega').value;
+
+        const rho = parseFloat(rho_deg) * Math.PI / 180;
+        const omega = parseFloat(omega_deg) * Math.PI / 180;
+        
+        console.log(rho_deg,omega_deg);
+
+        const res = UnifiedComp(1,rho,omega);
+        const r = res[0];
+        const theta = res[1];
+        const d = res[2];
+        const phi = res[4];
+        console.log(res);        
+
+        RenderHelix(1,r,d,theta,new THREE.Vector3(0,0,1),-phi);
+
+        create_vertex_mesh(new THREE.Vector3(0,0,0),d3.color("white"));
+        create_vertex_mesh(new THREE.Vector3(1,0,0),d3.color("red"));
+        create_vertex_mesh(new THREE.Vector3(0,1,0),d3.color("green"));
+        create_vertex_mesh(new THREE.Vector3(0,0,1),d3.color("blue"));
+        
     }
 
     function onExecute() {
@@ -1647,7 +1767,9 @@ function drawTetrahedron(dir, i, other_params) {
         // console.assert(nextParametricTet(C, 3 ,params) );
         clearAm();        
     }
-    test_nextParametricTet();
+    if (typeof GLOBAL_DHELIX_PAGE !== 'undefined') {    
+                test_nextParametricTet();
+    }
 
 
     // These are hard-wired test functions, not fully parametrized.
@@ -1906,7 +2028,9 @@ function drawTetrahedron(dir, i, other_params) {
             console.log("xxx c1-c2",i,c1-c2);                                    
         }
     }
-    test_xxx();
+    if (typeof GLOBAL_DHELIX_PAGE !== 'undefined') {        
+        test_xxx();
+    }
 
     // alpha and theta, phi in radians.
     // 0 <= alpha < PI
