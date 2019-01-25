@@ -314,6 +314,142 @@ function calculate_tetrahedron(l) {
     v1.y = -(v3.y=Math.sqrt(xyz1s-x1*x1-z1*z1));
     return v;
 }
+    function QFromRhoOmega(L,rho,omega) {
+        return L/(Math.sqrt(1 + Math.tan(rho) ** 2 + Math.tan(omega) ** 2));
+    }
+    function ChordFromLD(L,di) {
+        return Math.sqrt(L ** 2 - di**2);
+    }
+    function ThetaFromRC(r,c) {
+        return Math.abs(2 * Math.asin(c/(2*r)));
+    }
+    
+    // return r,theta,d,c,phi    
+    function UnifiedComp(L,rho,omega) {
+        const B = new THREE.Vector3(0,0,-L/2);
+        const C = new THREE.Vector3(0,0,L/2);            
+        const q = QFromRhoOmega(L,rho,omega);
+        const x = q * Math.tan(omega);
+        const y = q * Math.tan(rho);
+        const u = q - L;
+        const L2q = (L/2) + q; 
+        const A = new THREE.Vector3(-x,y,-L2q);
+        const D = new THREE.Vector3(x,y,L2q);
+        console.log(A,B,C,D);
+        const Bb = new THREE.Vector3(x,-y,u);
+        const Cb = new THREE.Vector3(-x,-y,-u);
+        const BbXCb = new THREE.Vector3().crossVectors(Bb,Cb);
+        const n2 = new THREE.Vector3().crossVectors(Cb,BbXCb);
+        const BbN2inner = Bb.dot(n2);
+        const n2z = n2.z;            
+        const Bn2 = n2z / (BbN2inner);
+        const LBn2 = L * Bn2;
+        const C1 = new THREE.Vector3(Bb.x,Bb.y,Bb.z).multiplyScalar(LBn2);
+        C1.add(B);
+        console.log("C1",C1);
+        // now, if we haven't messed up, phi can be computed from C1...
+        const phi = Math.atan2(Math.abs(C1.x),Math.abs(C1.z));
+        const di = 2 * Math.sqrt(C1.x ** 2 + C1.z ** 2);
+        // Have to be careful, multiplyScalar changes its value.
+        const r = Bb.multiplyScalar(LBn2).length();
+        const c = ChordFromLD(L,di);
+        const theta2 = ThetaFromRC(r,c);
+        return [r,theta2,di,c,phi];
+    }
+
+    function test_UnifiedComp() {
+        const res = UnifiedComp(1,Math.PI/10,Math.PI/30);
+        console.log(res);
+        console.log(res[4] * 180 / Math.PI);
+        console.assert(near(res[0],0.688145,1e-4));
+        console.assert(near(res[1],0.704444,1e-4));        
+              }
+    test_UnifiedComp();
+    
+
+function test_some_calculations() {
+
+    // var v = [new THREE.Vector3( Math.sqrt(8/9),-1/3,0),
+    //          new THREE.Vector3(-Math.sqrt(2/9),-1/3,Math.sqrt(2/3)),
+    //          new THREE.Vector3(-Math.sqrt(2/9),-1/3,-Math.sqrt(2/3)),
+    //          new THREE.Vector3(0,1,0)];
+    // v[0].y += 1/3;
+    // v[1].y += 1/3;
+    // v[2].y += 1/3;
+    // v[3].y += 1/3;
+
+    // var d = 1/v[0].distanceTo(v[1]);
+    // v.forEach(x => { x.x *= d; x.y *= d; x.z *= d; });
+    var x = 1/Math.sqrt(2);
+    var v = [new THREE.Vector3(0,0,1/2),
+             new THREE.Vector3(0,0,-1/2),
+             new THREE.Vector3(1/2,-x,0),
+             new THREE.Vector3(-1/2,-x,0)];
+
+
+    
+    // now I will attempt to compute the distanace between
+    // the centroids
+    function centroid(v0,v1,v2) {
+        return new THREE.Vector3((v0.x + v1.x + v2.x)/3,
+                                 (v0.y + v1.y + v2.y)/3,
+                                 (v0.z + v1.z + v2.z)/3);
+    }
+
+    const c = centroid(v[0],v[2],v[3]);
+
+    v[0].y -= c.y;
+    v[1].y -= c.y;
+    v[2].y -= c.y;
+    v[3].y -= c.y;
+    
+    const c0 = centroid(v[0],v[1],v[2]);
+    const c1 = centroid(v[0],v[1],v[3]);
+    const c2 = centroid(v[0],v[2],v[3]);
+    const c3 = centroid(v[1],v[2],v[3]);
+
+    console.log("CALCULATE");
+    console.log(v);
+    
+    console.log(c0.distanceTo(c1));
+    console.log("centroids",c0,c1,c2,c3);
+    var valid = { v: true };
+    
+    // We'll build out form v[0],v[2],v[3]
+    var pd = find_fourth_point_given_three_points_and_three_distances(
+        CHIRALITY_CCW,
+        v[0], v[2], v[3],
+        1, 1, 1,
+        valid);
+    
+    console.log("Fifth point",pd);
+    v.push(pd);
+    // now we need to compute the appropriate centroid fo the
+    // new point, then compute the angles of the centroid-to-centroid
+    // vector with the z axis
+    // now which centroid to we compute?
+    // 0 - +x, z = 0
+    // 1 - -x, z = 0.5
+    // 2 - -x, z = -0.5
+    // 3 - x = 0, y = 0.8164, z = 0
+    // 4 - x = 0.48, y = 0.54, : -0.83333
+    c4 = centroid(v[2],v[1],v[4]);
+    console.log("c4",c4);
+    var dir = c4.clone().sub(c3);
+    var check = c2.clone().sub(c3)
+    console.log("check",check);
+    // How can these be at the same Y level?
+    console.log(dir);
+    var rho = Math.atan2(dir.y,dir.z);
+    var ome = Math.atan2(dir.x,dir.z);    
+    console.log("rho,ome", rho * 180/Math.PI, ome * 180/
+                Math.PI);
+    
+    const res = UnifiedComp(1/3,rho,ome);
+    console.log("res",res);
+}
+
+test_some_calculations();
 
 // v [a, b, c, d], vc[a, b, c, d], ec[cb, ac, ba, ad, bd, cd]
 function get_base(init_pos, l) {
@@ -1353,56 +1489,6 @@ function drawTetrahedron(dir, i, other_params) {
         am.scene.add(line2);
     }
 
-    function QFromRhoOmega(L,rho,omega) {
-        return L/(Math.sqrt(1 + Math.tan(rho) ** 2 + Math.tan(omega) ** 2));
-    }
-    function ChordFromLD(L,di) {
-        return Math.sqrt(L ** 2 - di**2);
-    }
-    function ThetaFromRC(r,c) {
-        return Math.abs(2 * Math.asin(c/(2*r)));
-    }
-    
-    // return r,theta,d,c,phi    
-    function UnifiedComp(L,rho,omega) {
-        const B = new THREE.Vector3(0,0,-L/2);
-        const C = new THREE.Vector3(0,0,L/2);            
-        const q = QFromRhoOmega(L,rho,omega);
-        const x = q * Math.tan(omega);
-        const y = q * Math.tan(rho);
-        const u = q - L;
-        const L2q = (L/2) + q; 
-        const A = new THREE.Vector3(-x,y,-L2q);
-        const D = new THREE.Vector3(x,y,L2q);
-        const Bb = new THREE.Vector3(x,-y,u);
-        const Cb = new THREE.Vector3(-x,-y,-u);
-        const BbXCb = new THREE.Vector3().crossVectors(Bb,Cb);
-        const n2 = new THREE.Vector3().crossVectors(Cb,BbXCb);
-        const BbN2inner = Bb.dot(n2);
-        const n2z = n2.z;            
-        const Bn2 = n2z / (BbN2inner);
-        const LBn2 = L * Bn2;
-        const C1 = new THREE.Vector3(Bb.x,Bb.y,Bb.z).multiplyScalar(LBn2);
-        C1.add(B);
-        // now, if we haven't messed up, phi can be computed from C1...
-        const phi = Math.atan2(Math.abs(C1.x),Math.abs(C1.z));
-        const di = 2 * Math.sqrt(C1.x ** 2 + C1.z ** 2);
-        // Have to be careful, multiplyScalar changes its value.
-        const r = Bb.multiplyScalar(LBn2).length();
-        const c = ChordFromLD(L,di);
-        const theta2 = ThetaFromRC(r,c);
-        return [r,theta2,di,c,phi];
-    }
-
-    function test_UnifiedComp() {
-        const res = UnifiedComp(1,Math.PI/10,Math.PI/30);
-        console.log(res);
-        console.log(res[4] * 180 / Math.PI);
-        console.assert(near(res[0],0.688145,1e-4));
-        console.assert(near(res[1],0.704444,1e-4));        
-              }
-    test_UnifiedComp();
-    
 
     // Here I will attempt to do several things:
     // First, to compute the 4 points corresponding to rho and omega.
@@ -1428,7 +1514,8 @@ function drawTetrahedron(dir, i, other_params) {
         const theta = res[1];
         const d = res[2];
         const phi = res[4];
-        console.log(res);        
+        console.log("r,theta,d,phi",res);
+        console.log("theta",theta*180/Math.PI);
 
         RenderHelix(1,r,d,theta,new THREE.Vector3(0,0,1),-phi);
 
@@ -1767,7 +1854,7 @@ function drawTetrahedron(dir, i, other_params) {
         // console.assert(nextParametricTet(C, 3 ,params) );
         clearAm();        
     }
-    if (typeof GLOBAL_DHELIX_PAGE !== 'undefined') {    
+    if (typeof GLOBAL_DHELIX_PAGE === 'undefined') {    
                 test_nextParametricTet();
     }
 
@@ -2028,7 +2115,7 @@ function drawTetrahedron(dir, i, other_params) {
             console.log("xxx c1-c2",i,c1-c2);                                    
         }
     }
-    if (typeof GLOBAL_DHELIX_PAGE !== 'undefined') {        
+    if (typeof GLOBAL_DHELIX_PAGE === 'undefined') {        
         test_xxx();
     }
 

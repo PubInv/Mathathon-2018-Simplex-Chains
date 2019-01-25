@@ -22,6 +22,7 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \newtheorem{conjecture}{Conjecture}
+\newtheorem{observation}{Observation}
 
 \SetWatermarkText{DRAFT}
 \SetWatermarkScale{6}
@@ -242,6 +243,8 @@ Possibly due to my lack of imagination, these coordinates
 will become the basis of the formulae for $r,d$, and $\theta$
 in the discrete helix.
 
+
+
 \subsection{Observations}
 
 Having related the face angles to positions of the points directly connected
@@ -300,6 +303,24 @@ Following the \url{https://en.wikipedia.org/wiki/Skew_lines}, we calculate:
      \caption{Three Members}
   \label{fig:threemembersdiagram}
 \end{figure}
+
+Note that in Figure \ref{fig:threemembersdiagram} there is great
+room for confusion in terms of plane $\omega$ is actually
+measured against. The three triangles $FfG$, $FmG$, and $FgG$
+are all in general not co-planar, that is, they are all at
+slight angles to each other.  We must remain clear that $\omega$
+and $\rho$ are measured against the $FmG$. The up-vector
+of the object lies precisely in this plane. $\omega$ must
+be measured against the up-vector of the object.
+
+If the object in question is a physical macroscopic object,
+for example made out of wood or plastic, then making
+physical measurement against it is not likely to be confusing
+so long as we physically distinguish which was is considered
+up.
+
+If the object is a mathematical object, there is much
+greater change for confusion.
 
 Wolfram Alpha provides that:
 \begin{align}
@@ -362,6 +383,22 @@ $d$.
 
 This needs to be checked---however, if this is true, it is pretty
 extraordinary. Probably it is wrong.
+
+\section{The 4-point Algorithm}
+
+In this section, give a good drawing of the 4-point algorithm,
+and a linear algebra explanation.
+
+\section{Applying Symmetry to the 4-point Algorithm}
+
+In this section explain how many symmetries in the system
+allows for significant simplifcations.
+
+\section{Checks and Explorations}
+
+In this section add graphs. Also, a check against the BC helix.
+Possibly software should be used to produce a 3D simulation
+of the issues.
 
 \section{New Section}
 
@@ -527,6 +564,39 @@ Rather than starting with $\alpha$ and $\psi$ as inputs, we can think of a vecto
 moves in the positive $\overline Z$ direction, $\overline Z = \overline P_1 - \overline P_0$, and
 the angle $\theta$ which $Z$ rotates about the $z$-axis at each step. If a rotation matrix $M$
 represents rotation about and $T$ represents translation along the $z$-axis, then $P_n = (M+T)^nP_n$.
+
+\section{Reconsidering the BC Helix}
+
+In light of Lord's ovservation and the Delix algorithm, we can now
+reconsider the BC Helix, and in fact a variety of discrete helices which
+should perhaps becalled {\em Platonic delices} or if you prefer {\em Platonic delixes}.
+
+This complementary view is to think of the BC Helix not as the helix that
+intersects the vertices of the tetrahedron as Coxeter did, nor a single
+rail as may be valuable to engneers\cite{}, but rather as a helix through
+the center point of the faces of the tetrahedron. This is a delix of
+very small radius compared to the other two approaches, but it has
+the advantage that it is far more general. For example, it is
+clearly defined if one used truncated tetrahedra.
+
+More generally, the same approach gives the formula for the delix
+created by placing dodecahedra or icosahedra or octahedra face-to-face
+in a regular pattern. The table of parameters of such delices is provided
+below.
+
+Note this also makes clear that in these cases we must also specify the {\em twist},
+even if we insist on perfect face-to-face matching. Thinking of it this
+way, there are actually 3 tetrahedral delices, depending on which twist
+is chosen (keeping the faces matching). In the case of the tetrahedron,
+this creates the clockwise BC Helix, the anti-clockwise BC Helix, and the
+not-quite-close tetrahedral torus.
+
+In the case of the icosahedron, there are in fact many possibilities,
+as one need not choose the precisely opposite face as the joining face, and
+one may choose up to three twists.
+
+All of this is a consequence of Lord's observation that {\em any}
+repeated transformation produces a delix.
 
 
 \section{Three dimensions}
@@ -852,6 +922,9 @@ This reference is EXTREMELY IMPORTANT
 \url{https://link.springer.com/article/10.1023/A:1015863923728}
 \url{https://www.researchgate.net/publication/226976531_Helical_Structures_The_Geometry_of_Protein_Helices_and_Nanotubes}
 This reference clearly states that any repetitive unit gives rise to a helix, and gives some species: the icosahelix, for example, and gives a 96-tet ring (not quite regular, like this work.)  It gives a linear algebra way of talking about the transform. It does implies the helix is deducible from the transformation matrix, but does not appear to give any formular or method for describing it.
+
+\url{https://www.researchgate.net/publication/226781876_Sphere_packing_helices_and_the_polytope_3_3_5}
+
 
 Need to get and read this:
 \url{https://books.google.com/books?hl=en&lr=&id=1LZlSZ7ORrQC&oi=fnd&pg=PP1&ots=0hSEwJvlUB&sig=xNG9UWv_H1OXHwaOiOBJN7TW6xA#v=onepage&q&f=false}
@@ -1360,8 +1433,6 @@ RhoOmegaFromRTheta[r_,theta_] :=
          {ArcTan[z,y],ArcTan[z,x]}
          ]]]]]
          
- QFromRhoOmega[L_,rho_,omega_] :=
- L/Sqrt[1+Tan[rho]^2+Tan[omega]^2]
 
  Len[r_,theta_] := Norm[Ps[0,r,theta]-Ps[1,r,theta]]
 
@@ -1827,35 +1898,40 @@ N[UnifiedComp4[1, Pi/10, Pi/30]]
 
 
 
+ QFromRhoOmega[L_,rho_,omega_] :=
+ L/Sqrt[1+Tan[rho]^2+Tan[omega]^2]
+ 
+  ChordFromLD[L_,D_] := Sqrt[L^2 - D^2]
+  ThetaFromRC[R_,C_] :=
+  2 ArcSin[C/(2R)]
 
  UnifiedComp5[L_,rho_,omega_] :=
   With[{
       B = {0,0,-L/2},
-      C = {0,0,L/2},
       q = QFromRhoOmega[L,rho,omega]
     },
     With[{ x = q Tan[omega],
-        y = q Tan[rho]},
+        y = q Tan[rho],
+      u = q - L},
       With[{
           A = {-x,y,-(L/2 + q)},
           D = {x,y,(L/2 + q)},
-          (* Apparently we can take out the fact of 1/2 (1/8) here *)
-          Bb = {x,-y,(q-L)},
-          Cb = {-x,-y,-(q-L)}},
-        With[{BbXCb = Cross[Bb,Cb]
+          (* We have removed a factor of 1/2 (1/8) here *)
+          Bb = {x,-y,u},
+          Cb = {-x,-y,-u}},
+        With[{n2 =   Cross[Cb,Cross[Bb,Cb]]
           },
-          With[{n2 =   Cross[Cb,BbXCb]
-            },            
             With[{
              n2z = Part[n2,3]
               },
               With[{Bn2 = n2z / (Bb . n2)
                 },
-              With[{C1 = B + (L  Bn2) Bb
+                With[{LBn2 = L Bn2},
+              With[{C1 = B + LBn2 Bb
                 },
                 With[{
                     di = 2Sqrt[Part[C1,1]^2 + Part[C1,3]^2],
-                    r =   Norm[(L  Bn2) Bb]},
+                    r =   Abs[LBn2] Norm[ Bb]},
                   With[{
                       c = ChordFromLD[L,di]},
                     With[{ theta2 = ThetaFromRC[r,c]},
@@ -1864,7 +1940,57 @@ N[UnifiedComp4[1, Pi/10, Pi/30]]
 
   
 
-N[UnifiedComp5[1, Pi/10, Pi/30]]
+  N[UnifiedComp5[1, Pi/10, Pi/30]]
 
 
+ 
+
+Plot3D[Part[UnifiedComp5[1,rho,omega],3],{rho,0,Pi/4},{omega,0,Pi/4},AxesLabel->{rho, omega}]
+
+Plot3D[Part[UnifiedComp5[1,rho,omega],1],{rho,0,Pi/2},{omega,0,Pi/30},AxesLabel->{rho, omega}]
+
+Plot[Part[UnifiedComp5[1,rho,0],1],{rho,0,Pi/2},AxesLabel->{rho}]
+
+Plot[Part[UnifiedComp5[1,Pi/30,omega],1],{omega,0,Pi/2},AxesLabel->{omega}]
   
+
+
+(* In this section, I am purely attempting to work out the
+coordinates of the two face-to-face tetrahedra in order to
+compute rho, omega in this platonic case. *)
+
+(* This is all wrong because the centroid to centroid distance is actually 1/3 *)
+(* These are values for a regular tetrahedron, I think. *)
+(* These numbers are wrong, I think... *)
+alphaA = Pi/3;
+alphaB = -Pi/3;
+betaA = (Pi/2 -  ArcTan[2 Sqrt[2]] Cos[Pi/ 6]);
+betaB = (Pi/2 - ArcTan[2 Sqrt[2]] Cos[Pi/ 6]);
+
+omegaFromAB[aa_,ab_,ba_,bb_,tau_] :=
+ab + aa Cos[tau] + ba Sin[tau]
+
+rhoFromAB[aa_,ab_,ba_,bb_,tau_] :=
+bb + ba Cos[tau] + aa Sin[tau]
+
+N[omegaFromAB[alphaA,alphaB,betaA,betaB,2 Pi/3] 180 / Pi]
+N[rhoFromAB[alphaA,alphaB,betaA,betaB,2 Pi/3] 180 / Pi]
+
+(* Now a serious test for correctness is if we use these rho and omega (for a tetrahedron),
+does the delix correspond to the BC tetrahelix? And what does ``correspond mean''?)
+
+
+(* A sanity check is that if tau = 0, omega should be 0 and rho five times should almost be 2Pi *)
+alphaR = 0;
+betaR = ArcTan[2 Sqrt[2]]/2;
+omegaFromAB[alphaR,alphaR,betaR,betaR,0]
+(* This should be about 10 degrees *)
+N[(2Pi - rhoFromAB[alphaR,alphaR,betaR,betaR,0] 5 ) 180 / Pi]
+
+N[UnifiedComp5[1/3,rhoFromAB[alphaA,alphaB,betaA,betaB,2 Pi/3],
+    omegaFromAB[alphaA,alphaB,betaA,betaB,2 Pi/3] 180 / Pi]]
+
+N[UnifiedComp5[1/3,33.15 Pi / 180,
+    -6.587 Pi / 180]
+
+
