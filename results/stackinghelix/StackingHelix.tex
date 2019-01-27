@@ -1942,12 +1942,52 @@ N[UnifiedComp4[1, Pi/10, Pi/30]]
                       {r,theta2,di,c}
   ]]]]]]]]]]]
 
+
+
+(* Note, possibly this would be better done with C,D, or A,B *)
+UnifiedCompTwoPoints[L_,B_,D_] :=
+With[{q = D[[3]] - L/2,
+      x = D[[1]],
+      y = D[[2]]},
+    With[{u = q - L},
+      With[{Bb = {x,-y,u},
+          Cb = {-x,-y,-u}},
+        With[{n2 =   Cross[Cb,Cross[Bb,Cb]]
+          },
+            With[{
+             n2z = Part[n2,3]
+              },
+              With[{Bn2 = n2z / (Bb . n2)
+                },
+                With[{LBn2 = L Bn2},
+              With[{C1 = B + LBn2 Bb
+                },
+                With[{
+                    di = 2Sqrt[Part[C1,1]^2 + Part[C1,3]^2],
+                    r =   Abs[LBn2] Norm[ Bb]},
+                  With[{
+                      c = ChordFromLD[L,di]},
+                    With[{ theta2 = ThetaFromRC[r,c]},
+                      {r,theta2,di,c}
+  ]]]]]]]]]]]
+
+UnifiedComp7[L_,rho_,omega_] :=
+  With[{
+      B = {0,0,-L/2},
+      q = QFromRhoOmega[L,rho,omega]
+    },
+    With[{ x = q Tan[omega],
+        y = q Tan[rho],
+      u = q - L},
+      With[{
+          D = {x,y,(L/2 + q)}
+        },
+        UnifiedCompTwoPoints[L,B,D]]]]
   
 
   N[UnifiedComp5[1, Pi/10, Pi/30]]
+  N[UnifiedComp7[1, Pi/10, Pi/30]]  
 
-
- 
 
 Plot3D[Part[UnifiedComp5[1,rho,omega],3],{rho,0,Pi/4},{omega,0,Pi/4},AxesLabel->{rho, omega}]
 
@@ -2085,41 +2125,104 @@ VectorAngle[{v[[1]],0,v[[3]]},v]
 (* I now believe this should be done with a rotation.
 V0 is a rotation of NB vector by delta in the pure
 up direction (that is, in the ZY plane about {1,0,0}
-V0fromLNB[L_,NB_,delta_] :=
+V0fromLNB[L_,NB_,NC_,delta_] :=
 With[{k = Normalize[NB],
-    theta = AngleWithXZ[NB],
-    rt = RotationTransform[delta,{1,0,0}]},
-  rt[NB]
+    rt = RotationTransform[-delta,{1,0,0}]},
+  Print[N[delta] 180 / Pi];
+  Print[9999];
+  With[{ v0 = L Normalize[rt[NB]]},
+    Print[v0];
+    Print[N[VectorAngle[v0,k]] 180 / Pi];
+    Print[5555];
+    v0]
   ]
 
-AfromParam[v0_,tau_,NB_] :=
+ADirFromParam[L_,v0_,tau_,NB_] :=
 With[{k = Normalize[NB]},
   Print[N[k]];
   Print[tau];
   Print[N[v0]];
   With[{ rt = RotationTransform[tau,k]},
-    rt[v0]]]
+    L  Normalize[rt[v0]]]]
 
-AfromLtauNBNC[L_,tau_,NB_,NC_] :=
-With[{delta = VectorAngle[NC,{0,0,1}]},
-    With[{v0 = V0fromLNB[L,NB,delta]},
-        AfromParam[v0,tau,NB]]]
+(* Warning: I may not have the sign of this correct. *)
+ AfromLtauNBNC[L_,tau_,NB_,NC_] :=
+With[{delta = VectorAngle[{0,0,1},NC]},
+  Print[N[delta]];
+  With[{v0 = V0fromLNB[L,NB,NC,delta]},
+    Assert[Norm[v0] == L];
+    With[{ Ad = ADirFromParam[L,v0,tau,NB],
+        B = {0,0,-L/2}},
+      Assert[Abs[Norm[Ad] -L ] < 0.00001];
+      Print[N[Ad]];
+      Print[N[B]];
+      Print[2222];
+      Ad + B]]]
 
 (* For testing, I create a block of size 1
 with NB and NC based on half of a 45 degree angle. *)
+(* I need to write a function that takes two face normals,
+and computes the balancing of them, returning two new normals
+that are balanced around the up vector. Then I need
+to test that the same point is computed from both directions
+even when we have unbalanced normals. *)
 
 TestAfromLtauNBNC[tau_] :=
 With[{
     L0 = 1,
     NB0 = {0,-Sin[Pi/8],-Cos[Pi/8]},
-    NC0 = {0,Sin[Pi/8],Cos[Pi/8]},
-    tetAngle =  ArcTan[Sqrt[2]/2]},
+    NC0 = {0,-Sin[Pi/8],Cos[Pi/8]},
+    tetAngle = ArcTan[Sqrt[2]/2]},
   With[{
-    NB1 = {0,-Sin[tetAngle],-Cos[tetAngle]},
-    NC1 = {0,-Sin[tetAngle],-Cos[tetAngle]}
+      NB1 = {0,-Sin[tetAngle],-Cos[tetAngle]},
+      NC1 = {0,-Sin[tetAngle],Cos[tetAngle]},
+      B = {0,0,-L/2}
     },
-  (* Print[AfromLtauNBNC[L0,tau,NB0,NC0]]; *)
-  AfromLtauNBNC[L0,tau,NB1,NC1]]]
-  
+    Print[N[NB1]];
+    Print[N[NC1]];
+    Print[8888];
+    With[{
+        AA = AfromLtauNBNC[L0,tau,NB1,NC1]
+      },
+      Print[333333333333];
+      Print[N[AA]];
+      Print[Norm[AA - B]];
+      AA
+  ]]]
+
+(* I need to write a test that sends the face normals
+into UnifiedComp. Probably it would be better
+to separate out a version of UnifiedComp that takes
+points (the rho/omega version can implement that. *)
   
 
+
+
+On[Assert];
+
+TestRegularTets[] :=
+With[{
+    L0 = 1/3,
+    tetAngle = ArcTan[Sqrt[2]/2]},
+  With[{
+    NB1 = {0,-Sin[tetAngle],-Cos[tetAngle]},
+    NC1 = {0,-Sin[tetAngle],Cos[tetAngle]},
+    tau = 2 Pi /3
+    },
+    With[{
+        A = AfromLtauNBNC[L0,tau,NB1,NC1]},
+      Print[N[A]];
+      With[{ B = {0,0,-L0/2},
+          D = {-A[[1]],A[[2]],-A[[3]]}
+        },
+        Print[4444];
+        Print[L0];
+        Print[N[B]];
+        Print[N[D]];
+        With[{ res = UnifiedCompTwoPoints[L0,B,D],
+            theta = ArcCos[-2/3]},
+          Print[N[res]];
+          Print[33333];
+          Print[N[res[[2]]] 180 / Pi];
+          Assert[Abs[res[[2]] - theta] < 0.00001];
+]]]]]
