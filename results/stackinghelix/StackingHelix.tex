@@ -216,18 +216,22 @@ object.''
 \subsection{Relating Face Angles to Face Normal}
 
 Although intercomputable, we certainly want to be able to compute
-the coordinates or the point $B_1$ (the joint point of the second object),
+the coordinates or the point $C_1$ (the joint point of the second object),
 or equivalently, the axis vector of the second object.
 
 This depends not solely on one face, but on how they combine, and in
 particular how they combine via the twist $\tau$. We use $\omega$ and $\rho$
 to capture this combination.
-\begin{align}
-  \omega &= \alpha_B + \alpha_A \cos{\tau} + \beta_A \sin{\tau} \\
-  \rho &= \beta_B + \beta_A \cos{\tau}  + \alpha_A \sin{\tau}
-\end{align}
-$\omega$ is the rotation about the $y$-axis,
-$\rho$ is the rotation about the $x$-axis.
+
+A basic algorithmic approach to this to compute the unit vectors
+normal to faces $N_B$ and $N_A$, and let $A,B,C,D$ be four contigous
+points.
+Compute the rotation that aligns $N_B$ in the opposite direction to $N_A$.
+Apply this rotation to the vectors $AB$, and translate it to the
+point $B
+
+
+
 
 Given these angles and treating them as face diagonals,
 we can find the position of point $A_1$ via:
@@ -1962,35 +1966,160 @@ compute rho, omega in this platonic case. *)
 (* This is all wrong because the centroid to centroid distance is actually 1/3 *)
 (* These are values for a regular tetrahedron, I think. *)
 (* These numbers are wrong, I think... *)
-alphaA = Pi/3;
-alphaB = -Pi/3;
-betaA = (Pi/2 -  ArcTan[2 Sqrt[2]] Cos[Pi/ 6]);
-betaB = (Pi/2 - ArcTan[2 Sqrt[2]] Cos[Pi/ 6]);
-
-omegaFromAB[aa_,ab_,ba_,bb_,tau_] :=
-ab + aa Cos[tau] + ba Sin[tau]
-
-rhoFromAB[aa_,ab_,ba_,bb_,tau_] :=
-bb + ba Cos[tau] + aa Sin[tau]
-
-N[omegaFromAB[alphaA,alphaB,betaA,betaB,2 Pi/3] 180 / Pi]
-N[rhoFromAB[alphaA,alphaB,betaA,betaB,2 Pi/3] 180 / Pi]
-
-(* Now a serious test for correctness is if we use these rho and omega (for a tetrahedron),
-does the delix correspond to the BC tetrahelix? And what does ``correspond mean''?)
+alphaA = 0;
+alphaB = 0;
+betaA = ArcTan[Sqrt[2]/2];
+betaB = ArcTan[Sqrt[2]/2];
 
 
-(* A sanity check is that if tau = 0, omega should be 0 and rho five times should almost be 2Pi *)
-alphaR = 0;
-betaR = ArcTan[2 Sqrt[2]]/2;
-omegaFromAB[alphaR,alphaR,betaR,betaR,0]
-(* This should be about 10 degrees *)
-N[(2Pi - rhoFromAB[alphaR,alphaR,betaR,betaR,0] 5 ) 180 / Pi]
+tau = 2 Pi / 3;
 
-N[UnifiedComp5[1/3,rhoFromAB[alphaA,alphaB,betaA,betaB,2 Pi/3],
-    omegaFromAB[alphaA,alphaB,betaA,betaB,2 Pi/3] 180 / Pi]]
+(* I now believe these are wrong, and the approach is probably
+wrong. Instead we need to use Rodrigues' rule, rotate by tau,
+and get the resulting unit vector back and apply simple trig
+to it to get omega and rho. Note this also raises the
+question that it might be better to consider the face angles
+as unit vectors in the first place, but you still have to
+rotate them. However, possibly unfolding the definition of rho and
+omega as unit vectors will let us come closer to a formula.
+We will, however, write this as rotating a vector of length L,
+becasue that way a valuable point will be produced for our
+compuation later. *)
 
-N[UnifiedComp5[1/3,33.15 Pi / 180,
-    -6.587 Pi / 180]
+(* I may not need this with built in Mathematica stuff. *)
+vRot[k_,v_,theta_] := v Cos[theta] + Cross[k,v] Sin[theta]
++ k (k . v)(1 - Cos[theta])
 
+vRotM[k_,theta_] :=
+With[{ x = Part[k,1],
+    y = Part[k,2],
+    z = Part[k,3]},
+  With[{C = {
+        {0, -z, y},
+        {z, 0, -x},
+        {-y,x, 0}
+    }},
+    Print[C // MatrixForm];
+    Print[(1 - Cos[theta])C^2 // MatrixForm];
+    Print[IdentityMatrix[3] + (1 - Cos[theta])C^2 // MatrixForm];
+    Print[IdentityMatrix[3] + (Sin[theta] C)+ (1 - Cos[theta])C^2 // MatrixForm];        
+    IdentityMatrix[3] + (Sin[theta] C) + (1 - Cos[theta]) C^2]]
+
+vRotAux[k_,v_,theta_] :=
+vRotM[k,theta].v
+
+(* NOTE: This is incorrect, the vector v must be rotated into
+k. I is the opposite of k (if symmetric) but must be rotated. *)
+testvRot[tau_] :=
+With[{alphaA = 0,
+    alphaB = 0,
+    betaA = -ArcTan[Sqrt[2]/2],
+    betaB = ArcTan[Sqrt[2]/2],
+    L = 1
+  },
+  With[{k = Normalize[{Sin[alphaB],Sin[betaB],Cos[betaB]}]},
+    With[{
+      v = Normalize[-L {Sin[alphaA],Sin[betaA],Cos[betaA]} + k]
+    },
+    Print[k];
+    Print[Norm[k]];    
+    Print[v];
+    Print[Norm[v]];
+    With[{ rt = RotationTransform[tau,k]},
+      With[{
+          (*  vr = vRot[k,v,tau] *)
+          vr = rt[v]
+        },
+      Print[N[vr]];
+      Print[Norm[vr]];
+      Print[N[Normalize[vr]]];       
+      With[{ x = Part[vr,1],
+          y = Part[vr,2],
+          z = Part[vr,3]},
+        With[{ ro =
+            (* Warning: Mathematic uses x,y order here, Javascript other *)
+            { ArcTan[z,y],ArcTan[z,x]}},
+          Print[N[ro 180 / Pi]];
+          ro]]]]]]]
+        
+      
+
+
+N[ArcTan[Sqrt[2]/2]]
+
+
+(* Starting new work here. This is an attempt to compute
+the point A (and thereby D) from NB and NC (normal vectors)
+and tau (and L). This is based on my new understand that
+we can compute a vector to be rotated.
+
+I hope to test this with both regular regular objects,
+but in the end with the regular tetrahedron, for which
+we have a known solution (via Javascript work.)
+
+Variables:
+
+NB = Vector normal of the face containing B
+NC = Vector normal of the face containg C
+L = distance between B and C
+tau = the twist
+
+PA = the projection of BA onto the vector NB
+R = The up-pointing rejection of BA onto NB. (perpendicular)
+delta = angle between NC and the axis
+gamma = angle between the XZ plane and the NB vector.
+
+V0 = Vector to be rotated
+
+AfromParams[v0,taux,NB] -- a function to compute A
+
+V0fromLNB[L,NB,delta]
+
+TestAWith225s[] = test AfromParams with faces cut and 22.5 degrees
+
+*)
+
+AngleWithXZ[v_] :=
+VectorAngle[{v[[1]],0,v[[3]]},v]
+
+(* I now believe this should be done with a rotation.
+V0 is a rotation of NB vector by delta in the pure
+up direction (that is, in the ZY plane about {1,0,0}
+V0fromLNB[L_,NB_,delta_] :=
+With[{k = Normalize[NB],
+    theta = AngleWithXZ[NB],
+    rt = RotationTransform[delta,{1,0,0}]},
+  rt[NB]
+  ]
+
+AfromParam[v0_,tau_,NB_] :=
+With[{k = Normalize[NB]},
+  Print[N[k]];
+  Print[tau];
+  Print[N[v0]];
+  With[{ rt = RotationTransform[tau,k]},
+    rt[v0]]]
+
+AfromLtauNBNC[L_,tau_,NB_,NC_] :=
+With[{delta = VectorAngle[NC,{0,0,1}]},
+    With[{v0 = V0fromLNB[L,NB,delta]},
+        AfromParam[v0,tau,NB]]]
+
+(* For testing, I create a block of size 1
+with NB and NC based on half of a 45 degree angle. *)
+
+TestAfromLtauNBNC[tau_] :=
+With[{
+    L0 = 1,
+    NB0 = {0,-Sin[Pi/8],-Cos[Pi/8]},
+    NC0 = {0,Sin[Pi/8],Cos[Pi/8]},
+    tetAngle =  ArcTan[Sqrt[2]/2]},
+  With[{
+    NB1 = {0,-Sin[tetAngle],-Cos[tetAngle]},
+    NC1 = {0,-Sin[tetAngle],-Cos[tetAngle]}
+    },
+  (* Print[AfromLtauNBNC[L0,tau,NB0,NC0]]; *)
+  AfromLtauNBNC[L0,tau,NB1,NC1]]]
+  
+  
 
