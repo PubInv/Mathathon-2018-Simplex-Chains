@@ -2124,40 +2124,102 @@ VectorAngle[{v[[1]],0,v[[3]]},v]
 
 (* I now believe this should be done with a rotation.
 V0 is a rotation of NB vector by delta in the pure
-up direction (that is, in the ZY plane about {1,0,0}
+up direction (that is, in the ZY plane about {1,0,0} *)
 V0fromLNB[L_,NB_,NC_,delta_] :=
 With[{k = Normalize[NB],
     rt = RotationTransform[-delta,{1,0,0}]},
-  Print[N[delta] 180 / Pi];
-  Print[9999];
   With[{ v0 = L Normalize[rt[NB]]},
-    Print[v0];
-    Print[N[VectorAngle[v0,k]] 180 / Pi];
-    Print[5555];
     v0]
   ]
 
 ADirFromParam[L_,v0_,tau_,NB_] :=
 With[{k = Normalize[NB]},
-  Print[N[k]];
-  Print[tau];
-  Print[N[v0]];
   With[{ rt = RotationTransform[tau,k]},
     L  Normalize[rt[v0]]]]
 
+ComputeBalancingRotation[NB_,NC_] :=
+(* our stategy will be to project on the XY plane,
+and then compute the midpoint vector *)
+With[{ NBN = Normalize[NB],
+    NCN = Normalize[NC]},
+  With[{Bp = {NBN[[1]],NBN[[2]]},
+      Cp = {NCN[[1]],NCN[[2]]}},
+    Print[N[{Bp,Cp}]];
+    With[{ ba = ArcTan[Bp[[1]],Bp[[2]]],
+           ca = ArcTan[Cp[[1]],Cp[[2]]]},
+    Print[N[ba] 180 / Pi];
+    Print[N[ca] 180 / Pi];
+    Print[N[(ba+ca)/2] 180 / Pi];
+    With[{m = Bp+Cp},
+      With[{mn = m / 2},
+        Print[N[ArcTan[mn[[1]],mn[[2]]]] 180 / Pi];                  
+        (* We want to return the angle that makes the negative of this vector point up *)
+        Print[N[mn]];
+        With[{theta = -(ba+ca)/2 + -Pi/2 },
+          Print[70707070];
+          Print[N[theta] 180 / Pi];
+          With[{
+              (*              rt = RotationTransform[{{mn[[1]],mn[[2]],0},{0,-1,0}}] *)
+              rt = RotationTransform[-theta,{0,0,-1}]
+            },
+            With[{ Br = rt[NB],
+                Cr = rt[NC]},
+              Print[N[{theta,Br,Cr}]];
+              {theta,Br,Cr}
+      ]]]]]]]]
+      
+TestComputeBalancingRotation[] :=
+With[{C = {1,1/2,1},
+    B = {-1/2,-1,-1}},
+  With[{res = ComputeBalancingRotation[B,C]},
+    Print[res];
+    With[{ theta = res[[1]],
+        Br = res[[2]],
+        Cr = res[[3]]},
+      With[{Bp = Normalize[{Br[[1]],Br[[2]]}],
+          Cp = Normalize[{Cr[[1]],Cr[[2]]}]},
+        Print[8888888];
+        Print[N[Bp]];
+        Print[N[Cp]];
+          Assert[N[Bp[[1]]] == -N[Cp[[1]]]];
+        Assert[N[Bp[[1]]] == -N[Cp[[1]]]];
+        Assert[Bp[[2]] < 0];
+        Assert[Cp[[2]] < 0];
+        res
+  ]]]]
+
+TestComputeBalancingRotation2[] :=
+With[{C = {1,3/4,1},
+    B = {1,0,-1}},
+  With[{res = ComputeBalancingRotation[B,C]},
+    Print[N[res]];
+    With[{ theta = res[[1]],
+        Br = res[[2]],
+        Cr = res[[3]]},
+      With[{Bp = Normalize[{Br[[1]],Br[[2]]}],
+          Cp = Normalize[{Cr[[1]],Cr[[2]]}]},
+         Print[8888888];
+        Print[N[Bp]];
+        Print[N[Cp]];
+        Assert[N[Bp[[1]]] == -N[Cp[[1]]]];
+        Assert[N[Bp[[1]]] == -N[Cp[[1]]]];
+        Assert[Bp[[2]] < 0];
+        Assert[Cp[[2]] < 0];
+        res
+  ]]]]
+
 (* Warning: I may not have the sign of this correct. *)
- AfromLtauNBNC[L_,tau_,NB_,NC_] :=
-With[{delta = VectorAngle[{0,0,1},NC]},
-  Print[N[delta]];
-  With[{v0 = V0fromLNB[L,NB,NC,delta]},
-    Assert[Norm[v0] == L];
-    With[{ Ad = ADirFromParam[L,v0,tau,NB],
-        B = {0,0,-L/2}},
-      Assert[Abs[Norm[Ad] -L ] < 0.00001];
-      Print[N[Ad]];
-      Print[N[B]];
-      Print[2222];
-      Ad + B]]]
+AfromLtauNBNC[L_,tau_,NBunb_,NCunb_] :=
+With[{ res = ComputeBalancingRotation[NBunb,NCunb]},
+  With[{NB = res[[2]],
+    NC = res[[3]]},
+    With[{delta = VectorAngle[{0,0,1},NC]},
+      With[{v0 = V0fromLNB[L,NB,NC,delta]},
+        Assert[N[Norm[v0]] == L];
+        With[{ Ad = ADirFromParam[L,v0,tau,NB],
+            B = {0,0,-L/2}},
+          Assert[Abs[Norm[Ad] -L ] < 0.00001];
+          Ad + B]]]]]
 
 (* For testing, I create a block of size 1
 with NB and NC based on half of a 45 degree angle. *)
@@ -2226,3 +2288,33 @@ With[{
           Print[N[res[[2]]] 180 / Pi];
           Assert[Abs[res[[2]] - theta] < 0.00001];
 ]]]]]
+
+TestRegularTets2[] :=
+With[{
+    L0 = 1,
+    tetAngle = ArcTan[Sqrt[2]/2],
+    testRot = Pi/17
+  },
+  With[{ rt = RotationTransform[testRot,{0,0,1}]},
+    With[{
+        NB1 = rt[{0,-Sin[tetAngle],-Cos[tetAngle]}],
+        NC1 = rt[{0,-Sin[tetAngle],Cos[tetAngle]}],
+        tau = 2 Pi /3
+      },
+      With[{
+          A = AfromLtauNBNC[L0,tau,NB1,NC1]},
+        Print[N[A]];
+        With[{ B = {0,0,-L0/2},
+            D = {-A[[1]],A[[2]],-A[[3]]}
+          },
+          Print[4444];
+          Print[L0];
+          Print[N[B]];
+          Print[N[D]];
+          With[{ res = UnifiedCompTwoPoints[L0,B,D],
+              theta = ArcCos[-2/3]},
+            Print[N[res]];
+            Print[33333];
+            Print[N[res[[2]]] 180 / Pi];
+            Assert[Abs[res[[2]] - theta] < 0.00001];
+]]]]]]
